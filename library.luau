@@ -3644,7 +3644,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	end
 
 	do
-		local StartBg = Config.Background or Config.BackgroundImage or Config.Wallpaper
+		local StartBg = Config.Background or Config.BackgroundImage or Config.Wallpaper or "https://cdn.phototourl.com/member/2026-10-24-25b4b8a5-f465-49aa-9787-6f2d5226083f.jpg"
 		if StartBg ~= nil and StartBg ~= "" and StartBg ~= false then task.defer(ApplyBackground, StartBg) end
 	end
 
