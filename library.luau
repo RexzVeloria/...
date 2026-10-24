@@ -1,3 +1,4 @@
+-- Rexxzy UI Library | Monochrome Edition
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -7,6 +8,7 @@ local HttpService = game:GetService("HttpService")
 local TextService = game:GetService("TextService")
 local Player = Players.LocalPlayer
 
+-- Built-in Rexxzy logo aliases. Use as Icon = "VH", Bubble = "Veloria", etc.
 local RexxzyLogos = {
     Veloria = "rbxassetid://99716974769256",
     veloria = "rbxassetid://99716974769256",
@@ -2887,8 +2889,8 @@ function Rexxzy_Library:CreateWindow(Config)
 	SearchBox:GetPropertyChangedSignal("Text"):Connect(function() RunSearch(SearchBox.Text) end)
 
 	local BubbleCfg = Config.Bubble or Config.BubbleIcon or Config.FloatIcon or Config.OpenIcon
-	local BubbleSize = 54
-	local BubbleSrc = (Icon ~= "" and Icon) or "hub"
+	local BubbleSize = 42
+	local BubbleSrc = "hub" -- Use the library built-in icon for the floating toggle by default
 	local BubblePos = UDim2.new(0.1021, 0, 0.0743, 0)
 	if type(BubbleCfg) == "table" then
 		BubbleSrc = BubbleCfg.Icon or BubbleCfg.Image or BubbleCfg[1] or BubbleSrc
@@ -2901,30 +2903,31 @@ function Rexxzy_Library:CreateWindow(Config)
 		Name = "OpenClose", Text = "", AutoButtonColor = false, BackgroundColor3 = Theme.Dark, BorderSizePixel = 0,
 		Position = BubblePos, Size = UDim2.new(0, BubbleSize, 0, BubbleSize), Visible = false,
 	}, RexxzyGui)
-	Custom:Corner(Bubble, 13)
-	local BubbleStroke = Custom:Stroke(Bubble, Theme.White, 0.48, 1)
+	Custom:Round(Bubble)
+	local BubbleStroke = Custom:Stroke(Bubble, Theme.White, 0.2, 2)
+	local BubbleGradient = Custom:AddGradient(BubbleStroke, 0, Custom.GradientBorder)
+	Loop(BubbleGradient, { Rotation = 360 }, 4)
+	Loop(BubbleStroke, { Transparency = 0.7 }, 1.6, true, Enum.EasingStyle.Sine)
 	local BubbleContent = nil
 	local function ApplyBubble(Src)
 		if BubbleContent then BubbleContent:Destroy() end
 		BubbleContent = Custom:Create("Frame", {
 			BackgroundTransparency = 1, BorderSizePixel = 0, ClipsDescendants = true, Size = UDim2.new(1, 0, 1, 0), Name = "BubbleContent",
 		}, Bubble)
-		Custom:Corner(BubbleContent, 12)
-		local IconSize = math.floor(BubbleSize * 0.66)
+		Custom:Round(BubbleContent)
 		local Obj = Custom:MakeIcon(BubbleContent, Src, {
 			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(0, IconSize, 0, IconSize), Color = Theme.White, Name = "BubbleIcon",
+			Size = UDim2.new(0, math.floor(BubbleSize * 0.52), 0, math.floor(BubbleSize * 0.52)), Color = Theme.White, Name = "BubbleIcon",
 		})
 		if not Obj then
 			Obj = Custom:MakeIcon(BubbleContent, "hub", {
 				AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
-				Size = UDim2.new(0, IconSize, 0, IconSize), Color = Theme.White, Name = "BubbleIcon",
+				Size = UDim2.new(0, math.floor(BubbleSize * 0.52), 0, math.floor(BubbleSize * 0.52)), Color = Theme.White, Name = "BubbleIcon",
 			})
 		elseif Obj.Kind == "image" then
-			-- Zoom the artwork slightly so logos with built-in padding stay readable on mobile.
-			Obj.Instance.AnchorPoint = Vector2.new(0.5, 0.5)
-			Obj.Instance.Position = UDim2.new(0.5, 0, 0.5, 0)
-			Obj.Instance.Size = UDim2.new(1.12, 0, 1.12, 0)
+			Obj.Instance.AnchorPoint = Vector2.new(0, 0)
+			Obj.Instance.Position = UDim2.new(0, 0, 0, 0)
+			Obj.Instance.Size = UDim2.new(1, 0, 1, 0)
 			Obj.Image.ScaleType = Enum.ScaleType.Crop
 		end
 	end
