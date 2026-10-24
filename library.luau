@@ -2900,14 +2900,11 @@ function Rexxzy_Library:CreateWindow(Config)
 		BubbleSrc = BubbleCfg
 	end
 	local Bubble = Custom:Create("TextButton", {
-		Name = "OpenClose", Text = "", AutoButtonColor = false, BackgroundColor3 = Theme.Dark, BorderSizePixel = 0,
+		Name = "OpenClose", Text = "", AutoButtonColor = false, BackgroundColor3 = Color3.fromRGB(0, 0, 0), BorderSizePixel = 0,
 		Position = BubblePos, Size = UDim2.new(0, BubbleSize, 0, BubbleSize), Visible = false,
 	}, RexxzyGui)
 	Custom:Round(Bubble)
-	local BubbleStroke = Custom:Stroke(Bubble, Theme.White, 0.2, 2)
-	local BubbleGradient = Custom:AddGradient(BubbleStroke, 0, Custom.GradientBorder)
-	Loop(BubbleGradient, { Rotation = 360 }, 4)
-	Loop(BubbleStroke, { Transparency = 0.7 }, 1.6, true, Enum.EasingStyle.Sine)
+	local BubbleStroke = Custom:Stroke(Bubble, Color3.fromRGB(255, 255, 255), 0, 1.5)
 	local BubbleContent = nil
 	local function ApplyBubble(Src)
 		if BubbleContent then BubbleContent:Destroy() end
