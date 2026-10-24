@@ -1,3 +1,4 @@
+-- Rexxzy UI Library | Monochrome Edition
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -7,6 +8,7 @@ local HttpService = game:GetService("HttpService")
 local TextService = game:GetService("TextService")
 local Player = Players.LocalPlayer
 
+-- Built-in Rexxzy logo aliases. Use as Icon = "VH", Bubble = "Veloria", etc.
 local RexxzyLogos = {
     Veloria = "rbxassetid://99716974769256",
     veloria = "rbxassetid://99716974769256",
@@ -405,12 +407,14 @@ do
 
 	function Custom:Hover(Card, Stroke)
 		Card.MouseEnter:Connect(function()
-			Custom:Tween(Card, 0.15, { BackgroundTransparency = 0 })
-			Custom:Tween(Stroke, 0.15, { Transparency = 0.7 })
+			Card.BackgroundColor3 = Theme.Black
+			Card.BackgroundTransparency = 0
+			if Stroke then Stroke.Color = Theme.White Stroke.Transparency = 0 end
 		end)
 		Card.MouseLeave:Connect(function()
-			Custom:Tween(Card, 0.2, { BackgroundTransparency = 0 })
-			Custom:Tween(Stroke, 0.2, { Transparency = 0.92 })
+			Card.BackgroundColor3 = Theme.Black
+			Card.BackgroundTransparency = 0
+			if Stroke then Stroke.Color = Theme.White Stroke.Transparency = 0 end
 		end)
 	end
 
@@ -2455,10 +2459,8 @@ function Rexxzy_Library:CreateWindow(Config)
 	}, DropShadowHolder)
 	Custom:Corner(Main, 12)
 	Custom:AddGradient(Main, 125, Custom.GradientWindow)
-	local MainStroke = Custom:Stroke(Main, Theme.White, 0.25, 1.5)
-	local MainStrokeGradient = Custom:AddGradient(MainStroke, 0, Custom.GradientBorder)
-	Loop(MainStrokeGradient, { Rotation = 360 }, 6)
-	Loop(MainStroke, { Transparency = 0.75 }, 2, true, Enum.EasingStyle.Sine)
+	local MainStroke = Custom:Stroke(Main, Theme.White, 0, 1.5)
+	-- No animated gradient/transparency on the outer border: keep it crisp white.
 
 	local BgImage = Custom:Create("ImageLabel", {
 		BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), ZIndex = 0,
@@ -2700,11 +2702,11 @@ function Rexxzy_Library:CreateWindow(Config)
 	Custom:Round(MinBar)
 	Min.MouseEnter:Connect(function()
 		Custom:Tween(Min, 0.15, { BackgroundTransparency = 0 })
-		Custom:Tween(MinStroke, 0.15, { Transparency = 0.5 })
+		MinStroke.Transparency = 0
 	end)
 	Min.MouseLeave:Connect(function()
 		Custom:Tween(Min, 0.2, { BackgroundTransparency = 0 })
-		Custom:Tween(MinStroke, 0.2, { Transparency = 0.8 })
+		MinStroke.Transparency = 0
 	end)
 
 	if Config.Tags or Config[7] then
@@ -2737,11 +2739,11 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	SearchBox.Focused:Connect(function()
 		if SearchIconObj then SearchIconObj.SetColor(Theme.White, true) end
-		Custom:Tween(SearchStroke, 0.15, { Transparency = 0.5 })
+		SearchStroke.Transparency = 0
 	end)
 	SearchBox.FocusLost:Connect(function()
 		if SearchIconObj then SearchIconObj.SetColor(Theme.Sub, true) end
-		Custom:Tween(SearchStroke, 0.15, { Transparency = 0.9 })
+		SearchStroke.Transparency = 0
 	end)
 
 	local Layers = Custom:Create("Frame", {
@@ -3670,7 +3672,8 @@ function Rexxzy_Library:CreateWindow(Config)
 	end
 
 	do
-		local StartBg = Config.Background or Config.BackgroundImage or Config.Wallpaper or "https://cdn.phototourl.com/member/2026-10-24-25b4b8a5-f465-49aa-9787-6f2d5226083f.jpg"
+		-- Pure Black x White by default. A wallpaper is used only when explicitly passed in Config.
+		local StartBg = Config.Background or Config.BackgroundImage or Config.Wallpaper
 		if StartBg ~= nil and StartBg ~= "" and StartBg ~= false then task.defer(ApplyBackground, StartBg) end
 	end
 
@@ -3717,18 +3720,26 @@ function Rexxzy_Library:CreateWindow(Config)
 		local TabFuncs = { Frame = TabFrame, Button = TabBtn, Name = TabName }
 
 		TabBtn.MouseEnter:Connect(function()
-			if ActiveTab ~= TabFuncs then Custom:Tween(TabFill, 0.15, { BackgroundTransparency = 0.94 }) end
+			if ActiveTab ~= TabFuncs then
+				TabFill.BackgroundTransparency = 0
+				TabLabel.TextColor3 = Theme.Black
+				if TabIconImg then TabIconImg.SetColor(Theme.Black, true) end
+			end
 		end)
 		TabBtn.MouseLeave:Connect(function()
-			if ActiveTab ~= TabFuncs then Custom:Tween(TabFill, 0.2, { BackgroundTransparency = 1 }) end
+			if ActiveTab ~= TabFuncs then
+				TabFill.BackgroundTransparency = 1
+				TabLabel.TextColor3 = Theme.White
+				if TabIconImg then TabIconImg.SetColor(Theme.White, true) end
+			end
 		end)
 
 		local function Deactivate(T)
 			T.Frame.Visible = false
-			Custom:Tween(T.Fill, 0.15, { BackgroundTransparency = 1 })
-			Custom:Tween(T.Indicator, 0.15, { Size = UDim2.new(0, 3, 0, 0) })
-			Custom:Tween(T.Label, 0.15, { TextColor3 = Theme.Sub })
-			if T.IconImg then T.IconImg.SetColor(Theme.Sub, true) end
+			T.Fill.BackgroundTransparency = 1
+			T.Indicator.Size = UDim2.new(0, 3, 0, 0)
+			T.Label.TextColor3 = Theme.White
+			if T.IconImg then T.IconImg.SetColor(Theme.White, true) end
 		end
 
 		local function SelectTab()
@@ -3739,10 +3750,10 @@ function Rexxzy_Library:CreateWindow(Config)
 			TabFrame.Position = UDim2.new(0, 0, 0, 12)
 			TabFrame.Visible = true
 			Custom:Tween(TabFrame, 0.25, { Position = UDim2.new(0, 0, 0, 0) })
-			Custom:Tween(TabFill, 0.2, { BackgroundTransparency = 0.86 })
-			Custom:Tween(TabIndicator, 0.25, { Size = UDim2.new(0, 3, 0, 14) }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-			Custom:Tween(TabLabel, 0.15, { TextColor3 = Theme.White })
-			if TabIconImg then TabIconImg.SetColor(Theme.White, true) end
+			TabFill.BackgroundTransparency = 0
+			TabIndicator.Size = UDim2.new(0, 3, 0, 14)
+			TabLabel.TextColor3 = Theme.Black
+			if TabIconImg then TabIconImg.SetColor(Theme.Black, true) end
 		end
 
 		TabFuncs.Fill = TabFill
@@ -3900,7 +3911,7 @@ function Rexxzy_Library:CreateWindow(Config)
 					Position = UDim2.new(1, -10, 0.5, 0), Size = UDim2.new(0, 32, 0, 16), Name = "SwitchBg",
 				}, ToggleFrame)
 				Custom:Round(SwitchBg)
-				local SwitchStroke = Custom:Stroke(SwitchBg, Theme.White, 0.85, 1)
+				local SwitchStroke = Custom:Stroke(SwitchBg, Theme.White, 0, 1)
 				local SwitchFill = Custom:Create("Frame", {
 					BackgroundColor3 = Theme.White, BackgroundTransparency = 1, BorderSizePixel = 0,
 					Size = UDim2.new(1, 0, 1, 0), Name = "SwitchFill",
@@ -3918,7 +3929,7 @@ function Rexxzy_Library:CreateWindow(Config)
 					local Fill = State and 0 or 1
 					local Dot = State and UDim2.new(1, -13, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
 					local DotColor = State and Color3.fromRGB(0, 0, 0) or Theme.Sub
-					local StrokeT = State and 1 or 0.85
+					local StrokeT = 0
 					if Animate then
 						Custom:Tween(SwitchFill, 0.2, { BackgroundTransparency = Fill })
 						Custom:Tween(SwitchStroke, 0.2, { Transparency = StrokeT })
