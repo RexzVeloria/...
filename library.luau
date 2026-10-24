@@ -293,16 +293,17 @@ function RexxzyWebhook:AttachToLibrary(lib, configNameOrObj)
 end
 
 local Theme = {
+	-- Strict Black x White palette: no grey panels or red accent states.
 	Accent = Color3.fromRGB(255, 255, 255),
-	AccentSoft = Color3.fromRGB(205, 205, 205),
-	Dark = Color3.fromRGB(14, 14, 14),
-	Panel = Color3.fromRGB(24, 24, 24),
-	Field = Color3.fromRGB(12, 12, 12),
-	Text = Color3.fromRGB(238, 238, 238),
-	Sub = Color3.fromRGB(150, 150, 150),
-	Off = Color3.fromRGB(52, 52, 52),
-	Red = Color3.fromRGB(226, 52, 60),
-	RedHover = Color3.fromRGB(255, 84, 92),
+	AccentSoft = Color3.fromRGB(255, 255, 255),
+	Dark = Color3.fromRGB(0, 0, 0),
+	Panel = Color3.fromRGB(0, 0, 0),
+	Field = Color3.fromRGB(0, 0, 0),
+	Text = Color3.fromRGB(255, 255, 255),
+	Sub = Color3.fromRGB(255, 255, 255),
+	Off = Color3.fromRGB(0, 0, 0),
+	Red = Color3.fromRGB(0, 0, 0),
+	RedHover = Color3.fromRGB(0, 0, 0),
 	White = Color3.fromRGB(255, 255, 255),
 	Black = Color3.fromRGB(0, 0, 0),
 }
@@ -314,19 +315,19 @@ do
 	Custom.DefaultIcon = "rbxassetid://18505728250"
 	Custom.GradientWhite = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(176, 176, 176)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
 	})
 	Custom.GradientBorder = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(235, 235, 235)),
-		ColorSequenceKeypoint.new(0.25, Color3.fromRGB(38, 38, 38)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0.25, Color3.fromRGB(0, 0, 0)),
 		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(38, 38, 38)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(235, 235, 235)),
+		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(0, 0, 0)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
 	})
 	Custom.GradientWindow = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(8, 8, 8)),
-		ColorSequenceKeypoint.new(0.55, Color3.fromRGB(20, 20, 20)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(38, 38, 38)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
+		ColorSequenceKeypoint.new(0.55, Color3.fromRGB(0, 0, 0)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
 	})
 	Custom.GradientLine = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
@@ -390,7 +391,7 @@ do
 
 	function Custom:Card(Parent, Height, Name, Clickable)
 		local Card = Custom:Create(Clickable and "TextButton" or "Frame", {
-			BackgroundColor3 = Theme.White, BackgroundTransparency = 0.93, BorderSizePixel = 0,
+			BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, Height), Name = Name,
 		}, nil)
 		if Clickable then
@@ -405,11 +406,11 @@ do
 
 	function Custom:Hover(Card, Stroke)
 		Card.MouseEnter:Connect(function()
-			Custom:Tween(Card, 0.15, { BackgroundTransparency = 0.88 })
+			Custom:Tween(Card, 0.15, { BackgroundTransparency = 0 })
 			Custom:Tween(Stroke, 0.15, { Transparency = 0.7 })
 		end)
 		Card.MouseLeave:Connect(function()
-			Custom:Tween(Card, 0.2, { BackgroundTransparency = 0.93 })
+			Custom:Tween(Card, 0.2, { BackgroundTransparency = 0 })
 			Custom:Tween(Stroke, 0.2, { Transparency = 0.92 })
 		end)
 	end
@@ -1864,7 +1865,7 @@ function Rexxzy_Library:SetNotification(Config)
 	}, NotifContainer)
 
 	local Card = Custom:Create("Frame", {
-		BackgroundColor3 = Color3.fromRGB(18, 18, 18), BackgroundTransparency = 0.04, BorderSizePixel = 0,
+		BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0.04, BorderSizePixel = 0,
 		Position = UDim2.new(1, NOTIF_WIDTH + 20, 0, 0), Size = UDim2.new(1, 0, 1, 0), Name = "Card",
 		ClipsDescendants = true,
 	}, Slot)
@@ -2450,7 +2451,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	local WindowScale = Custom:Create("UIScale", { Scale = Base * 0.9 }, DropShadowHolder)
 
 	local Main = Custom:Create("Frame", {
-		BackgroundColor3 = Theme.White, BackgroundTransparency = 0.02, BorderSizePixel = 0,
+		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 		ClipsDescendants = true, Size = UDim2.new(1, 0, 1, 0), ZIndex = 1, Name = "Main",
 	}, DropShadowHolder)
 	Custom:Corner(Main, 12)
@@ -2551,7 +2552,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	Custom:AddGradient(TextLabel, 0)
 
 	local Separator = Custom:Label(TitleHolder, {
-		Text = "|", TextColor3 = Color3.fromRGB(90, 90, 90), TextSize = 13, LayoutOrder = 3,
+		Text = "|", TextColor3 = Color3.fromRGB(0, 0, 0), TextSize = 13, LayoutOrder = 3,
 		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 18), Name = "Separator",
 	})
 
@@ -2717,7 +2718,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	}, Main)
 
 	local SearchBoxContainer = Custom:Create("Frame", {
-		BackgroundColor3 = Theme.White, BackgroundTransparency = 0.93, BorderSizePixel = 0,
+		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 		Size = UDim2.new(1, 0, 0, 24), Name = "SBC",
 	}, Side)
 	Custom:Round(SearchBoxContainer)
@@ -2799,7 +2800,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	end)
 
 	local SearchPopup = Custom:Create("Frame", {
-		BackgroundColor3 = Color3.fromRGB(20, 20, 20), BackgroundTransparency = 0, BorderSizePixel = 0,
+		BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0, BorderSizePixel = 0,
 		ClipsDescendants = true, Position = UDim2.new(0, 0, 0, 28), Size = UDim2.new(1, 0, 0, 0),
 		Visible = false, ZIndex = 20, Name = "SearchPopup",
 	}, Side)
@@ -2889,6 +2890,8 @@ function Rexxzy_Library:CreateWindow(Config)
 	SearchBox:GetPropertyChangedSignal("Text"):Connect(function() RunSearch(SearchBox.Text) end)
 
 	local BubbleCfg = Config.Bubble or Config.BubbleIcon or Config.FloatIcon or Config.OpenIcon
+	local BubbleEnabled = Config.BubbleEnabled ~= false
+	local BubblePlatform = tostring(Config.BubblePlatform or "Both")
 	local BubbleSize = 42
 	local BubbleSrc = "hub" -- Use the library built-in icon for the floating toggle by default
 	local BubblePos = UDim2.new(0.1021, 0, 0.0743, 0)
@@ -2959,6 +2962,15 @@ function Rexxzy_Library:CreateWindow(Config)
 		end
 	end))
 
+	local function ShouldShowBubble()
+		if not BubbleEnabled then return false end
+		local Platform = string.lower(tostring(BubblePlatform))
+		if Platform == "mobile" or Platform == "mobile only" then
+			return UserInputService.TouchEnabled
+		end
+		return true
+	end
+
 	local function SetOpen(State)
 		if Destroyed then return end
 		Opened = State
@@ -2971,7 +2983,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			task.delay(0.15, function()
 				if Destroyed or Opened then return end
 				DropShadowHolder.Visible = false
-				Bubble.Visible = true
+				Bubble.Visible = ShouldShowBubble()
 			end)
 		end
 	end
@@ -3013,7 +3025,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), Visible = false, ZIndex = 49, Name = "ExitBackdrop",
 	}, Main)
 	local ExitConfirm = Custom:Create("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+		AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 		BorderSizePixel = 0, Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 230, 0, 104),
 		Visible = false, ZIndex = 50, Name = "ExitConfirm",
 	}, Main)
@@ -3093,6 +3105,22 @@ function Rexxzy_Library:CreateWindow(Config)
 	function Funcs:Destroy() Cleanup() end
 	function Funcs:Toggle() SetOpen(not Opened) end
 	function Funcs:SetOpen(State) SetOpen(State == true) end
+	Funcs.Gui = RexxzyGui
+	function Funcs:SetKeybind(NewKey)
+		if type(NewKey) == "string" then NewKey = Enum.KeyCode[NewKey] end
+		if typeof(NewKey) ~= "EnumItem" or NewKey.EnumType ~= Enum.KeyCode then return false end
+		Keybind = NewKey
+		return true
+	end
+	function Funcs:SetBubblePlatform(Platform)
+		local Value = string.lower(tostring(Platform or "Both"))
+		BubblePlatform = (Value == "mobile" or Value == "mobile only") and "Mobile" or "Both"
+		if not Opened then Bubble.Visible = ShouldShowBubble() end
+		return true
+	end
+	function Funcs:SetToggleButtonPlatform(Platform)
+		return self:SetBubblePlatform(Platform)
+	end
 
 	local Tabs = {}
 	local ActiveTab = nil
@@ -3134,7 +3162,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			Size = UDim2.new(1, 0, 1, 0), ZIndex = 59, Name = "DialogBackdrop",
 		}, Main)
 		local DFrame = Custom:Create("Frame", {
-			AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(20, 20, 20), BorderSizePixel = 0,
+			AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(0, 0, 0), BorderSizePixel = 0,
 			Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 230, 0, DH), ZIndex = 60, Name = "DialogFrame",
 		}, Main)
 		Custom:Corner(DFrame, 10)
@@ -3340,7 +3368,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		}, Main)
 		Custom:Corner(Overlay, 12)
 		local Panel = Custom:Create("Frame", {
-			Active = true, AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(18, 18, 18), BorderSizePixel = 0,
+			Active = true, AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(0, 0, 0), BorderSizePixel = 0,
 			Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, PANEL_W, 0, PANEL_H), ZIndex = 61, Visible = false, Name = "ColorPanel",
 		}, Main)
 		Custom:Corner(Panel, 10)
@@ -3447,7 +3475,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		end
 
 		local Presets = {
-			Color3.fromRGB(255, 255, 255), Color3.fromRGB(150, 150, 150), Color3.fromRGB(235, 64, 52), Color3.fromRGB(255, 159, 28),
+			Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 255, 255), Color3.fromRGB(235, 64, 52), Color3.fromRGB(255, 159, 28),
 			Color3.fromRGB(250, 222, 60), Color3.fromRGB(60, 200, 110), Color3.fromRGB(50, 190, 230), Color3.fromRGB(70, 110, 255),
 		}
 		local PresetButtons = {}
@@ -3890,7 +3918,7 @@ function Rexxzy_Library:CreateWindow(Config)
 					ToggleState = State
 					local Fill = State and 0 or 1
 					local Dot = State and UDim2.new(1, -13, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
-					local DotColor = State and Color3.fromRGB(14, 14, 14) or Theme.Sub
+					local DotColor = State and Color3.fromRGB(0, 0, 0) or Theme.Sub
 					local StrokeT = State and 1 or 0.85
 					if Animate then
 						Custom:Tween(SwitchFill, 0.2, { BackgroundTransparency = Fill })
@@ -4115,7 +4143,7 @@ function Rexxzy_Library:CreateWindow(Config)
 					Size = UDim2.new(1, 0, 1, -HEAD), Name = "Body",
 				}, DropdownFrame)
 				Custom:Create("Frame", {
-					BackgroundColor3 = Theme.White, BackgroundTransparency = 0.92, BorderSizePixel = 0,
+					BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 					Position = UDim2.new(0, 8, 0, 0), Size = UDim2.new(1, -16, 0, 1), Name = "Divider",
 				}, Body)
 
@@ -4536,14 +4564,14 @@ function Rexxzy_Library:CreateWindow(Config)
 					local Half = Lbl.TextBounds.X / 2 + 8
 					for _, Dir in ipairs({ -1, 1 }) do
 						Custom:Create("Frame", {
-							BackgroundColor3 = Theme.White, BackgroundTransparency = 0.88, BorderSizePixel = 0,
+							BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 							AnchorPoint = Vector2.new(Dir == -1 and 1 or 0, 0.5),
 							Position = UDim2.new(0.5, Dir * Half, 0.5, 0), Size = UDim2.new(0.5, -Half, 0, 1), Name = "SepLine",
 						}, SF)
 					end
 				else
 					Custom:Create("Frame", {
-						BackgroundColor3 = Theme.White, BackgroundTransparency = 0.88, BorderSizePixel = 0,
+						BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 						AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 0, 0.5, 0), Size = UDim2.new(1, 0, 0, 1), Name = "SepLine",
 					}, SF)
 				end
@@ -5058,9 +5086,9 @@ function KeySys.Defaults()
 		},
 		Appearance = {
 			Panel = Theme.White, Accent = Theme.White, Text = Theme.Text, SubText = Theme.Sub, Border = Theme.White,
-			Button = Theme.White, ButtonText = Color3.fromRGB(14, 14, 14), Secondary = Theme.White,
+			Button = Theme.White, ButtonText = Color3.fromRGB(0, 0, 0), Secondary = Theme.White,
 			Input = Theme.Field, InputText = Theme.Text, Success = Theme.White, Error = Theme.Red,
-			Warning = Color3.fromRGB(214, 214, 214), Info = Theme.AccentSoft,
+			Warning = Color3.fromRGB(255, 255, 255), Info = Theme.AccentSoft,
 			Font = Enum.Font.Gotham, FontBold = Enum.Font.GothamBold, IconSize = 16, IconAlign = "Left",
 			Animations = true, AnimationTime = 0.2, ReducedMotion = false,
 		},
@@ -5337,7 +5365,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 	local CSub = Col(App.SubText, Theme.Sub)
 	local CBorder = Col(App.Border, Theme.White)
 	local CButton = Col(App.Button, Theme.White)
-	local CButtonText = Col(App.ButtonText, Color3.fromRGB(14, 14, 14))
+	local CButtonText = Col(App.ButtonText, Color3.fromRGB(0, 0, 0))
 	local CSecondary = Col(App.Secondary, Theme.White)
 	local CInput = Col(App.Input, Theme.Field)
 	local CInputText = Col(App.InputText, Theme.Text)
