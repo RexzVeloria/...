@@ -293,18 +293,18 @@ function RexxzyWebhook:AttachToLibrary(lib, configNameOrObj)
 end
 
 local Theme = {
-	-- Strict Black x White palette: opaque black surfaces, solid white text/borders; preserve configured wallpaper.
-	Accent = Color3.fromRGB(255, 255, 255),
-	AccentSoft = Color3.fromRGB(255, 255, 255),
-	Dark = Color3.fromRGB(0, 0, 0),
-	Panel = Color3.fromRGB(0, 0, 0),
-	Field = Color3.fromRGB(0, 0, 0),
-	Text = Color3.fromRGB(255, 255, 255),
-	Sub = Color3.fromRGB(255, 255, 255),
-	Off = Color3.fromRGB(0, 0, 0),
-	Red = Color3.fromRGB(0, 0, 0),
-	RedHover = Color3.fromRGB(0, 0, 0),
-	White = Color3.fromRGB(255, 255, 255),
+	-- Soft monochrome: black surfaces, warm whites and charcoal details (not pure binary everywhere).
+	Accent = Color3.fromRGB(238, 238, 238),
+	AccentSoft = Color3.fromRGB(200, 200, 200),
+	Dark = Color3.fromRGB(14, 14, 14),
+	Panel = Color3.fromRGB(24, 24, 24),
+	Field = Color3.fromRGB(12, 12, 12),
+	Text = Color3.fromRGB(242, 242, 242),
+	Sub = Color3.fromRGB(165, 165, 165),
+	Off = Color3.fromRGB(48, 48, 48),
+	Red = Color3.fromRGB(190, 190, 190),
+	RedHover = Color3.fromRGB(220, 220, 220),
+	White = Color3.fromRGB(205, 205, 205),
 	Black = Color3.fromRGB(0, 0, 0),
 }
 
@@ -314,24 +314,24 @@ do
 	Custom.Theme = Theme
 	Custom.DefaultIcon = "rbxassetid://18505728250"
 	Custom.GradientWhite = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(238, 238, 238)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(190, 190, 190)),
 	})
 	Custom.GradientBorder = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(0.25, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(205, 205, 205)),
+		ColorSequenceKeypoint.new(0.25, Color3.fromRGB(65, 65, 65)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(175, 175, 175)),
+		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(65, 65, 65)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(205, 205, 205)),
 	})
 	Custom.GradientWindow = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(0.55, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(9, 9, 9)),
+		ColorSequenceKeypoint.new(0.55, Color3.fromRGB(17, 17, 17)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 28, 28)),
 	})
 	Custom.GradientLine = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 200, 200)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(135, 135, 135)),
 	})
 	Custom.FadeEnds = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
@@ -2459,8 +2459,8 @@ function Rexxzy_Library:CreateWindow(Config)
 	}, DropShadowHolder)
 	Custom:Corner(Main, 12)
 	Custom:AddGradient(Main, 125, Custom.GradientWindow)
-	local MainStroke = Custom:Stroke(Main, Theme.White, 0, 1.5)
-	-- No animated gradient/transparency on the outer border: keep it crisp white.
+	local MainStroke = Custom:Stroke(Main, Theme.White, 0.28, 1.2)
+	-- Keep the outer edge subtle; no looping bright gradient.
 
 	local BgImage = Custom:Create("ImageLabel", {
 		BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), ZIndex = 0,
@@ -3672,8 +3672,11 @@ function Rexxzy_Library:CreateWindow(Config)
 	end
 
 	do
-		-- Pure Black x White by default. A wallpaper is used only when explicitly passed in Config.
+		-- Keep the existing anime wallpaper by default, while still allowing caller overrides or explicit false.
 		local StartBg = Config.Background or Config.BackgroundImage or Config.Wallpaper
+		if StartBg == nil then
+			StartBg = "https://cdn.phototourl.com/member/2026-10-24-25b4b8a5-f465-49aa-9787-6f2d5226083f.jpg"
+		end
 		if StartBg ~= nil and StartBg ~= "" and StartBg ~= false then task.defer(ApplyBackground, StartBg) end
 	end
 
