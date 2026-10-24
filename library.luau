@@ -1,4 +1,3 @@
--- MugiHub UI Library | Monochrome Edition | github.com/4MugiHub/MugiHub
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -7,6 +6,15 @@ local VirtualUser = game:GetService("VirtualUser")
 local HttpService = game:GetService("HttpService")
 local TextService = game:GetService("TextService")
 local Player = Players.LocalPlayer
+
+local RexxzyLogos = {
+    Veloria = "rbxassetid://99716974769256",
+    veloria = "rbxassetid://99716974769256",
+    Verlo = "rbxassetid://99716974769256",
+    verlo = "rbxassetid://99716974769256",
+    VH = "rbxassetid://99716974769256",
+    vh = "rbxassetid://99716974769256",
+}
 
 local function SafeGetExecutor()
 	if identifyexecutor then
@@ -36,7 +44,7 @@ function WebhookConfig.new(name, cfg)
 	self.Name = name or "Config"
 	self.Enabled = cfg.Enabled ~= false
 	self.URL = cfg.URL or ""
-	self.Username = cfg.Username or "MugiHub"
+	self.Username = cfg.Username or "Rexxzy"
 	self.AvatarURL = cfg.AvatarURL or ""
 	self.SendPlayer = cfg.SendPlayer ~= false
 	self.SendGame = cfg.SendGame ~= false
@@ -256,20 +264,20 @@ end
 function WebhookConfig:SetEnabled(b) self.Enabled = b == true end
 function WebhookConfig:SetURL(u) self.URL = u or "" end
 
-local MugiWebhook = {}
-MugiWebhook._configs = {}
+local RexxzyWebhook = {}
+RexxzyWebhook._configs = {}
 
-function MugiWebhook:NewConfig(name, cfg)
+function RexxzyWebhook:NewConfig(name, cfg)
 	local c = WebhookConfig.new(name, cfg)
 	self._configs[name] = c
 	return c
 end
 
-function MugiWebhook:Get(name)
+function RexxzyWebhook:Get(name)
 	return self._configs[name]
 end
 
-function MugiWebhook:AttachToLibrary(lib, configNameOrObj)
+function RexxzyWebhook:AttachToLibrary(lib, configNameOrObj)
 	local cfg = type(configNameOrObj) == "string" and self._configs[configNameOrObj] or configNameOrObj
 	if not cfg or not lib then return end
 	if lib.SetNotification then
@@ -1343,7 +1351,7 @@ end
 
 local ImageCache = {}
 local ImagePending = {}
-local ImageFolder = "MugiHub/Cache"
+local ImageFolder = "Rexxzy/Cache"
 local ImageSession = {}
 
 local function Fnv(Str, Seed)
@@ -1586,7 +1594,7 @@ function Icons:Raster(Flat, Size, Thick, Source)
 	local Png = EncodePng(W, W, Rows)
 	local Ok, Asset = pcall(function()
 		if makefolder and isfolder then
-			if not isfolder("MugiHub") then makefolder("MugiHub") end
+			if not isfolder("Rexxzy") then makefolder("Rexxzy") end
 			if not isfolder(ImageFolder) then makefolder(ImageFolder) end
 		end
 		local Path = ImageFolder .. "/ico_" .. HashHex(Key) .. ".png"
@@ -1606,7 +1614,7 @@ local function ResolveImage(Url)
 	local Hash = HashHex(Url)
 	if makefolder and isfolder then
 		pcall(function()
-			if not isfolder("MugiHub") then makefolder("MugiHub") end
+			if not isfolder("Rexxzy") then makefolder("Rexxzy") end
 			if not isfolder(ImageFolder) then makefolder(ImageFolder) end
 		end)
 	end
@@ -1703,6 +1711,7 @@ end
 function Custom:MakeIcon(Parent, Source, Props)
 	if Source == nil or Source == "" or Source == false then return nil end
 	Props = Props or {}
+	if type(Source) == "string" then Source = RexxzyLogos[Source] or Source end
 	local Size = 16
 	if typeof(Props.Size) == "UDim2" then Size = Props.Size.X.Offset > 0 and Props.Size.X.Offset or 16 end
 	local Color = Props.Color or Theme.Sub
@@ -1796,8 +1805,14 @@ function Custom:Graphic(Parent, Source, Props)
 end
 
 
-local MugiHub_Library = {}
-MugiHub_Library.Unloaded = false
+local Rexxzy_Library = {}
+Rexxzy_Library.Unloaded = false
+Rexxzy_Library.Logos = RexxzyLogos
+
+function Rexxzy_Library:GetLogo(Name)
+    if type(Name) ~= "string" then return nil end
+    return RexxzyLogos[Name] or RexxzyLogos[string.lower(Name)] or RexxzyLogos[string.upper(Name)]
+end
 
 local NotifGui, NotifContainer, NotifCounter = nil, nil, 0
 local NOTIF_WIDTH = 240
@@ -1805,7 +1820,7 @@ local NOTIF_WIDTH = 240
 local function EnsureNotifGui()
 	if NotifGui and NotifGui.Parent then return end
 	NotifGui = Custom:Create("ScreenGui", {
-		Name = "MugiHubNotify", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false, DisplayOrder = 1000,
+		Name = "RexxzyNotify", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false, DisplayOrder = 1000,
 	}, Custom:GetGuiParent())
 	NotifContainer = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 1, BorderSizePixel = 0,
@@ -1817,7 +1832,7 @@ local function EnsureNotifGui()
 	}, NotifContainer)
 end
 
-function MugiHub_Library:SetNotification(Config)
+function Rexxzy_Library:SetNotification(Config)
 	if type(Config) == "string" then Config = { Content = Config } end
 	Config = Config or {}
 	EnsureNotifGui()
@@ -1916,13 +1931,13 @@ function MugiHub_Library:SetNotification(Config)
 end
 
 
-MugiHub_Library.Elements = {}
-MugiHub_Library.ConfigFolder = "MugiHub/Configs"
-MugiHub_Library.LegacyFolder = "MugiHub"
-MugiHub_Library.Loading = false
-MugiHub_Library.Flags = setmetatable({}, {
+Rexxzy_Library.Elements = {}
+Rexxzy_Library.ConfigFolder = "Rexxzy/Configs"
+Rexxzy_Library.LegacyFolder = "Rexxzy"
+Rexxzy_Library.Loading = false
+Rexxzy_Library.Flags = setmetatable({}, {
 	__index = function(_, Key)
-		local E = MugiHub_Library.Elements[Key]
+		local E = Rexxzy_Library.Elements[Key]
 		if E then
 			local ok, v = pcall(E.Get)
 			if ok then return v end
@@ -1946,8 +1961,8 @@ end
 local function EnsureFolders()
 	if not (makefolder and isfolder) then return end
 	pcall(function()
-		if not isfolder(MugiHub_Library.LegacyFolder) then makefolder(MugiHub_Library.LegacyFolder) end
-		if not isfolder(MugiHub_Library.ConfigFolder) then makefolder(MugiHub_Library.ConfigFolder) end
+		if not isfolder(Rexxzy_Library.LegacyFolder) then makefolder(Rexxzy_Library.LegacyFolder) end
+		if not isfolder(Rexxzy_Library.ConfigFolder) then makefolder(Rexxzy_Library.ConfigFolder) end
 	end)
 end
 
@@ -1964,8 +1979,8 @@ local function GetOwner()
 	end
 	Hw = Hw or "no-hwid"
 	OwnerCache = {
-		h = "h" .. Custom.HashHex("mugi-hw:" .. Hw),
-		u = "u" .. Custom.HashHex("mugi-uid:" .. tostring(Player.UserId)),
+		h = "h" .. Custom.HashHex("rexxzy-hw:" .. Hw),
+		u = "u" .. Custom.HashHex("rexxzy-uid:" .. tostring(Player.UserId)),
 	}
 	return OwnerCache
 end
@@ -1981,7 +1996,7 @@ local function CleanName(Name)
 end
 
 local function ConfigPath(Name)
-	return MugiHub_Library.ConfigFolder .. "/" .. tostring(Name) .. ".json"
+	return Rexxzy_Library.ConfigFolder .. "/" .. tostring(Name) .. ".json"
 end
 
 local function ReadJson(Path)
@@ -2027,8 +2042,8 @@ local function FireConfigs()
 	for _, Fn in ipairs(ConfigListeners) do pcall(Fn) end
 end
 
-local function IndexPath() return MugiHub_Library.ConfigFolder .. "/_index.json" end
-local function SettingsPath() return MugiHub_Library.ConfigFolder .. "/_settings.json" end
+local function IndexPath() return Rexxzy_Library.ConfigFolder .. "/_index.json" end
+local function SettingsPath() return Rexxzy_Library.ConfigFolder .. "/_settings.json" end
 
 local function SaveIndexSoon()
 	if IndexDirty or not FsReady() then return end
@@ -2088,18 +2103,18 @@ local function ReadHeader(Path)
 	return { h = {}, u = {}, t = 0, legacy = true }
 end
 
-function MugiHub_Library:GetOwner()
+function Rexxzy_Library:GetOwner()
 	local O = GetOwner()
 	return { Hwid = O.h, Account = O.u }
 end
 
-function MugiHub_Library:RefreshOwner()
+function Rexxzy_Library:RefreshOwner()
 	OwnerCache = nil
 	FireConfigs()
 	return self:GetOwner()
 end
 
-function MugiHub_Library:OnConfigsChanged(Fn)
+function Rexxzy_Library:OnConfigsChanged(Fn)
 	table.insert(ConfigListeners, Fn)
 	return {
 		Disconnect = function()
@@ -2108,7 +2123,7 @@ function MugiHub_Library:OnConfigsChanged(Fn)
 	}
 end
 
-function MugiHub_Library:RescanConfigs(Done, Force)
+function Rexxzy_Library:RescanConfigs(Done, Force)
 	if not FsReady() or not listfiles then
 		if Done then task.spawn(Done) end
 		return false
@@ -2136,7 +2151,7 @@ function MugiHub_Library:RescanConfigs(Done, Force)
 		if Force then ConfigIndex.Items = {} end
 		local Present = {}
 		local Reads = 0
-		local ok, Files = pcall(listfiles, MugiHub_Library.ConfigFolder)
+		local ok, Files = pcall(listfiles, Rexxzy_Library.ConfigFolder)
 		if ok and type(Files) == "table" then
 			for _, Path in ipairs(Files) do
 				local Name = string.match(tostring(Path), "([^/\\]+)%.json$")
@@ -2158,7 +2173,7 @@ function MugiHub_Library:RescanConfigs(Done, Force)
 		if not Settings.legacyDone then
 			Settings.legacyDone = true
 			SaveSettingsSoon()
-			local ok2, Old = pcall(listfiles, MugiHub_Library.LegacyFolder)
+			local ok2, Old = pcall(listfiles, Rexxzy_Library.LegacyFolder)
 			if ok2 and type(Old) == "table" then
 				local Moved = 0
 				for _, Path in ipairs(Old) do
@@ -2188,7 +2203,7 @@ function MugiHub_Library:RescanConfigs(Done, Force)
 	return true
 end
 
-function MugiHub_Library:GetConfigs()
+function Rexxzy_Library:GetConfigs()
 	if not ConfigIndex.Loaded and not ConfigIndex.Scanning then self:RescanConfigs() end
 	local Out = {}
 	for Name, It in pairs(ConfigIndex.Items) do
@@ -2198,7 +2213,7 @@ function MugiHub_Library:GetConfigs()
 	return Out
 end
 
-function MugiHub_Library:SaveConfig(Name, Silent)
+function Rexxzy_Library:SaveConfig(Name, Silent)
 	if not FsReady() then return false, "writefile is not supported" end
 	local Clean = CleanName(Name)
 	if not Clean then return false, "invalid config name" end
@@ -2235,7 +2250,7 @@ function MugiHub_Library:SaveConfig(Name, Silent)
 	return true, Clean
 end
 
-function MugiHub_Library:LoadConfig(Name, Done)
+function Rexxzy_Library:LoadConfig(Name, Done)
 	if not FsReady() then
 		if Done then task.spawn(Done, false, "readfile is not supported") end
 		return false, "readfile is not supported"
@@ -2285,7 +2300,7 @@ function MugiHub_Library:LoadConfig(Name, Done)
 	return true, Clean
 end
 
-function MugiHub_Library:DeleteConfig(Name)
+function Rexxzy_Library:DeleteConfig(Name)
 	if not (delfile and isfile) then return false end
 	local Clean = CleanName(Name)
 	if not Clean then return false end
@@ -2315,17 +2330,17 @@ function MugiHub_Library:DeleteConfig(Name)
 	return true
 end
 
-function MugiHub_Library:SetAutoLoad(Name)
+function Rexxzy_Library:SetAutoLoad(Name)
 	local S = LoadSettings()
 	SetPointer(S.autoload, Name and CleanName(Name) or nil)
 	SaveSettingsSoon()
 end
 
-function MugiHub_Library:GetAutoLoad()
+function Rexxzy_Library:GetAutoLoad()
 	return GetPointer(LoadSettings().autoload)
 end
 
-function MugiHub_Library:LoadAutoConfig(Done)
+function Rexxzy_Library:LoadAutoConfig(Done)
 	local Name = self:GetAutoLoad()
 	if not Name then
 		if Done then task.spawn(Done, false, "no auto-load config") end
@@ -2342,7 +2357,7 @@ function MugiHub_Library:LoadAutoConfig(Done)
 	return true
 end
 
-function MugiHub_Library:SetAutoSave(Name)
+function Rexxzy_Library:SetAutoSave(Name)
 	local S = LoadSettings()
 	local Clean = Name and CleanName(Name) or nil
 	SetPointer(S.autosave, Clean)
@@ -2350,12 +2365,12 @@ function MugiHub_Library:SetAutoSave(Name)
 	SaveSettingsSoon()
 end
 
-function MugiHub_Library:GetAutoSave()
+function Rexxzy_Library:GetAutoSave()
 	AutoSaveName = GetPointer(LoadSettings().autosave)
 	return AutoSaveName
 end
 
-function MugiHub_Library:MarkDirty()
+function Rexxzy_Library:MarkDirty()
 	if self.Loading or not self.Armed then return end
 	if not AutoSaveName then return end
 	DirtyFlag = true
@@ -2370,27 +2385,27 @@ function MugiHub_Library:MarkDirty()
 	end)
 end
 
-function MugiHub_Library:ClearImageCache()
+function Rexxzy_Library:ClearImageCache()
 	Custom:ClearImageCache()
 end
 
-function MugiHub_Library:Notify(Config)
+function Rexxzy_Library:Notify(Config)
 	return self:SetNotification(Config)
 end
 
-function MugiHub_Library:RegisterIcon(Name, Source) return Icons:Register(Name, Source) end
-function MugiHub_Library:HasIcon(Name) return Icons:Resolve(Name) ~= nil end
-function MugiHub_Library:GetIcons() return Icons:List() end
+function Rexxzy_Library:RegisterIcon(Name, Source) return Icons:Register(Name, Source) end
+function Rexxzy_Library:HasIcon(Name) return Icons:Resolve(Name) ~= nil end
+function Rexxzy_Library:GetIcons() return Icons:List() end
 
 task.defer(function()
 	if FsReady() then
-		MugiHub_Library:GetAutoSave()
-		MugiHub_Library:RescanConfigs()
+		Rexxzy_Library:GetAutoSave()
+		Rexxzy_Library:RescanConfigs()
 	end
 end)
 
 
-function MugiHub_Library:CreateWindow(Config)
+function Rexxzy_Library:CreateWindow(Config)
 	local Title = Config[1] or Config.Title or ""
 	local Desc = Config[2] or Config.Description or ""
 	local TabWidth = Config[3] or Config["Tab Width"] or 105
@@ -2411,14 +2426,14 @@ function MugiHub_Library:CreateWindow(Config)
 		return tw
 	end
 
-	local MugiHubGui = Custom:Create("ScreenGui", {
-		Name = "MugiHub", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false,
+	local RexxzyGui = Custom:Create("ScreenGui", {
+		Name = "Rexxzy", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false,
 		IgnoreGuiInset = true, DisplayOrder = 100,
 	}, Custom:GetGuiParent())
 
 	local Base = tonumber(Config.Scale or Config.UIScale) or 0.9
 	do
-		local Screen = MugiHubGui.AbsoluteSize
+		local Screen = RexxzyGui.AbsoluteSize
 		if Screen and Screen.X > 0 and Screen.Y > 0 then
 			if SizeUi.X.Offset > 0 then Base = math.min(Base, (Screen.X * 0.92) / SizeUi.X.Offset) end
 			if SizeUi.Y.Offset > 0 then Base = math.min(Base, (Screen.Y * 0.88) / SizeUi.Y.Offset) end
@@ -2429,7 +2444,7 @@ function MugiHub_Library:CreateWindow(Config)
 	local DropShadowHolder = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, BorderSizePixel = 0,
 		Position = UDim2.new(0.5, 0, 0.5, 0), Size = SizeUi, Name = "DropShadowHolder",
-	}, MugiHubGui)
+	}, RexxzyGui)
 	local WindowScale = Custom:Create("UIScale", { Scale = Base * 0.9 }, DropShadowHolder)
 
 	local Main = Custom:Create("Frame", {
@@ -2885,7 +2900,7 @@ function MugiHub_Library:CreateWindow(Config)
 	local Bubble = Custom:Create("TextButton", {
 		Name = "OpenClose", Text = "", AutoButtonColor = false, BackgroundColor3 = Theme.Dark, BorderSizePixel = 0,
 		Position = BubblePos, Size = UDim2.new(0, BubbleSize, 0, BubbleSize), Visible = false,
-	}, MugiHubGui)
+	}, RexxzyGui)
 	Custom:Round(Bubble)
 	local BubbleStroke = Custom:Stroke(Bubble, Theme.White, 0.2, 2)
 	local BubbleGradient = Custom:AddGradient(BubbleStroke, 0, Custom.GradientBorder)
@@ -2916,7 +2931,7 @@ function MugiHub_Library:CreateWindow(Config)
 	end
 	ApplyBubble(BubbleSrc)
 	local function ClampBubble()
-		local Scr = MugiHubGui.AbsoluteSize
+		local Scr = RexxzyGui.AbsoluteSize
 		local Pos, Sz = Bubble.AbsolutePosition, Bubble.AbsoluteSize
 		if Scr.X <= 0 or Scr.Y <= 0 then return end
 		local Dx = math.clamp(Pos.X, 0, math.max(Scr.X - Sz.X, 0)) - Pos.X
@@ -3054,10 +3069,10 @@ function MugiHub_Library:CreateWindow(Config)
 	local function Cleanup()
 		if Destroyed then return end
 		Destroyed = true
-		MugiHub_Library.Unloaded = true
+		Rexxzy_Library.Unloaded = true
 		for _, c in ipairs(Conns) do pcall(function() c:Disconnect() end) end
 		for _, t in ipairs(Loops) do pcall(function() t:Cancel() end) end
-		pcall(function() MugiHubGui:Destroy() end)
+		pcall(function() RexxzyGui:Destroy() end)
 	end
 
 	CancelButton.Activated:Connect(function()
@@ -3180,6 +3195,86 @@ function MugiHub_Library:CreateWindow(Config)
 	function Funcs:SetScale(NewScale)
 		Base = math.clamp(tonumber(NewScale) or Base, 0.5, 1.5)
 		if Opened and not Destroyed then Custom:Tween(WindowScale, 0.2, { Scale = Base }) end
+	end
+
+	function Funcs:SetSize(NewSize)
+		if Destroyed then return false end
+		if typeof(NewSize) == "Vector2" then
+			NewSize = UDim2.fromOffset(NewSize.X, NewSize.Y)
+		end
+		if typeof(NewSize) ~= "UDim2" then return false end
+		DropShadowHolder.Size = NewSize
+		return true
+	end
+
+	function Funcs:GetSize()
+		return DropShadowHolder.Size
+	end
+
+	local ResizeEnabled = Config.Resizable ~= false and Config.Resizeable ~= false
+	local ResizeGrip = Custom:Create("TextButton", {
+		Name = "ResizeGrip", Text = "◢", Font = Enum.Font.GothamBold, TextSize = 14,
+		TextColor3 = Theme.Sub, TextTransparency = 0.08, AutoButtonColor = false,
+		BackgroundColor3 = Theme.Panel, BackgroundTransparency = 0.18, BorderSizePixel = 0,
+		AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -3, 1, -3),
+		Size = UDim2.new(0, 20, 0, 20), ZIndex = 48, Visible = ResizeEnabled,
+	}, Main)
+	Custom:Corner(ResizeGrip, 5)
+	Custom:Stroke(ResizeGrip, Theme.White, 0.82, 1)
+	ResizeGrip.MouseEnter:Connect(function()
+		Custom:Tween(ResizeGrip, 0.12, { BackgroundTransparency = 0.02, TextColor3 = Theme.White })
+	end)
+	ResizeGrip.MouseLeave:Connect(function()
+		Custom:Tween(ResizeGrip, 0.15, { BackgroundTransparency = 0.18, TextColor3 = Theme.Sub })
+	end)
+
+	local Resizing, ResizeStart, ResizeStartSize, ResizeStartPos = false, nil, nil, nil
+	Track(ResizeGrip.InputBegan:Connect(function(Input)
+		if not ResizeEnabled then return end
+		if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+			Resizing = true
+			ResizeStart = Input.Position
+			local Current = DropShadowHolder.Size
+			local ScreenSize = RexxzyGui.AbsoluteSize
+			ResizeStartSize = Vector2.new(
+				Current.X.Scale * ScreenSize.X + Current.X.Offset,
+				Current.Y.Scale * ScreenSize.Y + Current.Y.Offset
+			)
+			ResizeStartPos = DropShadowHolder.Position
+		end
+	end))
+	Track(UserInputService.InputChanged:Connect(function(Input)
+		if not ResizeEnabled or not Resizing or not ResizeStart or not ResizeStartSize or Destroyed then return end
+		if Input.UserInputType ~= Enum.UserInputType.MouseMovement and Input.UserInputType ~= Enum.UserInputType.Touch then return end
+		local Delta = Input.Position - ResizeStart
+		local ScaleNow = math.max(WindowScale.Scale, 0.1)
+		local Screen = RexxzyGui.AbsoluteSize
+		local MaxW = math.max(1, math.floor(Screen.X * 0.94 / ScaleNow))
+		local MaxH = math.max(1, math.floor(Screen.Y * 0.90 / ScaleNow))
+		local MinW, MinH = math.min(360, MaxW), math.min(220, MaxH)
+		local Width = math.clamp(ResizeStartSize.X + Delta.X / ScaleNow, MinW, MaxW)
+		local Height = math.clamp(ResizeStartSize.Y + Delta.Y / ScaleNow, MinH, MaxH)
+		DropShadowHolder.Size = UDim2.fromOffset(math.floor(Width), math.floor(Height))
+		if ResizeStartPos then
+			DropShadowHolder.Position = UDim2.new(
+				ResizeStartPos.X.Scale, ResizeStartPos.X.Offset + (Width - ResizeStartSize.X) / 2,
+				ResizeStartPos.Y.Scale, ResizeStartPos.Y.Offset + (Height - ResizeStartSize.Y) / 2
+			)
+		end
+	end))
+	Track(UserInputService.InputEnded:Connect(function(Input)
+		if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+			Resizing = false
+			ResizeStart = nil
+			ResizeStartSize = nil
+			ResizeStartPos = nil
+		end
+	end))
+
+	function Funcs:SetResizable(State)
+		ResizeEnabled = State ~= false
+		if ResizeGrip then ResizeGrip.Visible = ResizeEnabled end
+		return ResizeEnabled
 	end
 
 
@@ -4491,7 +4586,7 @@ function MugiHub_Library:CreateWindow(Config)
 					local ok = pcall(function() game:GetService("GuiService"):OpenBrowserWindow(SocialUrl) end)
 					if not ok and setclipboard then
 						pcall(setclipboard, SocialUrl)
-						MugiHub_Library:SetNotification({ Content = "Link copied: " .. SocialUrl })
+						Rexxzy_Library:SetNotification({ Content = "Link copied: " .. SocialUrl })
 					end
 				end)
 				RegisterSearch(SocialName, SF, Where, SelectTab, EnsureOpen, TabFrame)
@@ -4520,9 +4615,9 @@ function MugiHub_Library:CreateWindow(Config)
 					CircleClick(CopyBtn)
 					if setclipboard then
 						pcall(setclipboard, CopyText)
-						MugiHub_Library:SetNotification({ Content = "Copied: " .. CopyText })
+						Rexxzy_Library:SetNotification({ Content = "Copied: " .. CopyText })
 					else
-						MugiHub_Library:SetNotification({ Content = "Clipboard is not supported by your executor" })
+						Rexxzy_Library:SetNotification({ Content = "Clipboard is not supported by your executor" })
 					end
 				end)
 				Custom:Hover(CF, CStroke)
@@ -4656,7 +4751,7 @@ function MugiHub_Library:CreateWindow(Config)
 				if type(CMConfig) == "string" then CMConfig = { CMConfig } end
 				CMConfig = CMConfig or {}
 				local CMName = CMConfig[1] or CMConfig.Name or "Configs"
-				local Library = MugiHub_Library
+				local Library = Rexxzy_Library
 				local Holder = Custom:Create("Frame", {
 					BackgroundTransparency = 1, BorderSizePixel = 0, AutomaticSize = Enum.AutomaticSize.Y,
 					Size = UDim2.new(1, 0, 0, 0), Name = CMName .. "ConfigManager",
@@ -4869,7 +4964,7 @@ function MugiHub_Library:CreateWindow(Config)
 						for K, V in pairs(Cfg) do Copy[K] = V end
 						local Orig = Cfg[CbIdx] or Cfg.Callback or function() end
 						local Wrapped = function(...)
-							MugiHub_Library:MarkDirty()
+							Rexxzy_Library:MarkDirty()
 							return Orig(...)
 						end
 						Copy[CbIdx] = Wrapped
@@ -4882,8 +4977,8 @@ function MugiHub_Library:CreateWindow(Config)
 					Result.SetVisible = function(State) if Frame and Frame.Parent then Frame.Visible = State and true or false end end
 					local FlagName = type(Cfg) == "table" and Cfg.Flag or nil
 					Result.Destroy = function()
-						if FlagName and MugiHub_Library.Elements[FlagName] and MugiHub_Library.Elements[FlagName].Owner == Result then
-							MugiHub_Library.Elements[FlagName] = nil
+						if FlagName and Rexxzy_Library.Elements[FlagName] and Rexxzy_Library.Elements[FlagName].Owner == Result then
+							Rexxzy_Library.Elements[FlagName] = nil
 						end
 						if Frame and Frame.Parent then Frame:Destroy() end
 					end
@@ -4903,7 +4998,7 @@ function MugiHub_Library:CreateWindow(Config)
 								return ok and Key or nil
 							end
 						end
-						MugiHub_Library.Elements[tostring(FlagName)] = {
+						Rexxzy_Library.Elements[tostring(FlagName)] = {
 							Owner = Result, Get = Result.Get, Set = Result.Set, Encode = Codec[1], Decode = Decode,
 						}
 					end
@@ -4923,7 +5018,7 @@ function MugiHub_Library:CreateWindow(Config)
 	Custom:Tween(WindowScale, 0.4, { Scale = Base }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 
 	task.delay(3, function()
-		if not MugiHub_Library.AutoLoading then MugiHub_Library.Armed = true end
+		if not Rexxzy_Library.AutoLoading then Rexxzy_Library.Armed = true end
 	end)
 
 	return Funcs
@@ -5204,7 +5299,7 @@ function KeySys.WithProvider(Context, Provider)
 	return Copy
 end
 
-function MugiHub_Library:CreateKeySystem(UserConfig)
+function Rexxzy_Library:CreateKeySystem(UserConfig)
 	local Cfg = KeySys.Merge(KeySys.Defaults(), UserConfig)
 	if type(Cfg.Key) == "boolean" then
 		Cfg.Authentication.API.Enabled = Cfg.Key
@@ -5226,12 +5321,12 @@ function MugiHub_Library:CreateKeySystem(UserConfig)
 	local Intro = true
 	local TargetScale = 1
 
-	if Behavior.ReplaceExisting ~= false and MugiHub_Library.ActiveKeySystem then
-		local Old = MugiHub_Library.ActiveKeySystem
-		MugiHub_Library.ActiveKeySystem = nil
+	if Behavior.ReplaceExisting ~= false and Rexxzy_Library.ActiveKeySystem then
+		local Old = Rexxzy_Library.ActiveKeySystem
+		Rexxzy_Library.ActiveKeySystem = nil
 		pcall(function() Old:Destroy(true) end)
 	end
-	MugiHub_Library.ActiveKeySystem = Self
+	Rexxzy_Library.ActiveKeySystem = Self
 
 	local function Dead() return Destroyed or Closing end
 	local function Track(C) table.insert(Conns, C) return C end
@@ -5268,13 +5363,13 @@ function MugiHub_Library:CreateKeySystem(UserConfig)
 		local Args = table.pack(...)
 		task.spawn(function()
 			local Ok, Err = pcall(Fn, table.unpack(Args, 1, Args.n))
-			if not Ok then warn("[MugiHub KeySystem] callback " .. Name .. " failed: " .. tostring(Err)) end
+			if not Ok then warn("[Rexxzy KeySystem] callback " .. Name .. " failed: " .. tostring(Err)) end
 		end)
 	end
 
 	local function Notify(Kind, Text)
 		if Behavior.Notifications == false or not Text or Text == "" then return end
-		MugiHub_Library:SetNotification({ Type = Kind, Content = tostring(Text), Delay = tonumber(Behavior.NotificationDelay) or 3 })
+		Rexxzy_Library:SetNotification({ Type = Kind, Content = tostring(Text), Delay = tonumber(Behavior.NotificationDelay) or 3 })
 	end
 
 	local ApiOn = type(API) == "table" and API.Enabled == true
@@ -5306,7 +5401,7 @@ function MugiHub_Library:CreateKeySystem(UserConfig)
 	end
 
 	local Gui = Custom:Create("ScreenGui", {
-		Name = "MugiHubKeySystem", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false,
+		Name = "RexxzyKeySystem", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false,
 		IgnoreGuiInset = true, DisplayOrder = tonumber(Win.DisplayOrder) or 150,
 	}, Custom:GetGuiParent())
 	local BackdropGoal = Win.Backdrop == false and 1 or (tonumber(Win.BackdropTransparency) or 0.5)
@@ -5619,15 +5714,15 @@ function MugiHub_Library:CreateKeySystem(UserConfig)
 	end
 
 	local function PersistPath()
-		return "MugiHub/KeySystem/" .. CleanName(tostring(PersistCfg.Name or "Default")) .. ".json"
+		return "Rexxzy/KeySystem/" .. CleanName(tostring(PersistCfg.Name or "Default")) .. ".json"
 	end
 
 	local function SavePersist(Key)
 		if PersistCfg.Enabled ~= true or not FsReady() then return end
 		pcall(function()
 			if makefolder and isfolder then
-				if not isfolder("MugiHub") then makefolder("MugiHub") end
-				if not isfolder("MugiHub/KeySystem") then makefolder("MugiHub/KeySystem") end
+				if not isfolder("Rexxzy") then makefolder("Rexxzy") end
+				if not isfolder("Rexxzy/KeySystem") then makefolder("Rexxzy/KeySystem") end
 			end
 			writefile(PersistPath(), HttpService:JSONEncode({ Key = Key, Mode = Mode, Time = os.time() }))
 		end)
@@ -5816,7 +5911,7 @@ function MugiHub_Library:CreateKeySystem(UserConfig)
 			if Mode == "Password" then VerifyPassword(Key) else VerifyApi(Key) end
 		end)
 		if not Ok then
-			warn("[MugiHub KeySystem] verification error: " .. tostring(Err))
+			warn("[Rexxzy KeySystem] verification error: " .. tostring(Err))
 			Reject("api_error", Msg.ApiError, Key)
 		end
 	end
@@ -5950,7 +6045,7 @@ function MugiHub_Library:CreateKeySystem(UserConfig)
 		for _, T in pairs(Spinners) do pcall(function() T:Cancel() end) end
 		table.clear(Spinners)
 		pcall(function() Gui:Destroy() end)
-		if MugiHub_Library.ActiveKeySystem == Self then MugiHub_Library.ActiveKeySystem = nil end
+		if Rexxzy_Library.ActiveKeySystem == Self then Rexxzy_Library.ActiveKeySystem = nil end
 	end
 
 	function Self:Destroy(Instant)
@@ -6103,6 +6198,7 @@ function MugiHub_Library:CreateKeySystem(UserConfig)
 end
 
 return {
-	Library = MugiHub_Library,
-	Webhook = MugiWebhook,
+	Library = Rexxzy_Library,
+	Webhook = RexxzyWebhook,
+	Logos = RexxzyLogos,
 }
