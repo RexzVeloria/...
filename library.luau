@@ -1,4 +1,4 @@
--- Rexxzy UI Library | Monochrome Edition
+-- Rexxzy UI Library | Soft Slate + Indigo
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -293,19 +293,19 @@ function RexxzyWebhook:AttachToLibrary(lib, configNameOrObj)
 end
 
 local Theme = {
-	-- Soft monochrome: muted charcoal surfaces, warm soft whites (easy on eyes, mobile-friendly).
-	Accent = Color3.fromRGB(220, 220, 222),
-	AccentSoft = Color3.fromRGB(168, 168, 172),
-	Dark = Color3.fromRGB(28, 28, 30),
-	Panel = Color3.fromRGB(38, 38, 42),
-	Field = Color3.fromRGB(26, 26, 28),
-	Text = Color3.fromRGB(228, 228, 230),
-	Sub = Color3.fromRGB(148, 148, 154),
-	Off = Color3.fromRGB(58, 58, 62),
-	Red = Color3.fromRGB(175, 175, 180),
-	RedHover = Color3.fromRGB(205, 205, 210),
-	White = Color3.fromRGB(190, 190, 194),
-	Black = Color3.fromRGB(22, 22, 24),
+	-- VH brand mono: deep black surfaces + luminous white (matches logo glow).
+	Accent = Color3.fromRGB(245, 245, 245),
+	AccentSoft = Color3.fromRGB(200, 200, 200),
+	Dark = Color3.fromRGB(10, 10, 10),
+	Panel = Color3.fromRGB(18, 18, 18),
+	Field = Color3.fromRGB(12, 12, 12),
+	Text = Color3.fromRGB(245, 245, 245),
+	Sub = Color3.fromRGB(150, 150, 150),
+	Off = Color3.fromRGB(42, 42, 42),
+	Red = Color3.fromRGB(210, 210, 210),
+	RedHover = Color3.fromRGB(235, 235, 235),
+	White = Color3.fromRGB(230, 230, 230),
+	Black = Color3.fromRGB(6, 6, 6),
 }
 
 local Custom = {}
@@ -314,24 +314,24 @@ do
 	Custom.Theme = Theme
 	Custom.DefaultIcon = "rbxassetid://18505728250"
 	Custom.GradientWhite = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(220, 220, 222)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(168, 168, 172)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(190, 190, 190)),
 	})
 	Custom.GradientBorder = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(175, 175, 180)),
-		ColorSequenceKeypoint.new(0.25, Color3.fromRGB(55, 55, 60)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(145, 145, 150)),
-		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(55, 55, 60)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(175, 175, 180)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0.25, Color3.fromRGB(40, 40, 40)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(210, 210, 210)),
+		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(40, 40, 40)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
 	})
 	Custom.GradientWindow = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 22)),
-		ColorSequenceKeypoint.new(0.55, Color3.fromRGB(30, 30, 33)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 40, 44)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(4, 4, 4)),
+		ColorSequenceKeypoint.new(0.55, Color3.fromRGB(10, 10, 10)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 18, 18)),
 	})
 	Custom.GradientLine = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(175, 175, 180)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(110, 110, 115)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 140, 140)),
 	})
 	Custom.FadeEnds = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
@@ -369,9 +369,9 @@ do
 
 	function Custom:Stroke(inst, Color, Transparency, Thickness)
 		return Custom:Create("UIStroke", {
-			-- Soft monochrome outlines: muted edge, not pure harsh white.
+			-- VH mono: luminous white edge like logo light streaks.
 			Color = Color or Theme.White,
-			Transparency = type(Transparency) == "number" and math.clamp(Transparency, 0, 0.75) or 0.35,
+			Transparency = type(Transparency) == "number" and math.clamp(Transparency, 0, 0.85) or 0.28,
 			Thickness = Thickness or 1,
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 		}, inst)
@@ -1870,7 +1870,7 @@ function Rexxzy_Library:SetNotification(Config)
 	}, NotifContainer)
 
 	local Card = Custom:Create("Frame", {
-		BackgroundColor3 = Color3.fromRGB(22, 22, 24), BackgroundTransparency = 0, BorderSizePixel = 0,
+		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 		Position = UDim2.new(1, NOTIF_WIDTH + 20, 0, 0), Size = UDim2.new(1, 0, 1, 0), Name = "Card",
 		ClipsDescendants = true,
 	}, Slot)
@@ -2555,7 +2555,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	Custom:AddGradient(TextLabel, 0)
 
 	local Separator = Custom:Label(TitleHolder, {
-		Text = "|", TextColor3 = Color3.fromRGB(22, 22, 24), TextSize = 13, LayoutOrder = 3,
+		Text = "|", TextColor3 = Theme.Black, TextSize = 13, LayoutOrder = 3,
 		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 18), Name = "Separator",
 	})
 
@@ -2803,7 +2803,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	end)
 
 	local SearchPopup = Custom:Create("Frame", {
-		BackgroundColor3 = Color3.fromRGB(22, 22, 24), BackgroundTransparency = 0, BorderSizePixel = 0,
+		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 		ClipsDescendants = true, Position = UDim2.new(0, 0, 0, 28), Size = UDim2.new(1, 0, 0, 0),
 		Visible = false, ZIndex = 20, Name = "SearchPopup",
 	}, Side)
@@ -2906,7 +2906,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		BubbleSrc = BubbleCfg
 	end
 	local Bubble = Custom:Create("TextButton", {
-		Name = "OpenClose", Text = "", AutoButtonColor = false, BackgroundColor3 = Color3.fromRGB(22, 22, 24), BorderSizePixel = 0,
+		Name = "OpenClose", Text = "", AutoButtonColor = false, BackgroundColor3 = Theme.Black, BorderSizePixel = 0,
 		Position = BubblePos, Size = UDim2.new(0, BubbleSize, 0, BubbleSize), Visible = false,
 	}, RexxzyGui)
 	Custom:Round(Bubble)
@@ -3028,7 +3028,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), Visible = false, ZIndex = 49, Name = "ExitBackdrop",
 	}, Main)
 	local ExitConfirm = Custom:Create("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(22, 22, 24),
+		AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Black,
 		BorderSizePixel = 0, Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 230, 0, 104),
 		Visible = false, ZIndex = 50, Name = "ExitConfirm",
 	}, Main)
@@ -3165,7 +3165,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			Size = UDim2.new(1, 0, 1, 0), ZIndex = 59, Name = "DialogBackdrop",
 		}, Main)
 		local DFrame = Custom:Create("Frame", {
-			AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(22, 22, 24), BorderSizePixel = 0,
+			AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Black, BorderSizePixel = 0,
 			Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 230, 0, DH), ZIndex = 60, Name = "DialogFrame",
 		}, Main)
 		Custom:Corner(DFrame, 10)
@@ -3371,7 +3371,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		}, Main)
 		Custom:Corner(Overlay, 12)
 		local Panel = Custom:Create("Frame", {
-			Active = true, AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Color3.fromRGB(22, 22, 24), BorderSizePixel = 0,
+			Active = true, AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Black, BorderSizePixel = 0,
 			Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, PANEL_W, 0, PANEL_H), ZIndex = 61, Visible = false, Name = "ColorPanel",
 		}, Main)
 		Custom:Corner(Panel, 10)
@@ -5114,7 +5114,7 @@ function KeySys.Defaults()
 		},
 		Appearance = {
 			Panel = Theme.White, Accent = Theme.White, Text = Theme.Text, SubText = Theme.Sub, Border = Theme.White,
-			Button = Theme.White, ButtonText = Color3.fromRGB(22, 22, 24), Secondary = Theme.White,
+			Button = Theme.Accent, ButtonText = Color3.fromRGB(14, 16, 28), Secondary = Theme.Panel,
 			Input = Theme.Field, InputText = Theme.Text, Success = Theme.White, Error = Theme.Red,
 			Warning = Color3.fromRGB(255, 255, 255), Info = Theme.AccentSoft,
 			Font = Enum.Font.Gotham, FontBold = Enum.Font.GothamBold, IconSize = 16, IconAlign = "Left",
@@ -5393,7 +5393,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 	local CSub = Col(App.SubText, Theme.Sub)
 	local CBorder = Col(App.Border, Theme.White)
 	local CButton = Col(App.Button, Theme.White)
-	local CButtonText = Col(App.ButtonText, Color3.fromRGB(22, 22, 24))
+	local CButtonText = Col(App.ButtonText, Theme.Black)
 	local CSecondary = Col(App.Secondary, Theme.White)
 	local CInput = Col(App.Input, Theme.Field)
 	local CInputText = Col(App.InputText, Theme.Text)
