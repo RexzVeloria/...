@@ -1,4 +1,3 @@
--- Rexxzy UI Library | Soft Slate + Indigo
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -8,7 +7,6 @@ local HttpService = game:GetService("HttpService")
 local TextService = game:GetService("TextService")
 local Player = Players.LocalPlayer
 
--- Built-in Rexxzy logo aliases. Use as Icon = "VH", Bubble = "Veloria", etc.
 local RexxzyLogos = {
     Veloria = "rbxassetid://99716974769256",
     veloria = "rbxassetid://99716974769256",
@@ -2416,8 +2414,8 @@ end)
 function Rexxzy_Library:CreateWindow(Config)
 	local Title = Config[1] or Config.Title or ""
 	local Desc = Config[2] or Config.Description or ""
-	local TabWidth = Config[3] or Config["Tab Width"] or 120
-	local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(540, 340)
+	local TabWidth = Config[3] or Config["Tab Width"] or 128
+	local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(600, 400)
 	local Keybind = Config[5] or Config.Keybind or Enum.KeyCode.RightControl
 	local Icon = Config[6] or Config.Icon or "hub"
 	local Funcs = {}
@@ -2439,7 +2437,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		IgnoreGuiInset = true, DisplayOrder = 100,
 	}, Custom:GetGuiParent())
 
-	local Base = tonumber(Config.Scale or Config.UIScale) or 1.05
+	local Base = tonumber(Config.Scale or Config.UIScale) or 1.12
 	do
 		local Screen = RexxzyGui.AbsoluteSize
 		if Screen and Screen.X > 0 and Screen.Y > 0 then
@@ -2895,8 +2893,8 @@ function Rexxzy_Library:CreateWindow(Config)
 	local BubbleCfg = Config.Bubble or Config.BubbleIcon or Config.FloatIcon or Config.OpenIcon
 	local BubbleEnabled = Config.BubbleEnabled ~= false
 	local BubblePlatform = tostring(Config.BubblePlatform or "Both")
-	local BubbleSize = 42
-	local BubbleSrc = "hub" -- Use the library built-in icon for the floating toggle by default
+	local BubbleSize = 58
+	local BubbleSrc = "VH" -- VH brand logo on floating toggle by default
 	local BubblePos = UDim2.new(0.1021, 0, 0.0743, 0)
 	if type(BubbleCfg) == "table" then
 		BubbleSrc = BubbleCfg.Icon or BubbleCfg.Image or BubbleCfg[1] or BubbleSrc
@@ -3847,17 +3845,17 @@ function Rexxzy_Library:CreateWindow(Config)
 				end
 				ButtonDesc = tostring(ButtonDesc)
 				local HasDesc = ButtonDesc ~= ""
-				local Btn, BtnStroke = Custom:Card(SectionContent, HasDesc and 44 or 34, ButtonName .. "Btn", true)
+				local Btn, BtnStroke = Custom:Card(SectionContent, HasDesc and 52 or 42, ButtonName .. "Btn", true)
 				Place(Btn)
 				local BtnLabel = Custom:Label(Btn, {
-					Text = ButtonName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 10, 0, HasDesc and 5 or 0), Size = UDim2.new(1, -32, 0, 14), Name = "BtnLabel",
+					Text = ButtonName, TextTruncate = Enum.TextTruncate.AtEnd, TextSize = 13,
+					Position = UDim2.new(0, 12, 0, HasDesc and 6 or 0), Size = UDim2.new(1, -40, 0, 16), Name = "BtnLabel",
 				})
 				if HasDesc then
 					Custom:Label(Btn, {
-						Font = Enum.Font.Gotham, Text = ButtonDesc, TextColor3 = Theme.Sub, TextSize = 9,
+						Font = Enum.Font.Gotham, Text = ButtonDesc, TextColor3 = Theme.Sub, TextSize = 11,
 						TextTruncate = Enum.TextTruncate.AtEnd,
-						Position = UDim2.new(0, 10, 0, 20), Size = UDim2.new(1, -32, 0, 12), Name = "BtnDesc",
+						Position = UDim2.new(0, 12, 0, 24), Size = UDim2.new(1, -40, 0, 14), Name = "BtnDesc",
 					})
 				else
 					BtnLabel.Size = UDim2.new(1, -32, 1, 0)
@@ -3867,8 +3865,8 @@ function Rexxzy_Library:CreateWindow(Config)
 				local BtnIconObj = nil
 				if BtnIconSrc ~= false and BtnIconSrc ~= "" then
 					BtnIconObj = Custom:MakeIcon(Btn, BtnIconSrc, {
-						AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -9, 0.5, 0),
-						Size = UDim2.new(0, 16, 0, 16), Color = Theme.Sub, Name = "BtnIcon",
+						AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -12, 0.5, 0),
+						Size = UDim2.new(0, 18, 0, 18), Color = Theme.Sub, Name = "BtnIcon",
 					})
 				end
 				if not BtnIconObj then
@@ -3896,24 +3894,24 @@ function Rexxzy_Library:CreateWindow(Config)
 				local ToggleDesc = ToggleConfig.Content or ToggleConfig.Description or ToggleConfig[4]
 				local HasDesc = type(ToggleDesc) == "string" and ToggleDesc ~= ""
 				Default = Default and true or false
-				local ToggleFrame, ToggleStroke = Custom:Card(SectionContent, HasDesc and 44 or 34, ToggleName .. "Toggle", true)
+				local ToggleFrame, ToggleStroke = Custom:Card(SectionContent, HasDesc and 52 or 42, ToggleName .. "Toggle", true)
 				Place(ToggleFrame)
 				local ToggleLabel = Custom:Label(ToggleFrame, {
 					Text = ToggleName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 10, 0, HasDesc and 5 or 0), Size = UDim2.new(1, -64, 0, 16), Name = "ToggleLabel",
+					Position = UDim2.new(0, 10, 0, HasDesc and 5 or 0), Size = UDim2.new(1, -72, 0, 16), Name = "ToggleLabel",
 				})
 				if HasDesc then
 					Custom:Label(ToggleFrame, {
 						Font = Enum.Font.Gotham, Text = ToggleDesc, TextColor3 = Theme.Sub, TextSize = 9,
 						TextTruncate = Enum.TextTruncate.AtEnd,
-						Position = UDim2.new(0, 10, 0, 20), Size = UDim2.new(1, -64, 0, 13), Name = "ToggleDesc",
+						Position = UDim2.new(0, 10, 0, 20), Size = UDim2.new(1, -72, 0, 14), Name = "ToggleDesc",
 					})
 				else
-					ToggleLabel.Size = UDim2.new(1, -64, 1, 0)
+					ToggleLabel.Size = UDim2.new(1, -72, 1, 0)
 				end
 				local SwitchBg = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(1, 0.5), BackgroundColor3 = Theme.Off, BorderSizePixel = 0,
-					Position = UDim2.new(1, -10, 0.5, 0), Size = UDim2.new(0, 38, 0, 20), Name = "SwitchBg",
+					Position = UDim2.new(1, -12, 0.5, 0), Size = UDim2.new(0, 44, 0, 24), Name = "SwitchBg",
 				}, ToggleFrame)
 				Custom:Round(SwitchBg)
 				local SwitchStroke = Custom:Stroke(SwitchBg, Theme.White, 0, 1)
@@ -3925,14 +3923,14 @@ function Rexxzy_Library:CreateWindow(Config)
 				Custom:AddGradient(SwitchFill, 90)
 				local SwitchDot = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(0, 0.5), BackgroundColor3 = Theme.Sub, BorderSizePixel = 0,
-					Position = UDim2.new(0, 3, 0.5, 0), Size = UDim2.new(0, 14, 0, 14), ZIndex = 2, Name = "SwitchDot",
+					Position = UDim2.new(0, 4, 0.5, 0), Size = UDim2.new(0, 16, 0, 16), ZIndex = 2, Name = "SwitchDot",
 				}, SwitchBg)
 				Custom:Round(SwitchDot)
 				local ToggleState = Default
 				local function UpdateToggle(State, Animate)
 					ToggleState = State
 					local Fill = State and 0 or 1
-					local Dot = State and UDim2.new(1, -17, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
+					local Dot = State and UDim2.new(1, -20, 0.5, 0) or UDim2.new(0, 4, 0.5, 0)
 					local DotColor = State and Theme.Black or Theme.Sub
 					local StrokeT = 0
 					if Animate then
@@ -3986,7 +3984,7 @@ function Rexxzy_Library:CreateWindow(Config)
 					return math.clamp((v - MinVal) / Range, 0, 1)
 				end
 
-				local SliderFrame, SliderStroke = Custom:Card(SectionContent, 46, SliderName .. "Slider", false)
+				local SliderFrame, SliderStroke = Custom:Card(SectionContent, 52, SliderName .. "Slider", false)
 				Place(SliderFrame)
 				Custom:Label(SliderFrame, {
 					Text = SliderName, TextTruncate = Enum.TextTruncate.AtEnd,
@@ -4078,7 +4076,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local Placeholder = InputConfig[2] or InputConfig.Placeholder or "Enter text..."
 				local Default = InputConfig[3] or InputConfig.Default or ""
 				local Callback = InputConfig[4] or InputConfig.Callback or function() end
-				local InputFrame, InputStroke = Custom:Card(SectionContent, 54, InputName .. "Input", false)
+				local InputFrame, InputStroke = Custom:Card(SectionContent, 58, InputName .. "Input", false)
 				Place(InputFrame)
 				Custom:Label(InputFrame, {
 					Text = InputName, TextTruncate = Enum.TextTruncate.AtEnd,
@@ -4129,7 +4127,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local DeleteIcon = DropdownConfig.DeleteIcon or "trash"
 				local EmptyText = DropdownConfig.Empty
 
-				local HEAD, ROW, MAXLIST, FILTERH = 28, 22, 120, 24
+				local HEAD, ROW, MAXLIST, FILTERH = 36, 28, 140, 28
 				local DropdownFrame, DropdownStroke = Custom:Card(SectionContent, HEAD, DropdownName .. "Dropdown", false)
 				Place(DropdownFrame)
 				DropdownFrame.ClipsDescendants = true
@@ -4461,7 +4459,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local DefaultKey = KeybindConfig[2] or KeybindConfig.Default or Enum.KeyCode.E
 				local Callback = KeybindConfig[3] or KeybindConfig.Callback or function() end
 				if type(DefaultKey) == "string" then DefaultKey = Enum.KeyCode[DefaultKey] or Enum.KeyCode.E end
-				local KeybindFrame, KeybindStroke = Custom:Card(SectionContent, 34, KeybindName .. "Keybind", false)
+				local KeybindFrame, KeybindStroke = Custom:Card(SectionContent, 42, KeybindName .. "Keybind", false)
 				Place(KeybindFrame)
 				Custom:Label(KeybindFrame, {
 					Text = KeybindName, TextTruncate = Enum.TextTruncate.AtEnd,
@@ -4530,7 +4528,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				end
 				local BlockName = Config[1] or Config.Title or DefaultTitle
 				local BlockText = Config[2] or Config.Text or ""
-				local Frame = Custom:Card(SectionContent, 34, BlockName .. Tag, false)
+				local Frame = Custom:Card(SectionContent, 42, BlockName .. Tag, false)
 				Place(Frame)
 				Frame.AutomaticSize = Enum.AutomaticSize.Y
 				Custom:Create("UIListLayout", { Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder }, Frame)
@@ -4609,7 +4607,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local SocialName = SocialConfig[1] or SocialConfig.Name or "Social"
 				local SocialUrl = SocialConfig[2] or SocialConfig.Url or ""
 				local SocialIcon = SocialConfig[3] or SocialConfig.Icon or ""
-				local SF, SStroke = Custom:Card(SectionContent, 34, SocialName .. "Social", true)
+				local SF, SStroke = Custom:Card(SectionContent, 42, SocialName .. "Social", true)
 				Place(SF)
 				if SocialIcon ~= "" then
 					Custom:Create("ImageLabel", {
@@ -4638,7 +4636,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			function SecFuncs:AddCopyGroup(CopyConfig)
 				local CopyName = CopyConfig[1] or CopyConfig.Name or "Copy Group"
 				local CopyText = CopyConfig[2] or CopyConfig.Text or ""
-				local CF, CStroke = Custom:Card(SectionContent, 34, CopyName .. "Copy", false)
+				local CF, CStroke = Custom:Card(SectionContent, 42, CopyName .. "Copy", false)
 				Place(CF)
 				Custom:Label(CF, {
 					Text = CopyName, TextTruncate = Enum.TextTruncate.AtEnd,
@@ -4671,7 +4669,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local CPName = CPConfig[1] or CPConfig.Name or "Color"
 				local Default = AsColor(CPConfig[2] or CPConfig.Default) or Color3.fromRGB(255, 255, 255)
 				local Callback = CPConfig[3] or CPConfig.Callback or function() end
-				local CPFrame, CPStroke = Custom:Card(SectionContent, 34, CPName .. "ColorPicker", true)
+				local CPFrame, CPStroke = Custom:Card(SectionContent, 42, CPName .. "ColorPicker", true)
 				Place(CPFrame)
 				Custom:Label(CPFrame, {
 					Text = CPName, TextTruncate = Enum.TextTruncate.AtEnd,
@@ -4744,7 +4742,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				if LabelText:match("^table:%s*0x[%da-fA-F]+$") then
 					return { Label = nil, Set = function() end, SetText = function() end, Get = function() return "" end }
 				end
-				local LF = Custom:Card(SectionContent, 34, "Label", false)
+				local LF = Custom:Card(SectionContent, 40, "Label", false)
 				Place(LF)
 				LF.AutomaticSize = Enum.AutomaticSize.Y
 				Custom:Create("UIPadding", {
@@ -4768,7 +4766,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local PDefault = PConfig[2] or PConfig.Default or 0
 				local PMax = PConfig[3] or PConfig.Max or 100
 				if PMax <= 0 then PMax = 100 end
-				local PF, PStroke = Custom:Card(SectionContent, 42, PName .. "Progress", false)
+				local PF, PStroke = Custom:Card(SectionContent, 48, PName .. "Progress", false)
 				Place(PF)
 				Custom:Label(PF, {
 					Text = PName, TextTruncate = Enum.TextTruncate.AtEnd,
@@ -5070,9 +5068,60 @@ function Rexxzy_Library:CreateWindow(Config)
 		return TabFuncs
 	end
 
-	Custom:Tween(WindowScale, 0.4, { Scale = Base }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+	-- VH splash intro (logo fade), then reveal window.
+	local SplashEnabled = Config.Splash ~= false
+	local SplashDuration = math.clamp(tonumber(Config.SplashDuration) or 0.95, 0.35, 3)
+	if SplashEnabled then
+		DropShadowHolder.Visible = false
+		WindowScale.Scale = Base * 0.88
+		local SplashGui = Custom:Create("ScreenGui", {
+			Name = "RexxzySplash", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false,
+			IgnoreGuiInset = true, DisplayOrder = 200,
+		}, Custom:GetGuiParent())
+		local SplashBg = Custom:Create("Frame", {
+			BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0), Name = "SplashBg",
+		}, SplashGui)
+		local LogoHold = Custom:Create("Frame", {
+			AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, BorderSizePixel = 0,
+			Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 96, 0, 96), Name = "LogoHold",
+		}, SplashBg)
+		local SplashScale = Custom:Create("UIScale", { Scale = 0.82 }, LogoHold)
+		local LogoImg = Custom:Create("ImageLabel", {
+			BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0),
+			Image = RexxzyLogos.VH or "rbxassetid://99716974769256",
+			ImageTransparency = 1, ScaleType = Enum.ScaleType.Fit, Name = "VHLogo",
+		}, LogoHold)
+		local Brand = Custom:Label(SplashBg, {
+			Text = tostring(Config.SplashText or Title or "VH"),
+			TextColor3 = Theme.Text, TextSize = 14, TextTransparency = 1,
+			TextXAlignment = Enum.TextXAlignment.Center,
+			AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.5, 58),
+			Size = UDim2.new(0, 220, 0, 22), Name = "SplashBrand",
+		})
+		task.spawn(function()
+			Custom:Tween(LogoImg, 0.35, { ImageTransparency = 0 })
+			Custom:Tween(Brand, 0.35, { TextTransparency = 0.15 })
+			Custom:Tween(SplashScale, 0.45, { Scale = 1 }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+			task.wait(SplashDuration)
+			if Destroyed then
+				pcall(function() SplashGui:Destroy() end)
+				return
+			end
+			Custom:Tween(LogoImg, 0.28, { ImageTransparency = 1 })
+			Custom:Tween(Brand, 0.28, { TextTransparency = 1 })
+			Custom:Tween(SplashBg, 0.3, { BackgroundTransparency = 1 })
+			task.wait(0.32)
+			pcall(function() SplashGui:Destroy() end)
+			if Destroyed then return end
+			DropShadowHolder.Visible = true
+			Custom:Tween(WindowScale, 0.4, { Scale = Base }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+		end)
+	else
+		Custom:Tween(WindowScale, 0.4, { Scale = Base }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+	end
 
-	task.delay(3, function()
+	task.delay(3 + (SplashEnabled and SplashDuration or 0), function()
 		if not Rexxzy_Library.AutoLoading then Rexxzy_Library.Armed = true end
 	end)
 
