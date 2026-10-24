@@ -1,4 +1,3 @@
--- Rexxzy UI Library | Monochrome Edition
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -8,7 +7,6 @@ local HttpService = game:GetService("HttpService")
 local TextService = game:GetService("TextService")
 local Player = Players.LocalPlayer
 
--- Built-in Rexxzy logo aliases. Use as Icon = "VH", Bubble = "Veloria", etc.
 local RexxzyLogos = {
     Veloria = "rbxassetid://99716974769256",
     veloria = "rbxassetid://99716974769256",
@@ -293,7 +291,7 @@ function RexxzyWebhook:AttachToLibrary(lib, configNameOrObj)
 end
 
 local Theme = {
-	-- Strict Black x White palette: no grey panels or red accent states.
+	-- Strict Black x White palette: opaque black surfaces, solid white text/borders; preserve configured wallpaper.
 	Accent = Color3.fromRGB(255, 255, 255),
 	AccentSoft = Color3.fromRGB(255, 255, 255),
 	Dark = Color3.fromRGB(0, 0, 0),
@@ -369,7 +367,8 @@ do
 
 	function Custom:Stroke(inst, Color, Transparency, Thickness)
 		return Custom:Create("UIStroke", {
-			Color = Color or Theme.White, Transparency = Transparency or 0.9, Thickness = Thickness or 1,
+			-- Monochrome theme: outlines are solid white, never grey/translucent.
+			Color = Color or Theme.White, Transparency = 0, Thickness = Thickness or 1,
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 		}, inst)
 	end
@@ -1865,7 +1864,7 @@ function Rexxzy_Library:SetNotification(Config)
 	}, NotifContainer)
 
 	local Card = Custom:Create("Frame", {
-		BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0.04, BorderSizePixel = 0,
+		BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0, BorderSizePixel = 0,
 		Position = UDim2.new(1, NOTIF_WIDTH + 20, 0, 0), Size = UDim2.new(1, 0, 1, 0), Name = "Card",
 		ClipsDescendants = true,
 	}, Slot)
@@ -1896,7 +1895,7 @@ function Rexxzy_Library:SetNotification(Config)
 	})
 
 	local BarTrack = Custom:Create("Frame", {
-		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.White, BackgroundTransparency = 0.9,
+		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.White, BackgroundTransparency = 0,
 		BorderSizePixel = 0, Position = UDim2.new(0, 12, 1, -4), Size = UDim2.new(1, -20, 0, 2), Name = "BarTrack",
 	}, Card)
 	Custom:Round(BarTrack)
@@ -2500,7 +2499,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	}, Main)
 
 	Custom:Create("Frame", {
-		BackgroundColor3 = Theme.White, BackgroundTransparency = 0.9, BorderSizePixel = 0,
+		BackgroundColor3 = Theme.White, BackgroundTransparency = 0, BorderSizePixel = 0,
 		Position = UDim2.new(0, 0, 0, 34), Size = UDim2.new(1, 0, 0, 1), Name = "DecideFrame",
 	}, Main)
 	local LineGlow = Custom:Create("Frame", {
@@ -2595,11 +2594,11 @@ function Rexxzy_Library:CreateWindow(Config)
 		if #TagList >= MAX_TAGS then return { Frame = nil, Set = function() end, SetIcon = function() end, Remove = function() end } end
 		Text = tostring(Text or "Tag")
 		local TagFrame = Custom:Create("Frame", {
-			BackgroundColor3 = Theme.White, BackgroundTransparency = 0.9, BorderSizePixel = 0,
+			BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 			AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 17), LayoutOrder = #TagList + 1, Name = "Tag",
 		}, TagHolder)
 		Custom:Round(TagFrame)
-		Custom:Stroke(TagFrame, Theme.White, 0.75, 1)
+		Custom:Stroke(TagFrame, Theme.White, 0, 1)
 		Custom:Create("UIListLayout", {
 			FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder,
 			VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 4),
@@ -2688,8 +2687,8 @@ function Rexxzy_Library:CreateWindow(Config)
 	Close.MouseLeave:Connect(function() Custom:Tween(Close, 0.2, { BackgroundColor3 = Theme.Red }) end)
 
 	local Min = Custom:Create("TextButton", {
-		Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0.5), BackgroundColor3 = Theme.White,
-		BackgroundTransparency = 0.9, BorderSizePixel = 0, ClipsDescendants = true, Position = UDim2.new(1, -34, 0.5, 0),
+		Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0.5), BackgroundColor3 = Theme.Black,
+		BackgroundTransparency = 0, BorderSizePixel = 0, ClipsDescendants = true, Position = UDim2.new(1, -34, 0.5, 0),
 		Size = UDim2.new(0, 22, 0, 22), Name = "Min",
 	}, Top)
 	Custom:Corner(Min, 6)
@@ -2700,11 +2699,11 @@ function Rexxzy_Library:CreateWindow(Config)
 	}, Min)
 	Custom:Round(MinBar)
 	Min.MouseEnter:Connect(function()
-		Custom:Tween(Min, 0.15, { BackgroundTransparency = 0.8 })
+		Custom:Tween(Min, 0.15, { BackgroundTransparency = 0 })
 		Custom:Tween(MinStroke, 0.15, { Transparency = 0.5 })
 	end)
 	Min.MouseLeave:Connect(function()
-		Custom:Tween(Min, 0.2, { BackgroundTransparency = 0.9 })
+		Custom:Tween(Min, 0.2, { BackgroundTransparency = 0 })
 		Custom:Tween(MinStroke, 0.2, { Transparency = 0.8 })
 	end)
 
@@ -2768,7 +2767,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	Custom:Create("UIListLayout", { Padding = UDim.new(0, 3), SortOrder = Enum.SortOrder.LayoutOrder }, ScrollTab)
 
 	local AvatarFooter = Custom:Create("Frame", {
-		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.White, BackgroundTransparency = 0.93,
+		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.Black, BackgroundTransparency = 0,
 		BorderSizePixel = 0, Position = UDim2.new(0, 0, 1, 0), Size = UDim2.new(1, 0, 0, 34), Name = "AvatarFooter",
 	}, Side)
 	Custom:Corner(AvatarFooter, 8)
@@ -3021,7 +3020,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	end))
 
 	local ExitBackdrop = Custom:Create("Frame", {
-		Active = true, BackgroundColor3 = Theme.Black, BackgroundTransparency = 0.45,
+		Active = true, BackgroundColor3 = Theme.Black, BackgroundTransparency = 0,
 		BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), Visible = false, ZIndex = 49, Name = "ExitBackdrop",
 	}, Main)
 	local ExitConfirm = Custom:Create("Frame", {
@@ -3030,7 +3029,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		Visible = false, ZIndex = 50, Name = "ExitConfirm",
 	}, Main)
 	Custom:Corner(ExitConfirm, 10)
-	Custom:Stroke(ExitConfirm, Theme.White, 0.6, 1)
+	Custom:Stroke(ExitConfirm, Theme.White, 0, 1)
 	local ExitScale = Custom:Create("UIScale", { Scale = 1 }, ExitConfirm)
 	Custom:Label(ExitConfirm, {
 		Text = "Close Window", TextColor3 = Theme.White, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Center,
@@ -3242,17 +3241,17 @@ function Rexxzy_Library:CreateWindow(Config)
 	local ResizeGrip = Custom:Create("TextButton", {
 		Name = "ResizeGrip", Text = "◢", Font = Enum.Font.GothamBold, TextSize = 14,
 		TextColor3 = Theme.Sub, TextTransparency = 0.08, AutoButtonColor = false,
-		BackgroundColor3 = Theme.Panel, BackgroundTransparency = 0.18, BorderSizePixel = 0,
+		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 		AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -3, 1, -3),
 		Size = UDim2.new(0, 20, 0, 20), ZIndex = 48, Visible = ResizeEnabled,
 	}, Main)
 	Custom:Corner(ResizeGrip, 5)
 	Custom:Stroke(ResizeGrip, Theme.White, 0.82, 1)
 	ResizeGrip.MouseEnter:Connect(function()
-		Custom:Tween(ResizeGrip, 0.12, { BackgroundTransparency = 0.02, TextColor3 = Theme.White })
+		Custom:Tween(ResizeGrip, 0.12, { BackgroundTransparency = 0, TextColor3 = Theme.White })
 	end)
 	ResizeGrip.MouseLeave:Connect(function()
-		Custom:Tween(ResizeGrip, 0.15, { BackgroundTransparency = 0.18, TextColor3 = Theme.Sub })
+		Custom:Tween(ResizeGrip, 0.15, { BackgroundTransparency = 0, TextColor3 = Theme.White })
 	end)
 
 	local Resizing, ResizeStart, ResizeStartSize, ResizeStartPos = false, nil, nil, nil
@@ -3760,12 +3759,12 @@ function Rexxzy_Library:CreateWindow(Config)
 			local SectionName = SectionConfig[1] or SectionConfig.Name or SectionConfig.Title or "Section"
 
 			local SectionFrame = Custom:Create("Frame", {
-				BackgroundColor3 = Theme.White, BackgroundTransparency = 0.95, BorderSizePixel = 0,
+				BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 				AutomaticSize = Enum.AutomaticSize.Y, Size = UDim2.new(1, 0, 0, 0),
 				LayoutOrder = #TabFrame:GetChildren(), Name = SectionName .. "Section",
 			}, TabFrame)
 			Custom:Corner(SectionFrame, 9)
-			Custom:Stroke(SectionFrame, Theme.White, 0.93, 1)
+			Custom:Stroke(SectionFrame, Theme.White, 0, 1)
 			Custom:Create("UIListLayout", { Padding = UDim.new(0, 0), SortOrder = Enum.SortOrder.LayoutOrder }, SectionFrame)
 
 			local Header = Custom:Create("TextButton", {
@@ -4714,8 +4713,21 @@ function Rexxzy_Library:CreateWindow(Config)
 			end
 
 			function SecFuncs:AddLabel(LabelConfig)
-				if type(LabelConfig) == "string" then LabelConfig = { LabelConfig } end
-				local LabelText = tostring(LabelConfig[1] or LabelConfig.Text or LabelConfig.Name or "")
+				local RawLabel
+				if type(LabelConfig) == "string" or type(LabelConfig) == "number" then
+					RawLabel = LabelConfig
+				elseif type(LabelConfig) == "table" then
+					RawLabel = LabelConfig[1] or LabelConfig.Text or LabelConfig.Name
+				end
+				-- A table object is not human-readable label content. Drop it instead
+				-- of showing Lua's internal "table: 0x..." address in the menu.
+				if type(RawLabel) ~= "string" and type(RawLabel) ~= "number" then
+					return { Label = nil, Set = function() end, SetText = function() end, Get = function() return "" end }
+				end
+				local LabelText = tostring(RawLabel)
+				if LabelText:match("^table:%s*0x[%da-fA-F]+$") then
+					return { Label = nil, Set = function() end, SetText = function() end, Get = function() return "" end }
+				end
 				local LF = Custom:Card(SectionContent, 28, "Label", false)
 				Place(LF)
 				LF.AutomaticSize = Enum.AutomaticSize.Y
