@@ -4727,38 +4727,173 @@ function Rexxzy_Library:CreateWindow(Config)
 			end
 
 			function SecFuncs:AddLabel(LabelConfig)
-				local RawLabel
+				-- Flexible label: dynamic text, icon, color, description, click — no Position offsets.
+				local Cfg = {}
 				if type(LabelConfig) == "string" or type(LabelConfig) == "number" then
-					RawLabel = LabelConfig
+					Cfg.Text = LabelConfig
 				elseif type(LabelConfig) == "table" then
-					RawLabel = LabelConfig[1] or LabelConfig.Text or LabelConfig.Name
+					for k, v in pairs(LabelConfig) do Cfg[k] = v end
+					if Cfg[1] ~= nil and Cfg.Text == nil and Cfg.Name == nil then Cfg.Text = Cfg[1] end
+					if Cfg[2] ~= nil and Cfg.Description == nil and Cfg.Content == nil then Cfg.Description = Cfg[2] end
 				end
-				-- A table object is not human-readable label content. Drop it instead
-				-- of showing Lua's internal "table: 0x..." address in the menu.
-				if type(RawLabel) ~= "string" and type(RawLabel) ~= "number" then
-					return { Label = nil, Set = function() end, SetText = function() end, Get = function() return "" end }
+
+				local function Sanitize(v)
+					if type(v) ~= "string" and type(v) ~= "number" then return nil end
+					local s = tostring(v)
+					-- Never show Lua table addresses like "table: 0x..."
+					if s:match("^table:%s*0x[%da-fA-F]+$") then return nil end
+					return s
 				end
-				local LabelText = tostring(RawLabel)
-				if LabelText:match("^table:%s*0x[%da-fA-F]+$") then
-					return { Label = nil, Set = function() end, SetText = function() end, Get = function() return "" end }
+
+				local LabelText = Sanitize(Cfg.Text or Cfg.Name or Cfg.Title) or ""
+				local DescText = Sanitize(Cfg.Description or Cfg.Content or Cfg.Sub) or ""
+				local TextColor = typeof(Cfg.Color) == "Color3" and Cfg.Color or (typeof(Cfg.TextColor3) == "Color3" and Cfg.TextColor3 or Theme.Text)
+				local DescColor = typeof(Cfg.DescColor) == "Color3" and Cfg.DescColor or Theme.Sub
+				local TextSize = math.clamp(tonumber(Cfg.TextSize or Cfg.Size) or 11, 8, 28)
+				local DescSize = math.clamp(tonumber(Cfg.DescSize) or 10, 8, 22)
+				local FontFace = typeof(Cfg.Font) == "EnumItem" and Cfg.Font or Enum.Font.GothamMedium
+				local Align = Enum.TextXAlignment.Left
+				do
+					local a = string.lower(tostring(Cfg.Align or Cfg.TextXAlignment or "left"))
+					if a == "center" or a == "middle" then Align = Enum.TextXAlignment.Center
+					elseif a == "right" then Align = Enum.TextXAlignment.Right end
 				end
-				local LF = Custom:Card(SectionContent, 40, "Label", false)
+				local Rich = Cfg.RichText == true
+				local IconSrc = Cfg.Icon
+				local Clickable = type(Cfg.Callback) == "function" or Cfg.Clickable == true
+				local Callback = type(Cfg.Callback) == "function" and Cfg.Callback or function() end
+				local CardH = (DescText ~= "" and 46) or 36
+
+				local LF, LStroke = Custom:Card(SectionContent, CardH, "Label", Clickable)
 				Place(LF)
 				LF.AutomaticSize = Enum.AutomaticSize.Y
+
+				-- Layout only (no Position offsets)
 				Custom:Create("UIPadding", {
-					PaddingTop = UDim.new(0, 7), PaddingBottom = UDim.new(0, 7), PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10),
+					PaddingTop = UDim.new(0, 8), PaddingBottom = UDim.new(0, 8),
+					PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10),
 				}, LF)
-				local Text = Custom:Label(LF, {
-					Font = Enum.Font.GothamMedium, Text = LabelText, TextColor3 = Theme.Text, TextSize = 11, TextWrapped = true,
-					TextYAlignment = Enum.TextYAlignment.Top, AutomaticSize = Enum.AutomaticSize.Y,
-					Size = UDim2.new(1, 0, 0, 14), Name = "LabelText",
+				local Row = Custom:Create("Frame", {
+					BackgroundTransparency = 1, BorderSizePixel = 0, AutomaticSize = Enum.AutomaticSize.Y,
+					Size = UDim2.new(1, 0, 0, 0), Name = "LabelRow",
+				}, LF)
+				Custom:Create("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					VerticalAlignment = Enum.VerticalAlignment.Center,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 8),
+				}, Row)
+
+				local IconObj = nil
+				local IconHold = nil
+				if IconSrc then
+					IconHold = Custom:Create("Frame", {
+						BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 1,
+						Size = UDim2.new(0, 18, 0, 18), Name = "IconHold",
+					}, Row)
+					IconObj = Custom:MakeIcon(IconHold, IconSrc, {
+						Size = UDim2.new(0, 16, 0, 16), Color = TextColor, Name = "LabelIcon",
+						AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
+					})
+				end
+
+				local TextCol = Custom:Create("Frame", {
+					BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 2,
+					AutomaticSize = Enum.AutomaticSize.Y,
+					Size = UDim2.new(1, IconSrc and -26 or 0, 0, 0), Name = "TextCol",
+				}, Row)
+				Custom:Create("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2),
+				}, TextCol)
+
+				local Text = Custom:Label(TextCol, {
+					Font = FontFace, Text = LabelText, TextColor3 = TextColor, TextSize = TextSize,
+					TextWrapped = true, TextXAlignment = Align, TextYAlignment = Enum.TextYAlignment.Top,
+					RichText = Rich, AutomaticSize = Enum.AutomaticSize.Y,
+					Size = UDim2.new(1, 0, 0, TextSize + 2), LayoutOrder = 1, Name = "LabelText",
 				})
+				local Desc = nil
+				if DescText ~= "" then
+					Desc = Custom:Label(TextCol, {
+						Font = Enum.Font.Gotham, Text = DescText, TextColor3 = DescColor, TextSize = DescSize,
+						TextWrapped = true, TextXAlignment = Align, TextYAlignment = Enum.TextYAlignment.Top,
+						RichText = Rich, AutomaticSize = Enum.AutomaticSize.Y,
+						Size = UDim2.new(1, 0, 0, DescSize + 2), LayoutOrder = 2, Name = "LabelDesc",
+					})
+				end
+
+				if Clickable then
+					LF.Activated:Connect(function()
+						CircleClick(LF)
+						task.spawn(Callback, Text.Text)
+					end)
+					Custom:Hover(LF, LStroke)
+				end
+
+				local function ApplyText(v)
+					local s = Sanitize(v)
+					if s == nil then return end
+					Text.Text = s
+				end
+				local function ApplyDesc(v)
+					local s = Sanitize(v)
+					if s == nil then
+						if Desc then Desc.Visible = false end
+						return
+					end
+					if not Desc then
+						Desc = Custom:Label(TextCol, {
+							Font = Enum.Font.Gotham, Text = s, TextColor3 = DescColor, TextSize = DescSize,
+							TextWrapped = true, TextXAlignment = Align, TextYAlignment = Enum.TextYAlignment.Top,
+							RichText = Rich, AutomaticSize = Enum.AutomaticSize.Y,
+							Size = UDim2.new(1, 0, 0, DescSize + 2), LayoutOrder = 2, Name = "LabelDesc",
+						})
+					else
+						Desc.Text = s
+						Desc.Visible = true
+					end
+				end
+				local function ApplyColor(c)
+					if typeof(c) ~= "Color3" then return end
+					Text.TextColor3 = c
+					if IconObj and IconObj.Instance then
+						pcall(function() IconObj.Instance.ImageColor3 = c end)
+					end
+				end
+				local function ApplyIcon(src)
+					if not src then
+						if IconHold then IconHold.Visible = false end
+						return
+					end
+					if not IconHold then
+						IconHold = Custom:Create("Frame", {
+							BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 1,
+							Size = UDim2.new(0, 18, 0, 18), Name = "IconHold",
+						}, Row)
+					end
+					IconHold.Visible = true
+					if IconObj and IconObj.Instance then
+						Custom:SetImage(IconObj.Instance, src)
+					else
+						IconObj = Custom:MakeIcon(IconHold, src, {
+							Size = UDim2.new(0, 16, 0, 16), Color = Text.TextColor3, Name = "LabelIcon",
+							AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
+						})
+					end
+				end
+
 				return {
 					Label = LF,
-					Set = function(NewText) Text.Text = tostring(NewText) end,
-					SetText = function(NewText) Text.Text = tostring(NewText) end,
+					Set = ApplyText,
+					SetText = ApplyText,
+					SetDescription = ApplyDesc,
+					SetDesc = ApplyDesc,
+					SetColor = ApplyColor,
+					SetIcon = ApplyIcon,
 					Get = function() return Text.Text end,
-				}
+					GetText = function() return Text.Text end,
+					GetDescription = function() return Desc and Desc.Visible and Desc.Text or "" end,
+				end
 			end
 
 			function SecFuncs:AddProgress(PConfig)
