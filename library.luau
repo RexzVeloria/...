@@ -14,12 +14,12 @@ local REXXZY_DEVELOPER_TAG_TEXT = "🛠️ Developer"
 local REXXZY_DEVELOPER_TAG_MAX_DISTANCE = 180
 
 local RexxzyLogos = {
-    Veloria = "rbxassetid://99716974769256",
-    veloria = "rbxassetid://99716974769256",
-    Verlo = "rbxassetid://99716974769256",
-    verlo = "rbxassetid://99716974769256",
-    VH = "rbxassetid://99716974769256",
-    vh = "rbxassetid://99716974769256",
+    Veloria = "rbxassetid://91690039393292",
+    veloria = "rbxassetid://91690039393292",
+    Verlo = "rbxassetid://91690039393292",
+    verlo = "rbxassetid://91690039393292",
+    VH = "rbxassetid://91690039393292",
+    vh = "rbxassetid://91690039393292",
 }
 
 local function SafeGetExecutor()
