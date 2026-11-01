@@ -6,4 +6,4 @@ A customizable UI library for Roblox.
 
 See the complete changelog:
 
-[View Update Log](Update.md)
+[View Update Log](update.md)
