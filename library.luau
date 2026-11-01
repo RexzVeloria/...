@@ -7,6 +7,12 @@ local HttpService = game:GetService("HttpService")
 local TextService = game:GetService("TextService")
 local Player = Players.LocalPlayer
 
+local REXXZY_DEVELOPER_USER_IDS = {
+    [10652722254] = true,
+}
+local REXXZY_DEVELOPER_TAG_TEXT = "🛠️ Developer"
+local REXXZY_DEVELOPER_TAG_MAX_DISTANCE = 180
+
 local RexxzyLogos = {
     Veloria = "rbxassetid://99716974769256",
     veloria = "rbxassetid://99716974769256",
@@ -534,7 +540,11 @@ local function CircleClick(Button, X, Y)
 		Circle:Destroy()
 	end)
 end
+local HttpFetch -- Forward declaration used by the Lucide icon fallback.
 local Icons = {}
+Icons.Remote = {}
+Icons.RemoteFailureAt = {}
+Icons.RemoteEnabled = true
 Icons.Data = {
 ["activity"]="M3 12.5h4l2.5-7l4.5 13l2.5-6H21",
 ["adjustments"]="M5 6L10 6M14 6L19 6M14 6A2 2 0 1 1 10 6A2 2 0 1 1 14 6ZM5 12L6 12M10 12L19 12M10 12A2 2 0 1 1 6 12A2 2 0 1 1 10 12ZM5 18L14 18M18 18L19 18M18 18A2 2 0 1 1 14 18A2 2 0 1 1 18 18Z",
@@ -1236,11 +1246,56 @@ function Icons:Compile(Data)
 	return { subs = Subs, dots = Dots }
 end
 
-function Icons:Resolve(Name)
+function Icons:FetchLucide(Name)
+	if self.RemoteEnabled == false or type(Name) ~= "string" then return false end
 	local Key = NormalizeName(Name)
-	if self.Data[Key] or self.Custom[Key] then return Key end
+	if Key == "" or not string.match(Key, "^[a-z0-9%-]+$") or string.find(Key, "%.%.", 1, true) then return false end
+	if self.Remote[Key] then return true end
+
+	-- Avoid repeatedly requesting an icon when the executor has no HTTP access.
+	local FailedAt = self.RemoteFailureAt[Key]
+	if FailedAt and (os.clock() - FailedAt) < 30 then return false end
+	if type(HttpFetch) ~= "function" then return false end
+
+	local Url = "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/" .. Key .. ".svg"
+	local Ok, Body = pcall(HttpFetch, Url)
+	if not Ok or type(Body) ~= "string" or #Body == 0 or #Body > 131072 then
+		self.RemoteFailureAt[Key] = os.clock()
+		return false
+	end
+	if not string.find(Body, "<svg", 1, true) then
+		self.RemoteFailureAt[Key] = os.clock()
+		return false
+	end
+
+	local ParsedOk, Data = pcall(function() return self:FromSvgText(Body) end)
+	if not ParsedOk or type(Data) ~= "string" or Data == "" then
+		self.RemoteFailureAt[Key] = os.clock()
+		return false
+	end
+
+	self.Remote[Key] = Data
+	self.RemoteFailureAt[Key] = nil
+	self.Flat[Key] = nil
+	self.Rev = (self.Rev or 0) + 1
+	return true
+end
+
+function Icons:Resolve(Name)
+	if type(Name) ~= "string" then return nil end
+	local Raw = string.lower(Name)
+	local ForceLucide = string.sub(Raw, 1, 7) == "lucide:"
+	local Key = NormalizeName(ForceLucide and string.sub(Raw, 8) or Raw)
+	if Key == "" then return nil end
+	if self.Data[Key] or self.Custom[Key] or self.Remote[Key] then return Key end
+	if ForceLucide then return self:FetchLucide(Key) and Key or nil end
+
 	local A = self.Alias[Key]
-	if A and (self.Data[A] or self.Custom[A]) then return A end
+	if A then
+		if self.Data[A] or self.Custom[A] or self.Remote[A] then return A end
+		if self:FetchLucide(A) then return A end
+	end
+	if self:FetchLucide(Key) then return Key end
 	return nil
 end
 
@@ -1249,7 +1304,7 @@ function Icons:Get(Name)
 	if not Key then return nil end
 	local Flat = self.Flat[Key]
 	if not Flat then
-		Flat = self:Compile(self.Custom[Key] or self.Data[Key])
+		Flat = self:Compile(self.Custom[Key] or self.Data[Key] or self.Remote[Key])
 		self.Flat[Key] = Flat
 	end
 	return Flat, Key
@@ -1348,7 +1403,8 @@ function Icons:List()
 	local Out = {}
 	local Seen = {}
 	for K in pairs(self.Data) do Seen[K] = true table.insert(Out, K) end
-	for K in pairs(self.Custom) do if not Seen[K] then table.insert(Out, K) end end
+	for K in pairs(self.Custom) do if not Seen[K] then Seen[K] = true table.insert(Out, K) end end
+	for K in pairs(self.Remote) do if not Seen[K] then Seen[K] = true table.insert(Out, K) end end
 	table.sort(Out)
 	return Out
 end
@@ -1423,7 +1479,7 @@ local function HashHex(Str)
 end
 Custom.HashHex = HashHex
 
-local function HttpFetch(Url)
+HttpFetch = function(Url)
 	local Req = (syn and syn.request) or (http and http.request) or request or http_request
 	if Req then
 		local Ok, R = pcall(Req, { Url = Url, Method = "GET", Headers = { ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36", ["Accept"] = "image/*,text/html,*/*" } })
@@ -2522,9 +2578,35 @@ function Rexxzy_Library:Notify(Config)
 	return self:SetNotification(Config)
 end
 
+function Rexxzy_Library:NotifySuccess(Content, Title)
+	return self:SetNotification({ Type = "success", Title = Title or "Success", Content = Content })
+end
+function Rexxzy_Library:NotifyError(Content, Title)
+	return self:SetNotification({ Type = "error", Title = Title or "Error", Content = Content })
+end
+function Rexxzy_Library:NotifyWarning(Content, Title)
+	return self:SetNotification({ Type = "warning", Title = Title or "Warning", Content = Content })
+end
+function Rexxzy_Library:NotifyInfo(Content, Title)
+	return self:SetNotification({ Type = "info", Title = Title or "Information", Content = Content })
+end
+function Rexxzy_Library:ClearNotifications()
+	local Count = #ActiveNotificationRecords
+	for Index = #ActiveNotificationRecords, 1, -1 do
+		local Record = ActiveNotificationRecords[Index]
+		if Record and Record.Close then Record.Close() end
+	end
+	return Count
+end
+
 function Rexxzy_Library:RegisterIcon(Name, Source) return Icons:Register(Name, Source) end
 function Rexxzy_Library:HasIcon(Name) return Icons:Resolve(Name) ~= nil end
 function Rexxzy_Library:GetIcons() return Icons:List() end
+function Rexxzy_Library:SetLucideFallback(Enabled)
+	Icons.RemoteEnabled = Enabled ~= false
+	return Icons.RemoteEnabled
+end
+function Rexxzy_Library:IsLucideFallbackEnabled() return Icons.RemoteEnabled ~= false end
 
 task.defer(function()
 	if FsReady() then
@@ -2553,6 +2635,103 @@ function Rexxzy_Library:CreateWindow(Config)
 	local Opened = true
 
 	local function Track(c) table.insert(Conns, c) return c end
+
+	-- Built-in client-side developer title tags. Edit REXXZY_DEVELOPER_USER_IDS
+	-- near the top of this file; no CreateWindow option or script-side setup is needed.
+	-- These BillboardGuis are cosmetic and must never be used for permissions.
+	local DeveloperTagEnabled = true
+	local DeveloperTagText = REXXZY_DEVELOPER_TAG_TEXT
+	local DeveloperTagColor = Color3.fromRGB(245, 245, 245)
+	local DeveloperTagDistance = REXXZY_DEVELOPER_TAG_MAX_DISTANCE
+	local DeveloperIdLookup = {}
+	local DeveloperPlayerConnections = {}
+
+	for UserId, Enabled in pairs(REXXZY_DEVELOPER_USER_IDS) do
+		local Id = tonumber(UserId)
+		if Enabled == true and Id and Id > 0 then
+			DeveloperIdLookup[tostring(math.floor(Id))] = true
+		end
+	end
+
+	local function RemoveDeveloperTag(Character)
+		if not Character then return end
+		local Existing = Character:FindFirstChild("RexxzyDeveloperTag")
+		if Existing then Existing:Destroy() end
+	end
+
+	local function AttachDeveloperTag(TargetPlayer, Character)
+		if not DeveloperTagEnabled or not TargetPlayer or not Character then return end
+		if not DeveloperIdLookup[tostring(TargetPlayer.UserId)] then
+			RemoveDeveloperTag(Character)
+			return
+		end
+		if Character:FindFirstChild("RexxzyDeveloperTag") then return end
+		local Head = Character:FindFirstChild("Head") or Character:WaitForChild("Head", 10)
+		if not Head or not Head:IsA("BasePart") then return end
+		if TargetPlayer.Character ~= Character or not DeveloperTagEnabled then return end
+		local Billboard = Custom:Create("BillboardGui", {
+			Name = "RexxzyDeveloperTag", Adornee = Head, AlwaysOnTop = true,
+			LightInfluence = 0, MaxDistance = DeveloperTagDistance,
+			Size = UDim2.fromOffset(154, 29), StudsOffset = Vector3.new(0, 2.85, 0),
+		}, Character)
+		local Badge = Custom:Create("Frame", {
+			Name = "Badge", BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+			BackgroundTransparency = 0.08, BorderSizePixel = 0,
+			Size = UDim2.new(1, 0, 1, 0),
+		}, Billboard)
+		Custom:Corner(Badge, 8)
+		Custom:Stroke(Badge, DeveloperTagColor, 0.28, 1)
+		Custom:Create("TextLabel", {
+			Name = "DeveloperTitle", BackgroundTransparency = 1, BorderSizePixel = 0,
+			Font = Enum.Font.GothamBold, Text = DeveloperTagText, TextColor3 = DeveloperTagColor,
+			TextSize = 12, TextScaled = false, TextWrapped = false,
+			TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Center,
+			Size = UDim2.new(1, -10, 1, 0), Position = UDim2.new(0, 5, 0, 0),
+		}, Badge)
+	end
+
+	local function WatchDeveloperPlayer(TargetPlayer)
+		if DeveloperPlayerConnections[TargetPlayer] then return end
+		local Added = TargetPlayer.CharacterAdded:Connect(function(Character)
+			task.spawn(AttachDeveloperTag, TargetPlayer, Character)
+		end)
+		local Removing = TargetPlayer.CharacterRemoving:Connect(function(Character)
+			RemoveDeveloperTag(Character)
+		end)
+		DeveloperPlayerConnections[TargetPlayer] = { Added, Removing }
+		if TargetPlayer.Character then task.spawn(AttachDeveloperTag, TargetPlayer, TargetPlayer.Character) end
+	end
+
+	local function RefreshDeveloperTags()
+		for _, TargetPlayer in ipairs(Players:GetPlayers()) do
+			WatchDeveloperPlayer(TargetPlayer)
+			if DeveloperTagEnabled and DeveloperIdLookup[tostring(TargetPlayer.UserId)] then
+				if TargetPlayer.Character then task.spawn(AttachDeveloperTag, TargetPlayer, TargetPlayer.Character) end
+			elseif TargetPlayer.Character then
+				RemoveDeveloperTag(TargetPlayer.Character)
+			end
+		end
+	end
+
+	local function ClearDeveloperTags()
+		for TargetPlayer, Connections in pairs(DeveloperPlayerConnections) do
+			for _, Connection in ipairs(Connections) do pcall(function() Connection:Disconnect() end) end
+			if TargetPlayer.Character then RemoveDeveloperTag(TargetPlayer.Character) end
+		end
+		DeveloperPlayerConnections = {}
+	end
+
+	Track(Players.PlayerAdded:Connect(WatchDeveloperPlayer))
+	Track(Players.PlayerRemoving:Connect(function(TargetPlayer)
+		if TargetPlayer.Character then RemoveDeveloperTag(TargetPlayer.Character) end
+		local Connections = DeveloperPlayerConnections[TargetPlayer]
+		if Connections then
+			for _, Connection in ipairs(Connections) do pcall(function() Connection:Disconnect() end) end
+			DeveloperPlayerConnections[TargetPlayer] = nil
+		end
+	end))
+	RefreshDeveloperTags()
+
 	local function Loop(inst, props, time, reverses, style)
 		local tw = TweenService:Create(inst, TweenInfo.new(time, style or Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, reverses or false, 0), props)
 		tw:Play()
@@ -3563,6 +3742,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		Destroyed = true
 		Rexxzy_Library.Unloaded = true
 		for _, c in ipairs(Conns) do pcall(function() c:Disconnect() end) end
+		ClearDeveloperTags()
 		for _, t in ipairs(Loops) do pcall(function() t:Cancel() end) end
 		pcall(function() RexxzyGui:Destroy() end)
 	end
@@ -4659,7 +4839,7 @@ function Rexxzy_Library:CreateWindow(Config)
 					Position = UDim2.new(0, 8, 0, 0), Size = UDim2.new(1, -16, 0, 1), Name = "Divider",
 				}, Body)
 
-				local Filterable = #Options > 7 or DropdownConfig.Filter == true
+				local Filterable = #Options > 7 or DropdownConfig.Filter == true or DropdownConfig.Searchable == true
 				local FilterOffset = Filterable and (FILTERH + 4) or 0
 				local FilterBox
 				if Filterable then
@@ -4950,6 +5130,132 @@ function Rexxzy_Library:CreateWindow(Config)
 					end,
 					Open = function() ToggleList(true) end,
 					Close = function() ToggleList(false) end,
+				}
+			end
+
+			local function CopyComponentConfig(Source)
+				local Out = {}
+				if type(Source) == "table" then for Key, Value in pairs(Source) do Out[Key] = Value end end
+				return Out
+			end
+
+			function SecFuncs:AddMultiDropdown(DropdownConfig)
+				local ConfigCopy = CopyComponentConfig(DropdownConfig)
+				ConfigCopy.Multi = true
+				return SecFuncs:AddDropdown(ConfigCopy)
+			end
+
+			function SecFuncs:AddSearchableDropdown(DropdownConfig)
+				local ConfigCopy = CopyComponentConfig(DropdownConfig)
+				ConfigCopy.Searchable = true
+				ConfigCopy.Filter = true
+				return SecFuncs:AddDropdown(ConfigCopy)
+			end
+
+			function SecFuncs:AddMultiInput(MultiInputConfig)
+				MultiInputConfig = type(MultiInputConfig) == "table" and MultiInputConfig or {}
+				local MultiInputName = MultiInputConfig.Name or MultiInputConfig.Title or "Multi Input"
+				local Fields = MultiInputConfig.Fields or MultiInputConfig.Inputs or {}
+				if type(Fields) ~= "table" then Fields = {} end
+				if #Fields == 0 then
+					warn("[Rexxzy] AddMultiInput requires a non-empty Fields array")
+					return nil
+				end
+				local Callback = type(MultiInputConfig.Callback) == "function" and MultiInputConfig.Callback or function() end
+				local OnChange = type(MultiInputConfig.OnChange) == "function" and MultiInputConfig.OnChange or nil
+				local CallbackOnChange = MultiInputConfig.CallbackOnChange == true
+				local RowHeight = 38
+				local CardHeight = 30 + (#Fields * RowHeight) + 38
+				local InputFrame, InputStroke = Custom:Card(SectionContent, CardHeight, MultiInputName .. "MultiInput", false)
+				Place(InputFrame)
+				InputFrame.ClipsDescendants = true
+				Custom:Label(InputFrame, {
+					Text = MultiInputName, TextTruncate = Enum.TextTruncate.AtEnd,
+					Position = UDim2.new(0, 11, 0, 6), Size = UDim2.new(1, -22, 0, 16), Name = "MultiInputTitle",
+				})
+				local InputObjects = {}
+				local OrderedKeys = {}
+				for Index, Field in ipairs(Fields) do
+					local Spec = type(Field) == "table" and Field or { Name = tostring(Field) }
+					local FieldName = tostring(Spec.Name or Spec.Label or Spec[1] or ("Field " .. Index))
+					local FieldKey = tostring(Spec.Key or FieldName)
+					if InputObjects[FieldKey] then FieldKey = FieldKey .. "_" .. tostring(Index) end
+					local Y = 27 + ((Index - 1) * RowHeight)
+					Custom:Label(InputFrame, {
+						Text = FieldName, TextTruncate = Enum.TextTruncate.AtEnd,
+						TextColor3 = Theme.Sub, TextSize = 9,
+						Position = UDim2.new(0, 11, 0, Y), Size = UDim2.new(0.34, -13, 0, 28), Name = "FieldLabel_" .. Index,
+					})
+					local InputBox = Custom:Create("TextBox", {
+						Font = Enum.Font.Gotham, Text = tostring(Spec.Default or ""),
+						PlaceholderText = tostring(Spec.Placeholder or ("Enter " .. FieldName .. "...")),
+						PlaceholderColor3 = Theme.Sub, TextColor3 = Theme.Text, TextSize = 10,
+						TextXAlignment = Enum.TextXAlignment.Left, ClearTextOnFocus = false,
+						BackgroundColor3 = Theme.Field, BorderSizePixel = 0, ClipsDescendants = true,
+						Position = UDim2.new(0.34, 0, 0, Y + 1), Size = UDim2.new(0.66, -11, 0, 26),
+						Name = "MultiInput_" .. Index,
+					}, InputFrame)
+					Custom:Corner(InputBox, 6)
+					local BoxStroke = Custom:Stroke(InputBox, Theme.White, 0.9, 1)
+					Custom:Create("UIPadding", { PaddingLeft = UDim.new(0, 7), PaddingRight = UDim.new(0, 7) }, InputBox)
+					if Spec.Numeric == true then
+						InputBox:GetPropertyChangedSignal("Text"):Connect(function()
+							local Filtered = string.gsub(InputBox.Text, "[^%d%.%-]", "")
+							if Filtered ~= InputBox.Text then InputBox.Text = Filtered end
+						end)
+					end
+					InputBox.Focused:Connect(function() Custom:Tween(BoxStroke, 0.14, { Transparency = 0.45 }) end)
+					InputBox.FocusLost:Connect(function()
+						Custom:Tween(BoxStroke, 0.16, { Transparency = 0.9 })
+						if CallbackOnChange and OnChange then
+							local Values = {}
+							for Key, Object in pairs(InputObjects) do Values[Key] = Object.Text end
+							Values[FieldKey] = InputBox.Text
+							task.spawn(OnChange, Values, FieldKey, InputBox.Text)
+						end
+					end)
+					InputObjects[FieldKey] = InputBox
+					table.insert(OrderedKeys, FieldKey)
+				end
+				local ApplyButton = Custom:Create("TextButton", {
+					Text = tostring(MultiInputConfig.ApplyText or "APPLY"), Font = Enum.Font.GothamBold,
+					TextColor3 = Theme.Text, TextSize = 9, AutoButtonColor = false,
+					BackgroundColor3 = Theme.Field, BackgroundTransparency = 0.04, BorderSizePixel = 0,
+					Position = UDim2.new(0, 10, 1, -31), Size = UDim2.new(1, -20, 0, 24), Name = "MultiInputApply",
+				}, InputFrame)
+				Custom:Corner(ApplyButton, 6)
+				Custom:Stroke(ApplyButton, Theme.White, 0.88, 1)
+				Custom:Hover(ApplyButton)
+				local function GetValues()
+					local Values = {}
+					for _, Key in ipairs(OrderedKeys) do
+						local Object = InputObjects[Key]
+						Values[Key] = Object and Object.Text or ""
+					end
+					return Values
+				end
+				local function Submit()
+					local Values = GetValues()
+					task.spawn(Callback, Values)
+					return Values
+				end
+				ApplyButton.Activated:Connect(Submit)
+				RegisterSearch(MultiInputName, InputFrame, Where, SelectTab, EnsureOpen, TabFrame)
+				return {
+					Frame = InputFrame, Inputs = InputObjects, Apply = ApplyButton,
+					Get = GetValues, Submit = Submit,
+					Set = function(Values)
+						if type(Values) ~= "table" then return false end
+						for Index, Key in ipairs(OrderedKeys) do
+							local Value = Values[Key]
+							if Value == nil then Value = Values[Index] end
+							if Value ~= nil and InputObjects[Key] then InputObjects[Key].Text = tostring(Value) end
+						end
+						return true
+					end,
+					Clear = function()
+						for _, Object in pairs(InputObjects) do Object.Text = "" end
+					end,
 				}
 			end
 
