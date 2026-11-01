@@ -11,6 +11,10 @@ Profile System
 - Added account information display.
 - Added User ID, Place ID, and Job ID copy actions.
 - Added configurable Support Link.
+- Added an interactive profile panel.
+- Added custom background support for Roblox asset IDs and image URLs.
+- Added account information and copy actions.
+- Added configurable support link.
 
 Mobile Responsive
 
@@ -37,17 +41,13 @@ MobileResponsive = true
 
 Set to "false" to disable mobile-specific responsive adjustments.
 
-Upcoming Features
+Other Features
 
-- Custom Avatar
-- Custom Profile Banner
-- Accent Color Picker
-- Theme Presets
-- Import / Export Configuration
-- Per-Game Settings
-- Notification Center
-- Quick Actions
-- Keybind Manager
+- Multi Dropdown
+- Searchable Dropdown
+- Multi Input
+- Added notification helpers for success, error, warning, and information messages.
+- Added notification clearing support.
 
 ---
 
