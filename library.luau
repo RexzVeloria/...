@@ -49,8 +49,8 @@ function WebhookConfig.new(name, cfg)
 	self.SendPlayer = cfg.SendPlayer ~= false
 	self.SendGame = cfg.SendGame ~= false
 	self.Timestamp = cfg.Timestamp ~= false
-	self.RateDelay = cfg.RateDelay or 2
-	self.QueueMax = cfg.QueueMax or 50
+	self.RateDelay = math.max(0, tonumber(cfg.RateDelay) or 2)
+	self.QueueMax = math.max(1, math.floor(tonumber(cfg.QueueMax) or 50))
 	self.Color = cfg.Color or 0xE6E6E6
 	self._queue = {}
 	self._events = {}
@@ -58,6 +58,7 @@ function WebhookConfig.new(name, cfg)
 	self._stats = { sent = 0, failed = 0, dropped = 0 }
 	self._lastSent = 0
 	self._processing = false
+	self._running = true
 	self._playerCache = nil
 	self._gameCache = nil
 	self:_StartWorker()
@@ -91,10 +92,12 @@ end
 
 function WebhookConfig:_BuildFields(data)
 	local fields = {}
-	if data then
+	if type(data) == "table" then
 		for k, v in pairs(data) do
+			if #fields >= 19 then break end
 			if type(k) == "string" and type(v) ~= "table" and type(v) ~= "function" then
-				table.insert(fields, { name = tostring(k), value = "```" .. tostring(v) .. "```", inline = true })
+				local Value = tostring(v):gsub("```", "'''"):sub(1, 1000)
+				table.insert(fields, { name = tostring(k):sub(1, 256), value = "```" .. Value .. "```", inline = true })
 			end
 		end
 	end
@@ -143,13 +146,17 @@ end
 
 function WebhookConfig:_StartWorker()
 	task.spawn(function()
-		while true do
+		while self._running do
 			task.wait(0.5)
+			if not self._running then break end
 			if #self._queue > 0 and not self._processing then
 				if (tick() - self._lastSent) >= self.RateDelay then
 					self._processing = true
 					local item = table.remove(self._queue, 1)
-					if item then self:_DoPost(item) end
+					if item then
+						local ok = pcall(function() self:_DoPost(item) end)
+						if not ok then self._stats.failed = self._stats.failed + 1 end
+					end
 					self._lastSent = tick()
 					self._processing = false
 				end
@@ -191,7 +198,7 @@ function WebhookConfig:Send(event, data)
 end
 
 function WebhookConfig:SendEmbed(tbl)
-	if not self:_CanSend() then return false end
+	if not self:_CanSend() or type(tbl) ~= "table" then return false end
 	local embed = {
 		title = tbl.Title or tbl.title or "Embed",
 		description = tbl.Description or tbl.description or "",
@@ -207,7 +214,7 @@ function WebhookConfig:SendEmbed(tbl)
 end
 
 function WebhookConfig:SendEmbeds(list)
-	if not self:_CanSend() then return false end
+	if not self:_CanSend() or type(list) ~= "table" then return false end
 	local embeds = {}
 	for i, tbl in ipairs(list) do
 		if i > 10 then break end
@@ -226,7 +233,7 @@ function WebhookConfig:SendEmbeds(list)
 end
 
 function WebhookConfig:SendRaw(payload)
-	if not self:_CanSend() then return false end
+	if not self:_CanSend() or type(payload) ~= "table" then return false end
 	return self:_Enqueue(payload)
 end
 
@@ -236,13 +243,31 @@ function WebhookConfig:SendContent(text)
 end
 
 function WebhookConfig:Flush()
+	if not self._running or self._flushing then return false end
+	self._flushing = true
 	task.spawn(function()
-		while #self._queue > 0 do
-			local item = table.remove(self._queue, 1)
-			if item then self:_DoPost(item) end
-			task.wait(0.5)
+		while self._running and #self._queue > 0 do
+			if self._processing then
+				task.wait(0.1)
+			else
+				local WaitFor = math.max(0, (tonumber(self.RateDelay) or 2) - (tick() - self._lastSent))
+				if WaitFor > 0 then
+					task.wait(math.min(WaitFor, 0.25))
+				else
+					self._processing = true
+					local item = table.remove(self._queue, 1)
+					if item then
+						local ok = pcall(function() self:_DoPost(item) end)
+						if not ok then self._stats.failed = self._stats.failed + 1 end
+					end
+					self._lastSent = tick()
+					self._processing = false
+				end
+			end
 		end
+		self._flushing = false
 	end)
+	return true
 end
 
 function WebhookConfig:ClearQueue()
@@ -258,7 +283,17 @@ function WebhookConfig:GetPlayerInfo() return self:_GetPlayer() end
 function WebhookConfig:GetGameInfo() return self:_GetGame() end
 
 function WebhookConfig:Configure(cfg)
+	if type(cfg) ~= "table" then return false end
 	for k, v in pairs(cfg) do self[k] = v end
+	if cfg.RateDelay ~= nil then self.RateDelay = math.max(0, tonumber(cfg.RateDelay) or 2) end
+	if cfg.QueueMax ~= nil then self.QueueMax = math.max(1, math.floor(tonumber(cfg.QueueMax) or 50)) end
+	return true
+end
+
+function WebhookConfig:Destroy()
+	self._running = false
+	self._queue = {}
+	return true
 end
 
 function WebhookConfig:SetEnabled(b) self.Enabled = b == true end
@@ -268,6 +303,9 @@ local RexxzyWebhook = {}
 RexxzyWebhook._configs = {}
 
 function RexxzyWebhook:NewConfig(name, cfg)
+	name = tostring(name or "Default")
+	local previous = self._configs[name]
+	if previous and previous.Destroy then previous:Destroy() end
 	local c = WebhookConfig.new(name, cfg)
 	self._configs[name] = c
 	return c
@@ -1831,124 +1869,196 @@ function Rexxzy_Library:GetLogo(Name)
     return RexxzyLogos[Name] or RexxzyLogos[string.lower(Name)] or RexxzyLogos[string.upper(Name)]
 end
 
-local NotifGui, NotifContainer, NotifCounter = nil, nil, 0
-local NOTIF_WIDTH = 280
+local NotifGui, NotifContainer, NotifCounter, NotifListLayout = nil, nil, 0, nil
+local NOTIF_DEFAULT_WIDTH = 320
+local ActiveNotificationRecords = {}
+
+local function UpdateNotificationLayout()
+	if not (NotifGui and NotifGui.Parent and NotifContainer and NotifContainer.Parent) then return end
+	local Screen = NotifGui.AbsoluteSize
+	local ScreenW = Screen and Screen.X or 0
+	local IsCompact = UserInputService.TouchEnabled and ScreenW > 0 and ScreenW < 900
+	local Width = NOTIF_DEFAULT_WIDTH
+	if IsCompact then Width = math.max(180, math.min(340, ScreenW - 24)) end
+	NotifContainer.Size = UDim2.new(0, Width, 1, -68)
+	if IsCompact then
+		NotifContainer.AnchorPoint = Vector2.new(0.5, 0)
+		NotifContainer.Position = UDim2.new(0.5, 0, 0, 48)
+		if NotifListLayout then NotifListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center end
+	else
+		NotifContainer.AnchorPoint = Vector2.new(1, 0)
+		NotifContainer.Position = UDim2.new(1, -14, 0, 50)
+		if NotifListLayout then NotifListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right end
+	end
+end
 
 local function EnsureNotifGui()
-	if NotifGui and NotifGui.Parent then return end
+	if NotifGui and NotifGui.Parent then
+		UpdateNotificationLayout()
+		return
+	end
 	NotifGui = Custom:Create("ScreenGui", {
 		Name = "RexxzyNotify", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false,
 		DisplayOrder = 1000, IgnoreGuiInset = true,
 	}, Custom:GetGuiParent())
-	-- AnchorPoint (1,0) at (1,-8,0,50): right edge flush, safe top offset for mobile status bar
 	NotifContainer = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(1, 0), BackgroundTransparency = 1, BorderSizePixel = 0,
-		Position = UDim2.new(1, -8, 0, 50), Size = UDim2.new(0, NOTIF_WIDTH, 1, -60), Name = "NotifContainer",
+		Position = UDim2.new(1, -14, 0, 50), Size = UDim2.new(0, NOTIF_DEFAULT_WIDTH, 1, -68),
+		Name = "NotifContainer", ClipsDescendants = false,
 	}, NotifGui)
-	Custom:Create("UIListLayout", {
+	local List = Custom:Create("UIListLayout", {
 		SortOrder = Enum.SortOrder.LayoutOrder, VerticalAlignment = Enum.VerticalAlignment.Top,
 		HorizontalAlignment = Enum.HorizontalAlignment.Right, Padding = UDim.new(0, 8),
 	}, NotifContainer)
+	-- Keep the layout object available for responsive alignment changes.
+	NotifListLayout = List
+	NotifGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+		task.defer(UpdateNotificationLayout)
+	end)
+	UpdateNotificationLayout()
 end
 
 function Rexxzy_Library:SetNotification(Config)
 	if type(Config) == "string" then Config = { Content = Config } end
-	Config = Config or {}
+	Config = type(Config) == "table" and Config or {}
 	EnsureNotifGui()
-	local Text = tostring(Config.Content or Config[1] or "")
-	local Head = Config.Title
-	local NType = string.lower(tostring(Config.Type or ""))
-	local TypeIcons = { success = "check-circle", error = "x-circle", warning = "alert-triangle", info = "info" }
-	local IconName = Config.Icon or TypeIcons[NType]
-	if TypeIcons[NType] and not Head then
-		Head = string.upper(string.sub(NType, 1, 1)) .. string.sub(NType, 2)
-	end
-	local NColor = NType == "error" and Theme.Red or Theme.White
-	local Delay = tonumber(Config.Delay or Config[6]) or 3
-	local AnimT = tonumber(Config.Time or Config[5]) or 0.25
-	NotifCounter = NotifCounter + 1
-	local Closed, BarTween = false, nil
-	local NF = {}
-	local TextX = IconName and 36 or 14
 
-	local TSz = TextService:GetTextSize(Text, 11, Enum.Font.GothamBold, Vector2.new(NOTIF_WIDTH - TextX - 12, 1000))
-	local TextY = Head and 22 or 8
-	local CardH = math.max(TextY + TSz.Y + 14, 32)
+	local Text = tostring(Config.Content or Config[1] or "")
+	if Text == "" then Text = " " end
+	local NType = string.lower(tostring(Config.Type or "info"))
+	local TypeIcons = {
+		success = "check-circle", error = "x-circle", warning = "alert-triangle", info = "info",
+	}
+	if not TypeIcons[NType] then NType = "info" end
+	local TypeTitles = { success = "Success", error = "Error", warning = "Warning", info = "Information" }
+	local TypeColors = {
+		success = Color3.fromRGB(112, 216, 148),
+		error = Color3.fromRGB(238, 104, 104),
+		warning = Color3.fromRGB(232, 184, 103),
+		info = Theme.White,
+	}
+	local Head = tostring(Config.Title or TypeTitles[NType])
+	local IconName = Config.Icon or TypeIcons[NType]
+	local NColor = TypeColors[NType]
+	local Delay = math.clamp(tonumber(Config.Delay or Config[6]) or 3, 0.5, 30)
+	local AnimT = math.clamp(tonumber(Config.Time or Config[5]) or 0.22, 0.12, 0.6)
+
+	-- Prevent a burst of messages from covering the screen.
+	for I = #ActiveNotificationRecords, 1, -1 do
+		local Record = ActiveNotificationRecords[I]
+		if not (Record.Slot and Record.Slot.Parent) then table.remove(ActiveNotificationRecords, I) end
+	end
+	if #ActiveNotificationRecords >= 4 then
+		local Oldest = ActiveNotificationRecords[1]
+		if Oldest and Oldest.Close then Oldest.Close() end
+	end
+
+	NotifCounter = NotifCounter + 1
+	local Closed = false
+	local BarTween = nil
+	local NF = {}
+	local Record = { Slot = nil, Close = nil }
+	local ParentWidth = NotifContainer.AbsoluteSize.X
+	if not ParentWidth or ParentWidth < 180 then ParentWidth = NOTIF_DEFAULT_WIDTH end
+	local BodyWidth = math.max(110, ParentWidth - 88)
+	local TextSize = 11
+	local TextBounds = TextService:GetTextSize(Text, TextSize, Enum.Font.GothamMedium, Vector2.new(BodyWidth, 1000))
+	local BodyHeight = math.clamp(TextBounds.Y + 2, 14, 44)
+	local CardHeight = math.max(64, 28 + BodyHeight + 14)
+	local IsCompact = UserInputService.TouchEnabled and ParentWidth < 360
 
 	local Slot = Custom:Create("Frame", {
 		BackgroundTransparency = 1, BorderSizePixel = 0, ClipsDescendants = true,
-		LayoutOrder = NotifCounter, Size = UDim2.new(1, 0, 0, CardH), Name = "NotifSlot",
+		LayoutOrder = NotifCounter, Size = UDim2.new(1, 0, 0, CardHeight), Name = "NotifSlot",
 	}, NotifContainer)
+	Record.Slot = Slot
 
+	local StartPosition = IsCompact and UDim2.new(0, 0, 0, -18) or UDim2.new(1, ParentWidth + 18, 0, 0)
+	local ExitPosition = IsCompact and UDim2.new(0, 0, 0, -18) or UDim2.new(1, ParentWidth + 18, 0, 0)
 	local Card = Custom:Create("Frame", {
-		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
-		Position = UDim2.new(1, NOTIF_WIDTH + 10, 0, 0), Size = UDim2.new(1, 0, 1, 0), Name = "Card",
-		ClipsDescendants = true,
+		BackgroundColor3 = Theme.Panel, BackgroundTransparency = 0.02, BorderSizePixel = 0,
+		Position = StartPosition, Size = UDim2.new(1, 0, 1, 0), Name = "Card", ClipsDescendants = true,
 	}, Slot)
-	Custom:Corner(Card, 8)
-	local CardStroke = Custom:Stroke(Card, Theme.White, 0.4, 1)
-	Custom:AddGradient(CardStroke, 0, Custom.GradientBorder)
+	Custom:Corner(Card, 10)
+	local CardStroke = Custom:Stroke(Card, Theme.White, 0.84, 1)
 
-	local Accent = Custom:Create("Frame", {
-		BackgroundColor3 = NColor, BorderSizePixel = 0, Size = UDim2.new(0, 3, 1, 0), Name = "Accent",
+	local IconBadge = Custom:Create("Frame", {
+		BackgroundColor3 = NColor, BackgroundTransparency = 0.87, BorderSizePixel = 0,
+		Position = UDim2.new(0, 10, 0, 11), Size = UDim2.new(0, 30, 0, 30), Name = "IconBadge",
 	}, Card)
-	Custom:AddGradient(Accent, 90)
+	Custom:Corner(IconBadge, 8)
+	Custom:MakeIcon(IconBadge, IconName, {
+		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(0, 16, 0, 16), Color = NColor, Name = "NotifIcon",
+	})
 
-	if IconName then
-		Custom:MakeIcon(Card, IconName, {
-			Size = UDim2.new(0, 18, 0, 18), Position = UDim2.new(0, 14, 0, Head and 4 or 7), Color = NColor, Name = "NotifIcon",
-		})
-	end
-	if Head then
-		Custom:Label(Card, {
-			Text = tostring(Head), TextColor3 = NColor, TextSize = 11,
-			Position = UDim2.new(0, TextX, 0, 7), Size = UDim2.new(1, -(TextX + 10), 0, 13), Name = "Title",
-		})
-	end
+	local CloseButton = Custom:Create("TextButton", {
+		Text = "×", Font = Enum.Font.Gotham, TextSize = 18, TextColor3 = Theme.Sub,
+		AutoButtonColor = false, BackgroundColor3 = Theme.Field, BackgroundTransparency = 0.15,
+		BorderSizePixel = 0, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -8, 0, 8),
+		Size = UDim2.new(0, 20, 0, 20), Name = "CloseButton", ZIndex = 3,
+	}, Card)
+	Custom:Corner(CloseButton, 6)
+
 	Custom:Label(Card, {
-		Font = Enum.Font.GothamMedium, Text = Text, TextColor3 = Head and Theme.Sub or Theme.Text, TextSize = 11,
+		Text = Head, TextColor3 = Theme.Text, TextSize = 11, Font = Enum.Font.GothamBold,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Position = UDim2.new(0, 50, 0, 8), Size = UDim2.new(1, -82, 0, 16), Name = "Title",
+	})
+	Custom:Label(Card, {
+		Font = Enum.Font.GothamMedium, Text = Text, TextColor3 = Theme.Sub, TextSize = TextSize,
 		TextWrapped = true, TextYAlignment = Enum.TextYAlignment.Top,
-		Position = UDim2.new(0, TextX, 0, TextY), Size = UDim2.new(1, -(TextX + 10), 0, TSz.Y + 2), Name = "Label",
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		Position = UDim2.new(0, 50, 0, 27), Size = UDim2.new(1, -62, 0, BodyHeight), Name = "Label",
 	})
 
 	local BarTrack = Custom:Create("Frame", {
-		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.White, BackgroundTransparency = 0,
-		BorderSizePixel = 0, Position = UDim2.new(0, 12, 1, -4), Size = UDim2.new(1, -20, 0, 2), Name = "BarTrack",
+		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.White, BackgroundTransparency = 0.88,
+		BorderSizePixel = 0, Position = UDim2.new(0, 10, 1, -4), Size = UDim2.new(1, -20, 0, 2), Name = "BarTrack",
 	}, Card)
 	Custom:Round(BarTrack)
 	local Bar = Custom:Create("Frame", {
 		BackgroundColor3 = NColor, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), Name = "Bar",
 	}, BarTrack)
 	Custom:Round(Bar)
-	Custom:AddGradient(Bar, 0)
-
-	Custom:Tween(Card, AnimT, { Position = UDim2.new(0, 0, 0, 0) })
-
-	task.spawn(function()
-		BarTween = TweenService:Create(Bar, TweenInfo.new(Delay, Enum.EasingStyle.Linear), { Size = UDim2.new(0, 0, 1, 0) })
-		BarTween:Play()
-		BarTween.Completed:Connect(function(State)
-			if State == Enum.PlaybackState.Completed and not Closed then NF:Close() end
-		end)
-	end)
 
 	local function DoClose()
 		if Closed then return end
 		Closed = true
 		if BarTween then pcall(function() BarTween:Cancel() end) end
-		local Out = Custom:Tween(Card, AnimT, { Position = UDim2.new(1, NOTIF_WIDTH + 10, 0, 0) }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-		Out.Completed:Wait()
 		if Slot and Slot.Parent then
-			local Collapse = Custom:Tween(Slot, 0.15, { Size = UDim2.new(1, 0, 0, 0) })
-			Collapse.Completed:Wait()
-			if Slot and Slot.Parent then Slot:Destroy() end
+			local Out = Custom:Tween(Card, AnimT, { Position = ExitPosition }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+			if Out then pcall(function() Out.Completed:Wait() end) end
+			if Slot and Slot.Parent then
+				local Collapse = Custom:Tween(Slot, 0.14, { Size = UDim2.new(1, 0, 0, 0) })
+				if Collapse then pcall(function() Collapse.Completed:Wait() end) end
+				if Slot and Slot.Parent then Slot:Destroy() end
+			end
+		end
+		for I = #ActiveNotificationRecords, 1, -1 do
+			if ActiveNotificationRecords[I] == Record then table.remove(ActiveNotificationRecords, I) break end
 		end
 	end
+	Record.Close = function() if not Closed then task.spawn(DoClose) end end
+	function NF:Close() Record.Close() end
+	CloseButton.Activated:Connect(function() Record.Close() end)
+	CloseButton.MouseEnter:Connect(function() Custom:Tween(CloseButton, 0.12, { BackgroundTransparency = 0 }) end)
+	CloseButton.MouseLeave:Connect(function() Custom:Tween(CloseButton, 0.12, { BackgroundTransparency = 0.15 }) end)
+	CardStroke.Transparency = 0.84
 
-	function NF:Close() task.spawn(DoClose) end
+	table.insert(ActiveNotificationRecords, Record)
+	Custom:Tween(Card, AnimT, { Position = UDim2.new(0, 0, 0, 0) }, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+
+	task.spawn(function()
+		if not (Bar and Bar.Parent) then return end
+		BarTween = TweenService:Create(Bar, TweenInfo.new(Delay, Enum.EasingStyle.Linear), { Size = UDim2.new(0, 0, 1, 0) })
+		BarTween:Play()
+		BarTween.Completed:Connect(function(State)
+			if State == Enum.PlaybackState.Completed and not Closed then Record.Close() end
+		end)
+	end)
 	return NF
 end
-
 
 Rexxzy_Library.Elements = {}
 Rexxzy_Library.ConfigFolder = "Rexxzy/Configs"
@@ -2425,6 +2535,7 @@ end)
 
 
 function Rexxzy_Library:CreateWindow(Config)
+	Config = type(Config) == "table" and Config or {}
 	local Title = Config[1] or Config.Title or ""
 	local Desc = Config[2] or Config.Description or ""
 	local _CfgTabWidth = Config[3] or Config["Tab Width"] or 128
@@ -2462,7 +2573,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			-- instead of shrinking a desktop 600x400 window into a tiny rectangle.
 			local MobileW = math.floor(math.min(Screen.X * 0.94, 680))
 			local MobileH = math.floor(math.min(Screen.Y * 0.88, 820))
-			SizeUi = UDim2.fromOffset(math.max(220, MobileW), math.max(260, MobileH))
+			SizeUi = UDim2.fromOffset(math.max(1, MobileW), math.max(1, MobileH))
 			Base = 1
 		else
 			if Screen and Screen.X > 0 and Screen.Y > 0 then
@@ -2489,6 +2600,23 @@ function Rexxzy_Library:CreateWindow(Config)
 	Custom:AddGradient(Main, 125, Custom.GradientWindow)
 	local MainStroke = Custom:Stroke(Main, Theme.White, 0.28, 1.2)
 	-- Keep the outer edge subtle; no looping bright gradient.
+
+	local function RefreshMobileLayout()
+		if not MobileLayout or Destroyed or not DropShadowHolder.Parent then return end
+		local Screen = RexxzyGui.AbsoluteSize
+		local Scale = math.max(tonumber(Base) or 1, 0.1)
+		if not Screen or Screen.X <= 0 or Screen.Y <= 0 then return end
+		local Width = math.floor(math.min(680, (Screen.X * 0.94) / Scale))
+		local Height = math.floor(math.min(820, (Screen.Y * 0.88) / Scale))
+		DropShadowHolder.Size = UDim2.fromOffset(math.max(1, Width), math.max(1, Height))
+	end
+
+	if MobileLayout then
+		Track(RexxzyGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+			task.defer(RefreshMobileLayout)
+		end))
+		task.defer(RefreshMobileLayout)
+	end
 
 	local BgImage = Custom:Create("ImageLabel", {
 		BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0), ZIndex = 0,
@@ -2743,13 +2871,16 @@ function Rexxzy_Library:CreateWindow(Config)
 	end
 
 	local Side = Custom:Create("Frame", {
-		BackgroundTransparency = 1, BorderSizePixel = 0,
-		Position = UDim2.new(0, 8, 0, 42), Size = UDim2.new(0, TabWidth, 1, -50), Name = "LayersTab",
+		BackgroundColor3 = Theme.Panel, BackgroundTransparency = 0.04, BorderSizePixel = 0,
+		ClipsDescendants = true, Position = UDim2.new(0, 8, 0, 42),
+		Size = UDim2.new(0, TabWidth, 1, -50), Name = "LayersTab",
 	}, Main)
+	Custom:Corner(Side, 10)
+	Custom:Stroke(Side, Theme.White, 0.93, 1)
 
 	local SearchBoxContainer = Custom:Create("Frame", {
-		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
-		Size = UDim2.new(1, 0, 0, 28), Name = "SBC",
+		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0.04, BorderSizePixel = 0,
+		Position = UDim2.new(0, 6, 0, 6), Size = UDim2.new(1, -12, 0, 30), Name = "SBC",
 	}, Side)
 	Custom:Round(SearchBoxContainer)
 	local SearchStroke = Custom:Stroke(SearchBoxContainer, Theme.White, 0.9, 1)
@@ -2792,14 +2923,19 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local ScrollTab = Custom:Create("ScrollingFrame", {
 		Active = true, BackgroundTransparency = 1, BorderSizePixel = 0, CanvasSize = UDim2.new(0, 0, 0, 0),
-		AutomaticCanvasSize = Enum.AutomaticSize.Y, ScrollBarThickness = 0, ScrollingDirection = Enum.ScrollingDirection.Y,
-		Position = UDim2.new(0, 0, 0, 34), Size = UDim2.new(1, 0, 1, -76), Name = "ScrollTab",
+		AutomaticCanvasSize = Enum.AutomaticSize.Y, ScrollBarThickness = 2, ScrollBarImageColor3 = Theme.Sub,
+		ScrollBarImageTransparency = 0.75, ScrollingDirection = Enum.ScrollingDirection.Y,
+		Position = UDim2.new(0, 5, 0, 42), Size = UDim2.new(1, -10, 1, -92), Name = "ScrollTab",
 	}, Side)
-	Custom:Create("UIListLayout", { Padding = UDim.new(0, 3), SortOrder = Enum.SortOrder.LayoutOrder }, ScrollTab)
+	Custom:Create("UIListLayout", { Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder }, ScrollTab)
+	Custom:Create("UIPadding", {
+		PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 5),
+		PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 3),
+	}, ScrollTab)
 
 	local AvatarFooter = Custom:Create("Frame", {
-		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.Black, BackgroundTransparency = 0,
-		BorderSizePixel = 0, Position = UDim2.new(0, 0, 1, 0), Size = UDim2.new(1, 0, 0, 38), Name = "AvatarFooter",
+		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.Black, BackgroundTransparency = 0.02,
+		BorderSizePixel = 0, Position = UDim2.new(0, 6, 1, -6), Size = UDim2.new(1, -12, 0, 38), Name = "AvatarFooter",
 	}, Side)
 	Custom:Corner(AvatarFooter, 8)
 	Custom:Stroke(AvatarFooter, Theme.White, 0.92, 1)
@@ -2973,7 +3109,7 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local function ProfileActionButton(Parent, Text, Position, Size, Callback, Name)
 		local Btn = Custom:Create("TextButton", {
-			Text = Text, Font = Enum.Font.GothamBold, TextSize = MobileLayout and 8 or 9, TextColor3 = Theme.Text,
+			Text = Text, Font = Enum.Font.GothamBold, TextSize = MobileLayout and 9 or 9, TextColor3 = Theme.Text,
 			AutoButtonColor = false, BackgroundColor3 = Theme.Field, BackgroundTransparency = 0.05,
 			BorderSizePixel = 0, Position = Position, Size = Size, ZIndex = 35, Name = Name or "ProfileAction",
 		}, Parent)
@@ -3474,12 +3610,12 @@ function Rexxzy_Library:CreateWindow(Config)
 	function Funcs:AddTabDivider(DividerText)
 		TabOrder = TabOrder + 1
 		local DF = Custom:Create("Frame", {
-			BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 18),
+			BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 22),
 			Name = "TabDivider",
 		}, ScrollTab)
 		Custom:Label(DF, {
-			Font = Enum.Font.GothamBold, Text = string.upper(tostring(DividerText or "")), TextColor3 = Theme.Sub, TextSize = 9,
-			Position = UDim2.new(0, 8, 0, 4), Size = UDim2.new(1, -8, 0, 12), Name = "DividerLabel",
+			Font = Enum.Font.GothamBold, Text = string.upper(tostring(DividerText or "")), TextColor3 = Theme.Sub, TextSize = 8,
+			Position = UDim2.new(0, 7, 0, 6), Size = UDim2.new(1, -10, 0, 11), Name = "DividerLabel",
 		})
 		return DF
 	end
@@ -3566,6 +3702,7 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	function Funcs:SetScale(NewScale)
 		Base = math.clamp(tonumber(NewScale) or Base, 0.5, 1.5)
+		if MobileLayout then RefreshMobileLayout() end
 		if Opened and not Destroyed then Custom:Tween(WindowScale, 0.2, { Scale = Base }) end
 	end
 
@@ -4031,33 +4168,38 @@ function Rexxzy_Library:CreateWindow(Config)
 	end
 
 	function Funcs:AddTab(Config)
+		Config = type(Config) == "table" and Config or {}
 		local TabName = Config[1] or Config.Name or Config.Title or "Tab"
 		local TabIcon = Config[2] or Config.Icon or ""
 
 		TabOrder = TabOrder + 1
 		local TabBtn = Custom:Create("TextButton", {
 			Text = "", AutoButtonColor = false, BackgroundTransparency = 1, BorderSizePixel = 0,
-			ClipsDescendants = true, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 30), Name = TabName .. "TabBtn",
+			ClipsDescendants = true, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 33), Name = TabName .. "TabBtn",
 		}, ScrollTab)
-		Custom:Corner(TabBtn, 7)
+		Custom:Corner(TabBtn, 8)
+		local TabStroke = Custom:Stroke(TabBtn, Theme.White, 0.85, 1)
+		TabStroke.Enabled = false
 		local TabFill = Custom:Create("Frame", {
-			BackgroundColor3 = Theme.White, BackgroundTransparency = 1, BorderSizePixel = 0,
+			BackgroundColor3 = Theme.Off, BackgroundTransparency = 1, BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 1, 0), Name = "Fill",
 		}, TabBtn)
-		Custom:AddGradient(TabFill, 0)
+		Custom:Corner(TabFill, 8)
 		local TabIndicator = Custom:Create("Frame", {
 			Name = "Indicator", BackgroundColor3 = Theme.White, BorderSizePixel = 0,
-			Position = UDim2.new(0, 3, 0.5, 0), AnchorPoint = Vector2.new(0, 0.5), Size = UDim2.new(0, 3, 0, 0),
+			Position = UDim2.new(0, 4, 0.5, 0), AnchorPoint = Vector2.new(0, 0.5), Size = UDim2.new(0, 2, 0, 0),
 		}, TabBtn)
 		Custom:Round(TabIndicator)
 		local TabIconImg = Custom:MakeIcon(TabBtn, TabIcon, {
-			AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 10, 0.5, 0), Size = UDim2.new(0, 16, 0, 16),
+			AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 12, 0.5, 0), Size = UDim2.new(0, 15, 0, 15),
 			Color = Theme.Sub, Name = "TabIcon",
 		})
 		local HasIcon = TabIconImg ~= nil
 		local TabLabel = Custom:Label(TabBtn, {
-			Text = TabName, TextColor3 = Theme.Sub, TextSize = 11, TextTruncate = Enum.TextTruncate.AtEnd,
-			Position = UDim2.new(0, HasIcon and 34 or 12, 0, 0), Size = UDim2.new(1, HasIcon and -38 or -16, 1, 0), Name = "TabLabel",
+			Text = TabName, TextColor3 = Theme.Sub, TextSize = 10, Font = Enum.Font.GothamSemibold,
+			TextTruncate = Enum.TextTruncate.AtEnd,
+			Position = UDim2.new(0, HasIcon and 36 or 13, 0, 0),
+			Size = UDim2.new(1, HasIcon and -42 or -20, 1, 0), Name = "TabLabel",
 		})
 
 		local TabFrame = Custom:Create("ScrollingFrame", {
@@ -4074,25 +4216,29 @@ function Rexxzy_Library:CreateWindow(Config)
 
 		TabBtn.MouseEnter:Connect(function()
 			if ActiveTab ~= TabFuncs then
-				TabFill.BackgroundTransparency = 0
-				TabLabel.TextColor3 = Theme.Black
-				if TabIconImg then TabIconImg.SetColor(Theme.Black, true) end
+				Custom:Tween(TabFill, 0.12, { BackgroundTransparency = 0.72 })
+				TabLabel.TextColor3 = Theme.Text
+				TabStroke.Enabled = true
+				TabStroke.Transparency = 0.84
+				if TabIconImg then TabIconImg.SetColor(Theme.Text, true) end
 			end
 		end)
 		TabBtn.MouseLeave:Connect(function()
 			if ActiveTab ~= TabFuncs then
-				TabFill.BackgroundTransparency = 1
-				TabLabel.TextColor3 = Theme.White
-				if TabIconImg then TabIconImg.SetColor(Theme.White, true) end
+				Custom:Tween(TabFill, 0.12, { BackgroundTransparency = 1 })
+				TabLabel.TextColor3 = Theme.Sub
+				TabStroke.Enabled = false
+				if TabIconImg then TabIconImg.SetColor(Theme.Sub, true) end
 			end
 		end)
 
 		local function Deactivate(T)
 			T.Frame.Visible = false
 			T.Fill.BackgroundTransparency = 1
-			T.Indicator.Size = UDim2.new(0, 3, 0, 0)
-			T.Label.TextColor3 = Theme.White
-			if T.IconImg then T.IconImg.SetColor(Theme.White, true) end
+			T.Indicator.Size = UDim2.new(0, 2, 0, 0)
+			T.Label.TextColor3 = Theme.Sub
+			T.Stroke.Enabled = false
+			if T.IconImg then T.IconImg.SetColor(Theme.Sub, true) end
 		end
 
 		local function SelectTab()
@@ -4100,19 +4246,22 @@ function Rexxzy_Library:CreateWindow(Config)
 			if ActiveTab then Deactivate(ActiveTab) end
 			ActiveTab = TabFuncs
 			NameTab.Text = TabName
-			TabFrame.Position = UDim2.new(0, 0, 0, 12)
+			TabFrame.Position = UDim2.new(0, 0, 0, 10)
 			TabFrame.Visible = true
-			Custom:Tween(TabFrame, 0.25, { Position = UDim2.new(0, 0, 0, 0) })
-			TabFill.BackgroundTransparency = 0
-			TabIndicator.Size = UDim2.new(0, 3, 0, 14)
-			TabLabel.TextColor3 = Theme.Black
-			if TabIconImg then TabIconImg.SetColor(Theme.Black, true) end
+			Custom:Tween(TabFrame, 0.2, { Position = UDim2.new(0, 0, 0, 0) })
+			Custom:Tween(TabFill, 0.16, { BackgroundTransparency = 0.18 })
+			Custom:Tween(TabIndicator, 0.16, { Size = UDim2.new(0, 2, 0, 16) })
+			TabStroke.Enabled = true
+			TabStroke.Transparency = 0.84
+			TabLabel.TextColor3 = Theme.White
+			if TabIconImg then TabIconImg.SetColor(Theme.White, true) end
 		end
 
 		TabFuncs.Fill = TabFill
 		TabFuncs.Indicator = TabIndicator
 		TabFuncs.Label = TabLabel
 		TabFuncs.IconImg = TabIconImg
+		TabFuncs.Stroke = TabStroke
 		TabBtn.Activated:Connect(function() CircleClick(TabBtn) SelectTab() end)
 		TabFuncs.Select = SelectTab
 		table.insert(Tabs, TabFuncs)
