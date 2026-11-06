@@ -1,3 +1,5 @@
+-- Just Indicator Is Update Or No
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -335,7 +337,7 @@ function RexxzyWebhook:AttachToLibrary(lib, configNameOrObj)
 end
 
 local Theme = {
-	-- VH brand mono: deep black surfaces + luminous white (matches logo glow).
+	
 	Accent = Color3.fromRGB(245, 245, 245),
 	AccentSoft = Color3.fromRGB(200, 200, 200),
 	Dark = Color3.fromRGB(10, 10, 10),
@@ -381,11 +383,10 @@ do
 		NumberSequenceKeypoint.new(1, 1),
 	})
 
-
 	function Custom:Create(Name, Props, Parent)
 		local inst = Instance.new(Name)
 		for k, v in pairs(Props) do inst[k] = v end
-		-- Keep every text control visually inside its own bounds.
+		
 		if Name == "TextLabel" or Name == "TextButton" or Name == "TextBox" then
 			if Props.ClipsDescendants == nil then inst.ClipsDescendants = true end
 			if Name ~= "TextBox" and Props.TextWrapped ~= true and Props.TextTruncate == nil then
@@ -418,7 +419,7 @@ do
 
 	function Custom:Stroke(inst, Color, Transparency, Thickness)
 		return Custom:Create("UIStroke", {
-			-- VH mono: luminous white edge like logo light streaks.
+			
 			Color = Color or Theme.White,
 			Transparency = type(Transparency) == "number" and math.clamp(Transparency, 0, 0.85) or 0.28,
 			Thickness = Thickness or 1,
@@ -540,7 +541,7 @@ local function CircleClick(Button, X, Y)
 		Circle:Destroy()
 	end)
 end
-local HttpFetch -- Forward declaration used by the Lucide icon fallback.
+local HttpFetch 
 local Icons = {}
 Icons.Remote = {}
 Icons.RemoteFailureAt = {}
@@ -1252,7 +1253,7 @@ function Icons:FetchLucide(Name)
 	if Key == "" or not string.match(Key, "^[a-z0-9%-]+$") or string.find(Key, "%.%.", 1, true) then return false end
 	if self.Remote[Key] then return true end
 
-	-- Avoid repeatedly requesting an icon when the executor has no HTTP access.
+	
 	local FailedAt = self.RemoteFailureAt[Key]
 	if FailedAt and (os.clock() - FailedAt) < 30 then return false end
 	if type(HttpFetch) ~= "function" then return false end
@@ -1408,7 +1409,6 @@ function Icons:List()
 	table.sort(Out)
 	return Out
 end
-
 
 function Icons:Draw(Parent, Flat, Size, Color, Thick)
 	local K = Size / 24
@@ -1915,7 +1915,6 @@ function Custom:Graphic(Parent, Source, Props)
 	return Obj
 end
 
-
 local Rexxzy_Library = {}
 Rexxzy_Library.Unloaded = false
 Rexxzy_Library.Logos = RexxzyLogos
@@ -1966,7 +1965,7 @@ local function EnsureNotifGui()
 		SortOrder = Enum.SortOrder.LayoutOrder, VerticalAlignment = Enum.VerticalAlignment.Top,
 		HorizontalAlignment = Enum.HorizontalAlignment.Right, Padding = UDim.new(0, 8),
 	}, NotifContainer)
-	-- Keep the layout object available for responsive alignment changes.
+	
 	NotifListLayout = List
 	NotifGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
 		task.defer(UpdateNotificationLayout)
@@ -1999,7 +1998,7 @@ function Rexxzy_Library:SetNotification(Config)
 	local Delay = math.clamp(tonumber(Config.Delay or Config[6]) or 3, 0.5, 30)
 	local AnimT = math.clamp(tonumber(Config.Time or Config[5]) or 0.22, 0.12, 0.6)
 
-	-- Prevent a burst of messages from covering the screen.
+	
 	for I = #ActiveNotificationRecords, 1, -1 do
 		local Record = ActiveNotificationRecords[I]
 		if not (Record.Slot and Record.Slot.Parent) then table.remove(ActiveNotificationRecords, I) end
@@ -2615,14 +2614,13 @@ task.defer(function()
 	end
 end)
 
-
 function Rexxzy_Library:CreateWindow(Config)
 	Config = type(Config) == "table" and Config or {}
 	local Title = Config[1] or Config.Title or ""
 	local Desc = Config[2] or Config.Description or ""
 	local _CfgTabWidth = Config[3] or Config["Tab Width"] or 128
 	local IsMobileCtx = UserInputService.TouchEnabled
-	-- Set MobileResponsive = false to keep the legacy fixed-size layout on touch devices.
+	
 	local MobileLayout = IsMobileCtx and Config.MobileResponsive ~= false
 	local TabWidth = IsMobileCtx and math.min(_CfgTabWidth, 148) or _CfgTabWidth
 	local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(600, 400)
@@ -2636,9 +2634,9 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local function Track(c) table.insert(Conns, c) return c end
 
-	-- Built-in client-side developer title tags. Edit REXXZY_DEVELOPER_USER_IDS
-	-- near the top of this file; no CreateWindow option or script-side setup is needed.
-	-- These BillboardGuis are cosmetic and must never be used for permissions.
+	
+	
+	
 	local DeveloperTagEnabled = true
 	local DeveloperTagText = REXXZY_DEVELOPER_TAG_TEXT
 	local DeveloperTagColor = Color3.fromRGB(245, 245, 245)
@@ -2748,8 +2746,8 @@ function Rexxzy_Library:CreateWindow(Config)
 	do
 		local Screen = RexxzyGui.AbsoluteSize
 		if MobileLayout and Screen and Screen.X > 0 and Screen.Y > 0 then
-			-- Portrait-friendly canvas: use the phone's available width and height
-			-- instead of shrinking a desktop 600x400 window into a tiny rectangle.
+			
+			
 			local MobileW = math.floor(math.min(Screen.X * 0.94, 680))
 			local MobileH = math.floor(math.min(Screen.Y * 0.88, 820))
 			SizeUi = UDim2.fromOffset(math.max(1, MobileW), math.max(1, MobileH))
@@ -2778,7 +2776,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	Custom:Corner(Main, 12)
 	Custom:AddGradient(Main, 125, Custom.GradientWindow)
 	local MainStroke = Custom:Stroke(Main, Theme.White, 0.28, 1.2)
-	-- Keep the outer edge subtle; no looping bright gradient.
+	
 
 	local function RefreshMobileLayout()
 		if not MobileLayout or Destroyed or not DropShadowHolder.Parent then return end
@@ -3144,7 +3142,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		if ok and url then AvatarImage.Image = url end
 	end)
 
-	-- The sidebar profile footer opens this compact profile and appearance panel.
+	
 	local ProfileCfg = type(Config.Profile) == "table" and Config.Profile or {}
 	local SupportLink = tostring(ProfileCfg.SupportLink or Config.SupportLink or Config.SupportURL or "")
 	local SupportText = tostring(ProfileCfg.SupportText or Config.SupportText or "Open support link")
@@ -3553,7 +3551,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	local BubbleEnabled = Config.BubbleEnabled ~= false
 	local BubblePlatform = tostring(Config.BubblePlatform or "Both")
 	local BubbleSize = 58
-	local BubbleSrc = "VH" -- VH brand logo on floating toggle by default
+	local BubbleSrc = "VH" 
 	local BubblePos = UDim2.new(0.1021, 0, 0.0743, 0)
 	if type(BubbleCfg) == "table" then
 		BubbleSrc = BubbleCfg.Icon or BubbleCfg.Image or BubbleCfg[1] or BubbleSrc
@@ -3966,7 +3964,6 @@ function Rexxzy_Library:CreateWindow(Config)
 		return ResizeEnabled
 	end
 
-
 	local function ToHSV(C)
 		local R, G, B = C.R, C.G, C.B
 		local Max, Min = math.max(R, G, B), math.min(R, G, B)
@@ -4336,7 +4333,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	end
 
 	do
-		-- Keep the existing wallpaper as the default, while preserving an explicit false value.
+		
 		local StartBg = Config.Background
 		if StartBg == nil then StartBg = Config.BackgroundImage end
 		if StartBg == nil then StartBg = Config.Wallpaper end
@@ -5532,7 +5529,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			end
 
 			function SecFuncs:AddLabel(LabelConfig)
-				-- Flexible label: dynamic text, icon, color, description, click — no Position offsets.
+				
 				local Cfg = {}
 				if type(LabelConfig) == "string" or type(LabelConfig) == "number" then
 					Cfg.Text = LabelConfig
@@ -5545,7 +5542,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local function Sanitize(v)
 					if type(v) ~= "string" and type(v) ~= "number" then return nil end
 					local s = tostring(v)
-					-- Never show Lua table addresses like "table: 0x..."
+					
 					if s:match("^table:%s*0x[%da-fA-F]+$") then return nil end
 					return s
 				end
@@ -5573,7 +5570,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				Place(LF)
 				LF.AutomaticSize = Enum.AutomaticSize.Y
 
-				-- Layout only (no Position offsets)
+				
 				Custom:Create("UIPadding", {
 					PaddingTop = UDim.new(0, 8), PaddingBottom = UDim.new(0, 8),
 					PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10),
@@ -5738,7 +5735,6 @@ function Rexxzy_Library:CreateWindow(Config)
 				RegisterSearch(PName, PF, Where, SelectTab, EnsureOpen, TabFrame)
 				return { Progress = PF, Set = SetValue, Get = function() return Value end }
 			end
-
 
 			function SecFuncs:AddConfigManager(CMConfig)
 				if type(CMConfig) == "string" then CMConfig = { CMConfig } end
@@ -6008,7 +6004,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		return TabFuncs
 	end
 
-	-- VH splash intro (logo fade), then reveal window.
+	
 	local SplashEnabled = Config.Splash ~= false
 	local SplashDuration = math.clamp(tonumber(Config.SplashDuration) or 0.95, 0.35, 3)
 	if SplashEnabled then
@@ -6088,11 +6084,84 @@ function KeySys.Merge(Base, User)
 	return Out
 end
 
+KeySys.ProviderPresets = {
+	linkvertise = {
+		Name = "Linkvertise", Type = "Free", Logo = "link",
+		Accent = Color3.fromRGB(255, 180, 50),
+		ButtonText = "Get Key (Linkvertise)",
+	},
+	workink = {
+		Name = "Work.ink", Type = "Free", Logo = "link",
+		Accent = Color3.fromRGB(80, 180, 255),
+		ButtonText = "Get Key (Work.ink)",
+	},
+	lootlabs = {
+		Name = "LootLabs", Type = "Free", Logo = "link",
+		Accent = Color3.fromRGB(120, 220, 120),
+		ButtonText = "Get Key (LootLabs)",
+	},
+	adblueprint = {
+		Name = "AdBlueprint", Type = "Free", Logo = "link",
+		Accent = Color3.fromRGB(200, 140, 255),
+		ButtonText = "Get Key (AdBlueprint)",
+	},
+	cuty = {
+		Name = "Cuty.io", Type = "Free", Logo = "link",
+		Accent = Color3.fromRGB(255, 120, 160),
+		ButtonText = "Get Key (Cuty)",
+	},
+	boost = {
+		Name = "Boost", Type = "Free", Logo = "zap",
+		Accent = Color3.fromRGB(255, 200, 80),
+		ButtonText = "Get Key (Boost)",
+	},
+	custom = {
+		Name = "Custom", Type = "Free", Logo = "key",
+		ButtonText = "Get Key",
+	},
+	premium = {
+		Name = "Premium", Type = "Premium", Logo = "badge-check",
+		Accent = Color3.fromRGB(245, 245, 245),
+		ButtonText = "Premium Access",
+	},
+	direct = {
+		Name = "Direct", Type = "Premium", Logo = "shield-check",
+		Accent = Color3.fromRGB(100, 220, 160),
+		ButtonText = "Get Premium Key",
+	},
+}
+
+function KeySys.ResolveProvider(P, Index)
+	if type(P) ~= "table" or P.Enabled == false then return nil end
+	local PresetKey = type(P.Preset) == "string" and string.lower(P.Preset) or ""
+	local Preset = KeySys.ProviderPresets[PresetKey] or {}
+	local TypeRaw = string.lower(tostring(P.Type or Preset.Type or "Free"))
+	local Type = (TypeRaw == "premium" or TypeRaw == "paid" or TypeRaw == "vip") and "Premium" or "Free"
+	local Id = tostring(P.Id or (PresetKey ~= "" and PresetKey) or ("provider" .. Index))
+	return {
+		Id = Id,
+		Name = tostring(P.Name or Preset.Name or Id),
+		Type = Type,
+		Logo = P.Logo or P.Icon or Preset.Logo or "link",
+		Url = type(P.Url) == "string" and P.Url or nil,
+		Accent = typeof(P.Accent) == "Color3" and P.Accent or (typeof(Preset.Accent) == "Color3" and Preset.Accent or nil),
+		ButtonText = P.ButtonText or Preset.ButtonText,
+		GetKey = type(P.GetKey) == "function" and P.GetKey or nil,
+		Verify = type(P.Verify) == "function" and P.Verify or nil,
+		VerifyUrl = type(P.VerifyUrl) == "table" and P.VerifyUrl or nil,
+		Settings = type(P.Settings) == "table" and P.Settings or nil,
+		Timeout = tonumber(P.Timeout),
+		Order = tonumber(P.Order) or Index,
+	}
+end
+
 function KeySys.Defaults()
 	return {
 		Title = "Access Verification",
 		Description = "Verify your key to continue.",
 		Icon = "key",
+		
+		Style = "Full",
 		AccountIndependent = true,
 		AllowMultipleAccounts = true,
 		HWIDMode = "Disabled",
@@ -6124,6 +6193,10 @@ function KeySys.Defaults()
 			Trim = true,
 			MaxLength = 512,
 			ShowProviderName = true,
+			
+			GroupByType = true,
+			FreeLabel = "Free Key",
+			PremiumLabel = "Premium Key",
 			Messages = {
 				Empty = "Enter your key to continue.",
 				Invalid = "That key is not valid.",
@@ -6426,22 +6499,30 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		elseif PwOn then Mode = "Password" end
 	end
 
+	local IsMini = string.lower(tostring(Cfg.Style or "Full")) == "mini"
+	if IsMini then
+		if Win.Width == nil or Win.Width == 400 then Win.Width = 300 end
+		if Win.Padding == nil or Win.Padding == 16 then Win.Padding = 12 end
+		if Win.CornerRadius == nil or Win.CornerRadius == 14 then Win.CornerRadius = 12 end
+		if Win.Scale == nil or Win.Scale == 1.05 then Win.Scale = 1 end
+	end
+	local GroupByType = Auth.GroupByType ~= false
+	local FreeLabel = tostring(Auth.FreeLabel or "Free Key")
+	local PremiumLabel = tostring(Auth.PremiumLabel or "Premium Key")
+
 	local Providers = {}
 	do
-		local PresetNames = { linkvertise = "Linkvertise", jnkie = "Jnkie" }
 		local List = type(API) == "table" and type(API.Providers) == "table" and API.Providers or {}
 		for Index, P in ipairs(List) do
-			if type(P) == "table" and P.Enabled ~= false then
-				local Preset = type(P.Preset) == "string" and string.lower(P.Preset) or ""
-				local Id = tostring(P.Id or (Preset ~= "" and Preset) or ("provider" .. Index))
-				table.insert(Providers, {
-					Id = Id, Name = tostring(P.Name or PresetNames[Preset] or Id), Logo = P.Logo or P.Icon, Url = P.Url,
-					Accent = typeof(P.Accent) == "Color3" and P.Accent or nil, ButtonText = P.ButtonText,
-					GetKey = type(P.GetKey) == "function" and P.GetKey or nil, Verify = type(P.Verify) == "function" and P.Verify or nil,
-					VerifyUrl = type(P.VerifyUrl) == "table" and P.VerifyUrl or nil, Settings = P.Settings, Timeout = tonumber(P.Timeout),
-				})
-			end
+			local Resolved = KeySys.ResolveProvider(P, Index)
+			if Resolved then table.insert(Providers, Resolved) end
 		end
+		table.sort(Providers, function(A, B)
+			if GroupByType and A.Type ~= B.Type then
+				return A.Type == "Premium"
+			end
+			return (A.Order or 0) < (B.Order or 0)
+		end)
 	end
 
 	local Gui = Custom:Create("ScreenGui", {
@@ -6455,8 +6536,8 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 	}, Gui)
 
 	local BasePos = typeof(Win.Position) == "UDim2" and Win.Position or UDim2.new(0.5, 0, 0.5, 0)
-	local Width = math.clamp(tonumber(Win.Width) or 360, 240, 640)
-	local Radius = math.clamp(tonumber(Win.CornerRadius) or 12, 0, 28)
+	local Width = math.clamp(tonumber(Win.Width) or (IsMini and 300 or 360), 220, 640)
+	local Radius = math.clamp(tonumber(Win.CornerRadius) or (IsMini and 12 or 14), 0, 28)
 	local Main = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5), AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = typeof(App.Background) == "Color3" and App.Background or Theme.White,
 		BackgroundTransparency = tonumber(Win.BackgroundTransparency) or 0.02, BorderSizePixel = 0, ClipsDescendants = true,
@@ -6618,9 +6699,9 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 
 	local VerifyBtn = Custom:Create("TextButton", {
 		Text = "", AutoButtonColor = false, BackgroundColor3 = CButton, BorderSizePixel = 0, ClipsDescendants = true, LayoutOrder = 6,
-		Size = UDim2.new(1, 0, 0, 36), Name = "Verify",
+		Size = UDim2.new(1, 0, 0, IsMini and 32 or 36), Name = "Verify",
 	}, Main)
-	Custom:Corner(VerifyBtn, 8)
+	Custom:Corner(VerifyBtn, IsMini and 7 or 8)
 	if CButton == Theme.White then Custom:AddGradient(VerifyBtn, 90) end
 	local VerifyInner, VerifyLabel, VerifyIcon = ButtonContent(VerifyBtn, "shield-check", "check", tostring(Auth.VerifyText), CButtonText, CButtonText)
 	local VerifySpin = Ic(VerifyInner, "loader", "info", {
@@ -6632,27 +6713,69 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		AutomaticSize = Enum.AutomaticSize.Y, BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 7,
 		Size = UDim2.new(1, 0, 0, 0), Name = "GetKeyBox",
 	}, Main)
-	Custom:Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }, GetKeyBox)
+	Custom:Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, IsMini and 5 or 6) }, GetKeyBox)
 	local ProviderButtons = {}
 	local KeyButtonCount = 0
-	for Index, P in ipairs(Providers) do
+	local BtnH = IsMini and 30 or 34
+	local LayoutCursor = 0
+	local HasFree, HasPremium = false, false
+	for _, P in ipairs(Providers) do
+		if P.Type == "Premium" then HasPremium = true else HasFree = true end
+	end
+	local function AddSectionHeader(Label, Order)
+		local Row = Custom:Create("Frame", {
+			BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = Order,
+			Size = UDim2.new(1, 0, 0, IsMini and 16 or 18), Name = "Section_" .. Label,
+		}, GetKeyBox)
+		Custom:Label(Row, {
+			Font = FontBold, Text = string.upper(Label), TextColor3 = CSub, TextSize = IsMini and 9 or 10,
+			TextXAlignment = Enum.TextXAlignment.Left, Size = UDim2.new(1, 0, 1, 0), Name = "Label",
+		})
+	end
+	local function AddProviderButton(P, Order)
 		local Ready = P.GetKey ~= nil or (type(P.Url) == "string" and P.Url ~= "")
 		local Accent = P.Accent or CAccent
 		local B = Custom:Create("TextButton", {
 			Text = "", AutoButtonColor = false, BackgroundColor3 = CSecondary, BackgroundTransparency = Ready and 0.92 or 0.96, BorderSizePixel = 0,
-			ClipsDescendants = true, LayoutOrder = Index, Size = UDim2.new(1, 0, 0, 34), Name = "GetKey_" .. P.Id,
+			ClipsDescendants = true, LayoutOrder = Order, Size = UDim2.new(1, 0, 0, BtnH), Name = "GetKey_" .. P.Id,
 		}, GetKeyBox)
-		Custom:Corner(B, 8)
+		Custom:Corner(B, IsMini and 7 or 8)
 		local BStroke = Custom:Stroke(B, P.Accent or CBorder, P.Accent and 0.55 or 0.8, 1)
 		local Text = P.ButtonText
 		if not Text then
 			Text = tostring(Auth.GetKeyText)
 			if #Providers > 1 and Auth.ShowProviderName ~= false then Text = Text .. " - " .. P.Name end
 		end
+		if IsMini and P.ButtonText == nil and #Providers == 1 then
+			Text = tostring(Auth.GetKeyText)
+		end
 		local _, BLabel, BIcon = ButtonContent(B, P.Logo or "link", "link", tostring(Text), Accent, Ready and CText or CSub)
 		HoverFx(B, BStroke, Ready and 0.92 or 0.96, 0.86, P.Accent and 0.55 or 0.8, P.Accent and 0.2 or 0.5)
-		ProviderButtons[Index] = { Button = B, Provider = P, Ready = Ready }
+		table.insert(ProviderButtons, { Button = B, Provider = P, Ready = Ready })
 		KeyButtonCount = KeyButtonCount + 1
+	end
+	if GroupByType and HasFree and HasPremium then
+		LayoutCursor = LayoutCursor + 1
+		AddSectionHeader(PremiumLabel, LayoutCursor)
+		for _, P in ipairs(Providers) do
+			if P.Type == "Premium" then
+				LayoutCursor = LayoutCursor + 1
+				AddProviderButton(P, LayoutCursor)
+			end
+		end
+		LayoutCursor = LayoutCursor + 1
+		AddSectionHeader(FreeLabel, LayoutCursor)
+		for _, P in ipairs(Providers) do
+			if P.Type ~= "Premium" then
+				LayoutCursor = LayoutCursor + 1
+				AddProviderButton(P, LayoutCursor)
+			end
+		end
+	else
+		for _, P in ipairs(Providers) do
+			LayoutCursor = LayoutCursor + 1
+			AddProviderButton(P, LayoutCursor)
+		end
 	end
 
 	local HM = KeySys.HwidMode(Cfg)
@@ -7235,6 +7358,534 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 				PersistTrial = true
 				StartVerify(Saved.Key)
 			end
+		end
+	end)
+
+	return Self
+end
+
+function Rexxzy_Library:CreateKaitunGui(UserConfig)
+	UserConfig = type(UserConfig) == "table" and UserConfig or {}
+
+	local function Col(V, D)
+		return typeof(V) == "Color3" and V or D
+	end
+
+	local Cfg = {
+		Title = UserConfig.Title or UserConfig[1] or "Kaitun Auto Farm",
+		Status = UserConfig.Status or UserConfig[2] or "Waiting for teleport...",
+		Logo = UserConfig.Logo or UserConfig.Icon or RexxzyLogos.Veloria or RexxzyLogos.VH or "rbxassetid://91690039393292",
+		LogoSize = math.clamp(tonumber(UserConfig.LogoSize) or 86, 40, 180),
+		Subtitle = UserConfig.Subtitle or "",
+
+		Background = Col(UserConfig.Background, Theme.Black),
+		BackgroundTransparency = typeof(UserConfig.BackgroundTransparency) == "number" and UserConfig.BackgroundTransparency or 0,
+		Accent = Col(UserConfig.Accent, Theme.White),
+		Text = Col(UserConfig.Text, Theme.Text),
+		SubText = Col(UserConfig.SubText, Theme.Sub),
+		ProgressColor = Col(UserConfig.ProgressColor, Theme.White),
+		ProgressTrack = Col(UserConfig.ProgressTrack, Color3.fromRGB(40, 40, 40)),
+
+		Timer = type(UserConfig.Timer) == "table" and UserConfig.Timer or {
+			Enabled = UserConfig.Timer ~= false,
+			Seconds = tonumber(UserConfig.Timer) or 0,
+			CountDown = true,
+			Format = "mm:ss",
+		},
+		Progress = type(UserConfig.Progress) == "table" and UserConfig.Progress or {
+			Enabled = UserConfig.Progress ~= false,
+			Value = tonumber(UserConfig.Progress) or 0,
+			ShowPercent = true,
+			Height = 4,
+		},
+		Discord = type(UserConfig.Discord) == "table" and UserConfig.Discord or {
+			Enabled = UserConfig.Discord ~= false and (UserConfig.DiscordUrl or UserConfig.Discord) ~= nil,
+			Text = "Join Discord",
+			Url = typeof(UserConfig.Discord) == "string" and UserConfig.Discord or (UserConfig.DiscordUrl or ""),
+			Color = Color3.fromRGB(160, 160, 160),
+		},
+
+		IgnoreGuiInset = UserConfig.IgnoreGuiInset ~= false,
+		DisplayOrder = math.clamp(tonumber(UserConfig.DisplayOrder) or 250, 1, 999),
+		ZIndexBehavior = UserConfig.ZIndexBehavior or Enum.ZIndexBehavior.Sibling,
+		Animations = UserConfig.Animations ~= false,
+		CloseOnClick = UserConfig.CloseOnClick == true,
+		Name = tostring(UserConfig.Name or "RexxzyKaitunGui"),
+	}
+
+	if type(Cfg.Timer) ~= "table" then
+		Cfg.Timer = { Enabled = true, Seconds = tonumber(Cfg.Timer) or 0, CountDown = true, Format = "mm:ss" }
+	end
+	Cfg.Timer.Enabled = Cfg.Timer.Enabled ~= false
+	Cfg.Timer.Seconds = math.max(0, tonumber(Cfg.Timer.Seconds) or 0)
+	Cfg.Timer.CountDown = Cfg.Timer.CountDown ~= false
+	Cfg.Timer.Format = tostring(Cfg.Timer.Format or "mm:ss")
+
+	if type(Cfg.Progress) ~= "table" then
+		Cfg.Progress = { Enabled = true, Value = tonumber(Cfg.Progress) or 0, ShowPercent = true, Height = 4 }
+	end
+	Cfg.Progress.Enabled = Cfg.Progress.Enabled ~= false
+	Cfg.Progress.Value = math.clamp(tonumber(Cfg.Progress.Value) or 0, 0, 1)
+	Cfg.Progress.ShowPercent = Cfg.Progress.ShowPercent ~= false
+	Cfg.Progress.Height = math.clamp(tonumber(Cfg.Progress.Height) or 4, 2, 12)
+
+	if type(Cfg.Discord) ~= "table" then
+		Cfg.Discord = { Enabled = false, Text = "Join Discord", Url = "", Color = Color3.fromRGB(160, 160, 160) }
+	end
+	Cfg.Discord.Enabled = Cfg.Discord.Enabled ~= false and tostring(Cfg.Discord.Url or "") ~= ""
+	Cfg.Discord.Text = tostring(Cfg.Discord.Text or "Join Discord")
+	Cfg.Discord.Url = tostring(Cfg.Discord.Url or "")
+	Cfg.Discord.Color = Col(Cfg.Discord.Color, Color3.fromRGB(160, 160, 160))
+
+	local Self = {}
+	local Conns, Tweens = {}, {}
+	local Destroyed, Closing = false, false
+	local CurrentProgress = Cfg.Progress.Value
+	local CurrentSeconds = Cfg.Timer.Seconds
+	local TimerRunning = false
+
+	local function Dead() return Destroyed or Closing end
+	local function Track(C) table.insert(Conns, C) return C end
+	local function Anim(Inst, Time, Props, Style, Dir)
+		if not Inst or not Inst.Parent then return nil end
+		if Cfg.Animations then
+			local Tw = Custom:Tween(Inst, Time or 0.25, Props, Style, Dir)
+			table.insert(Tweens, Tw)
+			return Tw
+		end
+		for K, V in pairs(Props) do Inst[K] = V end
+		return nil
+	end
+
+	local function FormatTime(Sec)
+		Sec = math.max(0, math.floor(Sec + 0.5))
+		local M = math.floor(Sec / 60)
+		local S = Sec % 60
+		if Cfg.Timer.Format == "ss" then
+			return string.format("%02d", Sec)
+		end
+		return string.format("%02d:%02d", M, S)
+	end
+
+	local Gui = Custom:Create("ScreenGui", {
+		Name = Cfg.Name,
+		ResetOnSpawn = false,
+		IgnoreGuiInset = Cfg.IgnoreGuiInset,
+		DisplayOrder = Cfg.DisplayOrder,
+		ZIndexBehavior = Cfg.ZIndexBehavior,
+	}, Custom:GetGuiParent())
+
+	local Root = Custom:Create("Frame", {
+		Name = "Root",
+		BackgroundColor3 = Cfg.Background,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 1, 0),
+		ClipsDescendants = true,
+	}, Gui)
+
+	local Center = Custom:Create("Frame", {
+		Name = "Center",
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.48, 0),
+		Size = UDim2.new(0, 340, 0, 280),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ZIndex = 5,
+	}, Root)
+
+	Custom:Create("UIListLayout", {
+		FillDirection = Enum.FillDirection.Vertical,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, 10),
+	}, Center)
+
+	local TimerLabel = Custom:Label(Center, {
+		Name = "Timer",
+		LayoutOrder = 1,
+		Font = Enum.Font.GothamMedium,
+		Text = Cfg.Timer.Enabled and FormatTime(CurrentSeconds) or "",
+		TextColor3 = Cfg.SubText,
+		TextSize = 13,
+		TextTransparency = 0.15,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		Size = UDim2.new(1, 0, 0, 18),
+		Visible = Cfg.Timer.Enabled,
+	})
+
+	local LogoHold = Custom:Create("Frame", {
+		Name = "LogoHold",
+		LayoutOrder = 2,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(0, Cfg.LogoSize, 0, Cfg.LogoSize),
+	}, Center)
+	local LogoScale = Custom:Create("UIScale", { Scale = 0.92 }, LogoHold)
+	local LogoImg = Custom:Create("ImageLabel", {
+		Name = "Logo",
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 1, 0),
+		Image = tostring(Cfg.Logo),
+		ImageColor3 = Cfg.Accent,
+		ImageTransparency = 0,
+		ScaleType = Enum.ScaleType.Fit,
+	}, LogoHold)
+
+	local Glow = Custom:Create("ImageLabel", {
+		Name = "Glow",
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(1.6, 0, 1.6, 0),
+		Image = "rbxassetid://5028857084",
+		ImageColor3 = Cfg.Accent,
+		ImageTransparency = 0.82,
+		ZIndex = 0,
+	}, LogoHold)
+
+	local TitleLabel = Custom:Label(Center, {
+		Name = "Title",
+		LayoutOrder = 3,
+		Font = Enum.Font.GothamBold,
+		Text = tostring(Cfg.Title),
+		TextColor3 = Cfg.Text,
+		TextSize = 18,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		TextWrapped = true,
+		Size = UDim2.new(1, 0, 0, 24),
+	})
+
+	local SubtitleLabel = Custom:Label(Center, {
+		Name = "Subtitle",
+		LayoutOrder = 4,
+		Font = Enum.Font.Gotham,
+		Text = tostring(Cfg.Subtitle),
+		TextColor3 = Cfg.SubText,
+		TextSize = 12,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		TextWrapped = true,
+		Size = UDim2.new(1, 0, 0, 16),
+		Visible = tostring(Cfg.Subtitle) ~= "",
+	})
+
+	local StatusLabel = Custom:Label(Center, {
+		Name = "Status",
+		LayoutOrder = 5,
+		Font = Enum.Font.Gotham,
+		Text = tostring(Cfg.Status),
+		TextColor3 = Cfg.SubText,
+		TextSize = 13,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		TextWrapped = true,
+		Size = UDim2.new(1, 0, 0, 18),
+	})
+
+	local ProgressBox = Custom:Create("Frame", {
+		Name = "ProgressBox",
+		LayoutOrder = 6,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(0, 220, 0, 28),
+		Visible = Cfg.Progress.Enabled,
+	}, Center)
+
+	local TrackBar = Custom:Create("Frame", {
+		Name = "Track",
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.new(0.5, 0, 0, 4),
+		Size = UDim2.new(1, 0, 0, Cfg.Progress.Height),
+		BackgroundColor3 = Cfg.ProgressTrack,
+		BorderSizePixel = 0,
+	}, ProgressBox)
+	Custom:Corner(TrackBar, math.floor(Cfg.Progress.Height / 2 + 0.5))
+	local FillBar = Custom:Create("Frame", {
+		Name = "Fill",
+		BackgroundColor3 = Cfg.ProgressColor,
+		BorderSizePixel = 0,
+		Size = UDim2.new(CurrentProgress, 0, 1, 0),
+	}, TrackBar)
+	Custom:Corner(FillBar, math.floor(Cfg.Progress.Height / 2 + 0.5))
+	if Cfg.ProgressColor == Theme.White or Cfg.ProgressColor == Color3.fromRGB(245, 245, 245) then
+		Custom:AddGradient(FillBar, 90, Custom.GradientWhite)
+	end
+
+	local PercentLabel = Custom:Label(ProgressBox, {
+		Name = "Percent",
+		Font = Enum.Font.GothamMedium,
+		Text = Cfg.Progress.ShowPercent and string.format("%d%%", math.floor(CurrentProgress * 100 + 0.5)) or "",
+		TextColor3 = Cfg.SubText,
+		TextSize = 11,
+		TextXAlignment = Enum.TextXAlignment.Center,
+		Position = UDim2.new(0, 0, 0, Cfg.Progress.Height + 8),
+		Size = UDim2.new(1, 0, 0, 14),
+		Visible = Cfg.Progress.ShowPercent,
+	})
+
+	local DiscordRow = Custom:Create("Frame", {
+		Name = "Discord",
+		AnchorPoint = Vector2.new(0.5, 1),
+		Position = UDim2.new(0.5, 0, 1, -28),
+		Size = UDim2.new(0, 320, 0, 22),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ZIndex = 6,
+		Visible = Cfg.Discord.Enabled,
+	}, Root)
+
+	local DiscordBtn = Custom:Create("TextButton", {
+		Name = "DiscordBtn",
+		Text = "",
+		AutoButtonColor = false,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(1, 0, 1, 0),
+	}, DiscordRow)
+
+	local DiscordInner = Custom:Create("Frame", {
+		Name = "Inner",
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		AutomaticSize = Enum.AutomaticSize.XY,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+	}, DiscordBtn)
+	Custom:Create("UIListLayout", {
+		FillDirection = Enum.FillDirection.Horizontal,
+		HorizontalAlignment = Enum.HorizontalAlignment.Center,
+		VerticalAlignment = Enum.VerticalAlignment.Center,
+		Padding = UDim.new(0, 6),
+		SortOrder = Enum.SortOrder.LayoutOrder,
+	}, DiscordInner)
+
+	Custom:Label(DiscordInner, {
+		Name = "Prefix",
+		Font = Enum.Font.Gotham,
+		Text = "Join Discord  ·",
+		TextColor3 = Cfg.SubText,
+		TextSize = 11,
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.new(0, 0, 0, 18),
+		LayoutOrder = 1,
+	})
+	local DiscordLinkLabel = Custom:Label(DiscordInner, {
+		Name = "Link",
+		Font = Enum.Font.GothamMedium,
+		Text = Cfg.Discord.Url ~= "" and Cfg.Discord.Url or Cfg.Discord.Text,
+		TextColor3 = Cfg.Discord.Color,
+		TextSize = 11,
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.new(0, 0, 0, 18),
+		LayoutOrder = 2,
+	})
+
+	function Self:SetTitle(Text)
+		if Dead() then return end
+		TitleLabel.Text = tostring(Text or "")
+	end
+
+	function Self:SetSubtitle(Text)
+		if Dead() then return end
+		SubtitleLabel.Text = tostring(Text or "")
+		SubtitleLabel.Visible = SubtitleLabel.Text ~= ""
+	end
+
+	function Self:SetStatus(Text)
+		if Dead() then return end
+		StatusLabel.Text = tostring(Text or "")
+	end
+
+	function Self:SetProgress(Value, Animate)
+		if Dead() or not Cfg.Progress.Enabled then return end
+		CurrentProgress = math.clamp(tonumber(Value) or 0, 0, 1)
+		if Animate ~= false and Cfg.Animations then
+			Anim(FillBar, 0.35, { Size = UDim2.new(CurrentProgress, 0, 1, 0) })
+		else
+			FillBar.Size = UDim2.new(CurrentProgress, 0, 1, 0)
+		end
+		if Cfg.Progress.ShowPercent then
+			PercentLabel.Text = string.format("%d%%", math.floor(CurrentProgress * 100 + 0.5))
+		end
+	end
+
+	function Self:GetProgress()
+		return CurrentProgress
+	end
+
+	function Self:SetTimer(Seconds)
+		if Dead() or not Cfg.Timer.Enabled then return end
+		CurrentSeconds = math.max(0, tonumber(Seconds) or 0)
+		TimerLabel.Text = FormatTime(CurrentSeconds)
+	end
+
+	function Self:GetTimer()
+		return CurrentSeconds
+	end
+
+	function Self:StartTimer(FromSeconds)
+		if Dead() or not Cfg.Timer.Enabled then return end
+		if FromSeconds ~= nil then
+			CurrentSeconds = math.max(0, tonumber(FromSeconds) or 0)
+			TimerLabel.Text = FormatTime(CurrentSeconds)
+		end
+		if TimerRunning then return end
+		TimerRunning = true
+		task.spawn(function()
+			while TimerRunning and not Dead() do
+				task.wait(1)
+				if not TimerRunning or Dead() then break end
+				if Cfg.Timer.CountDown then
+					CurrentSeconds = math.max(0, CurrentSeconds - 1)
+				else
+					CurrentSeconds = CurrentSeconds + 1
+				end
+				TimerLabel.Text = FormatTime(CurrentSeconds)
+				if Cfg.Timer.CountDown and CurrentSeconds <= 0 then
+					TimerRunning = false
+					break
+				end
+			end
+		end)
+	end
+
+	function Self:StopTimer()
+		TimerRunning = false
+	end
+
+	function Self:SetLogo(Asset)
+		if Dead() then return end
+		LogoImg.Image = tostring(Asset or "")
+	end
+
+	function Self:SetDiscord(Url, Text)
+		if Dead() then return end
+		if type(Url) == "table" then
+			Cfg.Discord.Url = tostring(Url.Url or Url[1] or "")
+			Cfg.Discord.Text = tostring(Url.Text or Cfg.Discord.Text)
+			Cfg.Discord.Enabled = Cfg.Discord.Url ~= ""
+		else
+			Cfg.Discord.Url = tostring(Url or "")
+			if Text then Cfg.Discord.Text = tostring(Text) end
+			Cfg.Discord.Enabled = Cfg.Discord.Url ~= ""
+		end
+		DiscordRow.Visible = Cfg.Discord.Enabled
+		DiscordLinkLabel.Text = Cfg.Discord.Url ~= "" and Cfg.Discord.Url or Cfg.Discord.Text
+	end
+
+	function Self:Show()
+		if Dead() then return end
+		Gui.Enabled = true
+		Root.Visible = true
+		if Cfg.Animations then
+			Root.BackgroundTransparency = 1
+			LogoScale.Scale = 0.88
+			Anim(Root, 0.32, { BackgroundTransparency = Cfg.BackgroundTransparency })
+			Anim(LogoScale, 0.4, { Scale = 1 }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+		else
+			Root.BackgroundTransparency = Cfg.BackgroundTransparency
+			LogoScale.Scale = 1
+		end
+	end
+
+	function Self:Hide()
+		if Dead() then return end
+		if Cfg.Animations then
+			Anim(Root, 0.25, { BackgroundTransparency = 1 })
+			Anim(LogoScale, 0.2, { Scale = 0.9 })
+			task.delay(0.28, function()
+				if not Dead() then Root.Visible = false end
+			end)
+		else
+			Root.Visible = false
+		end
+	end
+
+	function Self:Destroy(Instant)
+		if Destroyed or Closing then return end
+		Closing = true
+		TimerRunning = false
+		local function Teardown()
+			if Destroyed then return end
+			Destroyed = true
+			for _, C in ipairs(Conns) do pcall(function() C:Disconnect() end) end
+			for _, T in ipairs(Tweens) do pcall(function() T:Cancel() end) end
+			pcall(function() Gui:Destroy() end)
+			if Rexxzy_Library.ActiveKaitunGui == Self then
+				Rexxzy_Library.ActiveKaitunGui = nil
+			end
+		end
+		if Instant == true or not Cfg.Animations then
+			Teardown()
+		else
+			Anim(Root, 0.22, { BackgroundTransparency = 1 })
+			Anim(LogoScale, 0.18, { Scale = 0.88 })
+			task.delay(0.26, Teardown)
+		end
+	end
+
+	function Self:IsDestroyed()
+		return Destroyed or Closing
+	end
+
+	function Self:GetGui()
+		return Gui
+	end
+
+	Self.Gui = Gui
+	Self.Root = Root
+	Self.Frame = Center
+
+	Track(DiscordBtn.Activated:Connect(function()
+		if Dead() or not Cfg.Discord.Enabled then return end
+		local Url = Cfg.Discord.Url
+		if Url == "" then return end
+		local Fn = setclipboard or toclipboard or (Clipboard and Clipboard.set)
+		if Fn then
+			pcall(Fn, Url)
+			DiscordLinkLabel.Text = "Copied!"
+			task.delay(1.4, function()
+				if not Dead() then
+					DiscordLinkLabel.Text = Cfg.Discord.Url ~= "" and Cfg.Discord.Url or Cfg.Discord.Text
+				end
+			end)
+		end
+	end))
+	Track(DiscordBtn.MouseEnter:Connect(function()
+		if Dead() then return end
+		Anim(DiscordLinkLabel, 0.12, { TextColor3 = Cfg.Discord.Color:Lerp(Theme.White, 0.35) })
+	end))
+	Track(DiscordBtn.MouseLeave:Connect(function()
+		if Dead() then return end
+		Anim(DiscordLinkLabel, 0.18, { TextColor3 = Cfg.Discord.Color })
+	end))
+
+	if Cfg.CloseOnClick then
+		local Catcher = Custom:Create("TextButton", {
+			Name = "Catcher",
+			Text = "",
+			AutoButtonColor = false,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 1, 0),
+			ZIndex = 2,
+		}, Root)
+		Track(Catcher.Activated:Connect(function()
+			Self:Destroy()
+		end))
+	end
+
+	if Rexxzy_Library.ActiveKaitunGui and Rexxzy_Library.ActiveKaitunGui ~= Self then
+		pcall(function() Rexxzy_Library.ActiveKaitunGui:Destroy(true) end)
+	end
+	Rexxzy_Library.ActiveKaitunGui = Self
+
+	task.defer(function()
+		if Dead() then return end
+		Self:Show()
+		if Cfg.Timer.Enabled and Cfg.Timer.Seconds > 0 and UserConfig.AutoStartTimer ~= false then
+			Self:StartTimer()
 		end
 	end)
 
