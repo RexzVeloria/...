@@ -1,4 +1,4 @@
--- Just Indicator Is Update Or No
+-- Just Indicator Is Update Or No A
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -4338,7 +4338,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		if StartBg == nil then StartBg = Config.BackgroundImage end
 		if StartBg == nil then StartBg = Config.Wallpaper end
 		if StartBg == nil then
-			StartBg = "https://cdn.phototourl.com/member/2026-10-24-25b4b8a5-f465-49aa-9787-6f2d5226083f.jpg"
+			StartBg = "https://cdn.phototourl.com/member/2026-11-06-532431b5-ad1e-464c-96ee-55e6789d2edc.png"
 		end
 		DefaultBackground = StartBg
 		if StartBg ~= nil and StartBg ~= "" and StartBg ~= false then task.defer(ApplyBackground, StartBg) end
