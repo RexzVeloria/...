@@ -1,4 +1,4 @@
--- Just Indicator Is Update Or No A
+-- Just Indicator Is Update Or No AB
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -337,19 +337,22 @@ function RexxzyWebhook:AttachToLibrary(lib, configNameOrObj)
 end
 
 local Theme = {
-	
-	Accent = Color3.fromRGB(245, 245, 245),
-	AccentSoft = Color3.fromRGB(200, 200, 200),
-	Dark = Color3.fromRGB(10, 10, 10),
-	Panel = Color3.fromRGB(18, 18, 18),
-	Field = Color3.fromRGB(12, 12, 12),
-	Text = Color3.fromRGB(245, 245, 245),
-	Sub = Color3.fromRGB(150, 150, 150),
-	Off = Color3.fromRGB(42, 42, 42),
-	Red = Color3.fromRGB(210, 210, 210),
-	RedHover = Color3.fromRGB(235, 235, 235),
-	White = Color3.fromRGB(230, 230, 230),
-	Black = Color3.fromRGB(6, 6, 6),
+	-- Neutral dark palette: clear separation between window, panels and controls.
+	Accent = Color3.fromRGB(242, 243, 246),
+	AccentSoft = Color3.fromRGB(190, 193, 201),
+	Dark = Color3.fromRGB(8, 9, 12),
+	Panel = Color3.fromRGB(15, 17, 21),
+	Field = Color3.fromRGB(22, 24, 29),
+	Text = Color3.fromRGB(242, 243, 246),
+	Sub = Color3.fromRGB(145, 149, 158),
+	Off = Color3.fromRGB(38, 41, 48),
+	Hover = Color3.fromRGB(31, 34, 41),
+	Selected = Color3.fromRGB(35, 38, 46),
+	Border = Color3.fromRGB(66, 70, 80),
+	Red = Color3.fromRGB(75, 78, 87),
+	RedHover = Color3.fromRGB(94, 98, 108),
+	White = Color3.fromRGB(235, 237, 242),
+	Black = Color3.fromRGB(8, 10, 13),
 }
 
 local Custom = {}
@@ -358,8 +361,8 @@ do
 	Custom.Theme = Theme
 	Custom.DefaultIcon = "rbxassetid://18505728250"
 	Custom.GradientWhite = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(190, 190, 190)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(248, 249, 252)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(202, 205, 213)),
 	})
 	Custom.GradientBorder = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
@@ -369,9 +372,9 @@ do
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
 	})
 	Custom.GradientWindow = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(4, 4, 4)),
-		ColorSequenceKeypoint.new(0.55, Color3.fromRGB(10, 10, 10)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 18, 18)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(9, 11, 15)),
+		ColorSequenceKeypoint.new(0.55, Color3.fromRGB(11, 13, 17)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(16, 18, 23)),
 	})
 	Custom.GradientLine = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
@@ -410,7 +413,7 @@ do
 	end
 
 	function Custom:Corner(inst, Radius)
-		return Custom:Create("UICorner", { CornerRadius = UDim.new(0, Radius or 6) }, inst)
+		return Custom:Create("UICorner", { CornerRadius = UDim.new(0, Radius or 8) }, inst)
 	end
 
 	function Custom:Round(inst)
@@ -448,29 +451,44 @@ do
 
 	function Custom:Card(Parent, Height, Name, Clickable)
 		local Card = Custom:Create(Clickable and "TextButton" or "Frame", {
-			BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
+			BackgroundColor3 = Theme.Field, BackgroundTransparency = 0, BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 0, Height), Name = Name,
 		}, nil)
 		if Clickable then
 			Card.AutoButtonColor = false
 			Card.Text = ""
 		end
-		Custom:Corner(Card, 9)
-		local Stroke = Custom:Stroke(Card, Theme.White, 0.88, 1)
+		Custom:Corner(Card, 10)
+		local Stroke = Custom:Stroke(Card, Theme.Border, 0.72, 1)
 		Card.Parent = Parent
 		return Card, Stroke
 	end
 
 	function Custom:Hover(Card, Stroke)
+		local BaseColor = Card.BackgroundColor3
+		local BaseTransparency = Card.BackgroundTransparency
+		local BaseStrokeColor = Stroke and Stroke.Color
+		local BaseStrokeTransparency = Stroke and Stroke.Transparency
 		Card.MouseEnter:Connect(function()
-			Card.BackgroundColor3 = Theme.Black
-			Card.BackgroundTransparency = 0
-			if Stroke then Stroke.Color = Theme.White Stroke.Transparency = 0 end
+			Custom:Tween(Card, 0.14, {
+				BackgroundColor3 = Theme.Hover,
+				BackgroundTransparency = math.min(BaseTransparency, 0.02),
+			})
+			if Stroke then
+				Custom:Tween(Stroke, 0.14, { Color = Theme.White, Transparency = 0.52 })
+			end
 		end)
 		Card.MouseLeave:Connect(function()
-			Card.BackgroundColor3 = Theme.Black
-			Card.BackgroundTransparency = 0
-			if Stroke then Stroke.Color = Theme.White Stroke.Transparency = 0 end
+			Custom:Tween(Card, 0.16, {
+				BackgroundColor3 = BaseColor,
+				BackgroundTransparency = BaseTransparency,
+			})
+			if Stroke then
+				Custom:Tween(Stroke, 0.16, {
+					Color = BaseStrokeColor,
+					Transparency = BaseStrokeTransparency,
+				})
+			end
 		end)
 	end
 
@@ -2618,11 +2636,11 @@ function Rexxzy_Library:CreateWindow(Config)
 	Config = type(Config) == "table" and Config or {}
 	local Title = Config[1] or Config.Title or ""
 	local Desc = Config[2] or Config.Description or ""
-	local _CfgTabWidth = Config[3] or Config["Tab Width"] or 128
+	local _CfgTabWidth = Config[3] or Config["Tab Width"] or 144
 	local IsMobileCtx = UserInputService.TouchEnabled
 	
 	local MobileLayout = IsMobileCtx and Config.MobileResponsive ~= false
-	local TabWidth = IsMobileCtx and math.min(_CfgTabWidth, 148) or _CfgTabWidth
+	local TabWidth = IsMobileCtx and math.min(_CfgTabWidth, 136) or _CfgTabWidth
 	local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(600, 400)
 	local Keybind = Config[5] or Config.Keybind or Enum.KeyCode.RightControl
 	local Icon = Config[6] or Config.Icon or "hub"
@@ -2773,9 +2791,9 @@ function Rexxzy_Library:CreateWindow(Config)
 		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 		ClipsDescendants = true, Size = UDim2.new(1, 0, 1, 0), ZIndex = 1, Name = "Main",
 	}, DropShadowHolder)
-	Custom:Corner(Main, 12)
+	Custom:Corner(Main, 14)
 	Custom:AddGradient(Main, 125, Custom.GradientWindow)
-	local MainStroke = Custom:Stroke(Main, Theme.White, 0.28, 1.2)
+	local MainStroke = Custom:Stroke(Main, Theme.Border, 0.58, 1.1)
 	
 
 	local function RefreshMobileLayout()
@@ -2843,9 +2861,14 @@ function Rexxzy_Library:CreateWindow(Config)
 		Position = UDim2.new(0, 0, 0, 42), Size = UDim2.new(1, 0, 0, 1), Name = "DecideGlow",
 	}, Main)
 	local LineGradient = Custom:Create("UIGradient", {
-		Color = Custom.GradientLine, Transparency = Custom.FadeEnds, Offset = Vector2.new(-1, 0),
+		Color = Custom.GradientLine,
+		Transparency = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0.88),
+			NumberSequenceKeypoint.new(0.5, 0.35),
+			NumberSequenceKeypoint.new(1, 0.88),
+		}),
+		Offset = Vector2.new(0, 0),
 	}, LineGlow)
-	Loop(LineGradient, { Offset = Vector2.new(1, 0) }, 3)
 
 	local TitleHolder = Custom:Create("Frame", {
 		BackgroundTransparency = 1, BorderSizePixel = 0, ClipsDescendants = true,
@@ -3048,19 +3071,19 @@ function Rexxzy_Library:CreateWindow(Config)
 	end
 
 	local Side = Custom:Create("Frame", {
-		BackgroundColor3 = Theme.Panel, BackgroundTransparency = 0.04, BorderSizePixel = 0,
+		BackgroundColor3 = Theme.Panel, BackgroundTransparency = 0, BorderSizePixel = 0,
 		ClipsDescendants = true, Position = UDim2.new(0, 8, 0, 50),
 		Size = UDim2.new(0, TabWidth, 1, -58), Name = "LayersTab",
 	}, Main)
-	Custom:Corner(Side, 10)
-	Custom:Stroke(Side, Theme.White, 0.93, 1)
+	Custom:Corner(Side, 11)
+	Custom:Stroke(Side, Theme.Border, 0.72, 1)
 
 	local SearchBoxContainer = Custom:Create("Frame", {
-		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0.04, BorderSizePixel = 0,
-		Position = UDim2.new(0, 6, 0, 6), Size = UDim2.new(1, -12, 0, 32), Name = "SBC",
+		BackgroundColor3 = Theme.Field, BackgroundTransparency = 0, BorderSizePixel = 0,
+		Position = UDim2.new(0, 7, 0, 7), Size = UDim2.new(1, -14, 0, 34), Name = "SBC",
 	}, Side)
-	Custom:Round(SearchBoxContainer)
-	local SearchStroke = Custom:Stroke(SearchBoxContainer, Theme.White, 0.9, 1)
+	Custom:Corner(SearchBoxContainer, 8)
+	local SearchStroke = Custom:Stroke(SearchBoxContainer, Theme.Border, 0.7, 1)
 
 	local SearchIconObj = Custom:MakeIcon(SearchBoxContainer, "search", {
 		AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 8, 0.5, 0), Size = UDim2.new(0, 14, 0, 14),
@@ -3076,11 +3099,11 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	SearchBox.Focused:Connect(function()
 		if SearchIconObj then SearchIconObj.SetColor(Theme.White, true) end
-		SearchStroke.Transparency = 0
+		Custom:Tween(SearchStroke, 0.14, { Transparency = 0.38, Color = Theme.White })
 	end)
 	SearchBox.FocusLost:Connect(function()
 		if SearchIconObj then SearchIconObj.SetColor(Theme.Sub, true) end
-		SearchStroke.Transparency = 0
+		Custom:Tween(SearchStroke, 0.16, { Transparency = 0.7, Color = Theme.Border })
 	end)
 
 	local Layers = Custom:Create("Frame", {
@@ -3089,7 +3112,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	}, Main)
 
 	local NameTab = Custom:Label(Layers, {
-		Text = "", TextColor3 = Theme.White, TextSize = 15, Size = UDim2.new(1, 0, 0, 22), Name = "NameTab",
+		Text = "", TextColor3 = Theme.White, TextSize = 16, Size = UDim2.new(1, 0, 0, 22), Name = "NameTab",
 	})
 	Custom:AddGradient(NameTab, 0)
 
@@ -3100,27 +3123,27 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local ScrollTab = Custom:Create("ScrollingFrame", {
 		Active = true, BackgroundTransparency = 1, BorderSizePixel = 0, CanvasSize = UDim2.new(0, 0, 0, 0),
-		AutomaticCanvasSize = Enum.AutomaticSize.Y, ScrollBarThickness = 2, ScrollBarImageColor3 = Theme.Sub,
-		ScrollBarImageTransparency = 0.75, ScrollingDirection = Enum.ScrollingDirection.Y,
-		Position = UDim2.new(0, 5, 0, 44), Size = UDim2.new(1, -10, 1, -94), Name = "ScrollTab",
+		AutomaticCanvasSize = Enum.AutomaticSize.Y, ScrollBarThickness = 3, ScrollBarImageColor3 = Theme.Sub,
+		ScrollBarImageTransparency = 0.55, ScrollingDirection = Enum.ScrollingDirection.Y,
+		Position = UDim2.new(0, 6, 0, 49), Size = UDim2.new(1, -12, 1, -103), Name = "ScrollTab",
 	}, Side)
-	Custom:Create("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }, ScrollTab)
+	Custom:Create("UIListLayout", { Padding = UDim.new(0, 7), SortOrder = Enum.SortOrder.LayoutOrder }, ScrollTab)
 	Custom:Create("UIPadding", {
 		PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 5),
-		PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 3),
+		PaddingLeft = UDim.new(0, 1), PaddingRight = UDim.new(0, 2),
 	}, ScrollTab)
 
 	local AvatarFooter = Custom:Create("Frame", {
-		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.Black, BackgroundTransparency = 0.02,
-		BorderSizePixel = 0, Position = UDim2.new(0, 6, 1, -6), Size = UDim2.new(1, -12, 0, 40), Name = "AvatarFooter",
+		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.Field, BackgroundTransparency = 0,
+		BorderSizePixel = 0, Position = UDim2.new(0, 7, 1, -7), Size = UDim2.new(1, -14, 0, 44), Name = "AvatarFooter",
 	}, Side)
-	Custom:Corner(AvatarFooter, 8)
-	Custom:Stroke(AvatarFooter, Theme.White, 0.92, 1)
+	Custom:Corner(AvatarFooter, 9)
+	Custom:Stroke(AvatarFooter, Theme.Border, 0.72, 1)
 
 	local AvatarImage = Custom:Create("ImageLabel", {
 		Image = "rbxasset://textures/ui/GuiImagePlaceholder.png", AnchorPoint = Vector2.new(0, 0.5),
-		BackgroundColor3 = Theme.Field, BorderSizePixel = 0,
-		Position = UDim2.new(0, 5, 0.5, 0), Size = UDim2.new(0, 24, 0, 24), Name = "AvatarImage",
+		BackgroundColor3 = Theme.Panel, BorderSizePixel = 0,
+		Position = UDim2.new(0, 7, 0.5, 0), Size = UDim2.new(0, 28, 0, 28), Name = "AvatarImage",
 	}, AvatarFooter)
 	Custom:Round(AvatarImage)
 	Custom:Stroke(AvatarImage, Theme.White, 0.4, 1.2)
@@ -3130,9 +3153,9 @@ function Rexxzy_Library:CreateWindow(Config)
 		return Name:sub(1, 3) .. "***"
 	end
 	Custom:Label(AvatarFooter, {
-		Text = "Welcome, " .. CensorName(Player.Name), TextColor3 = Theme.Text, TextSize = 10,
+		Text = "Welcome, " .. CensorName(Player.Name), TextColor3 = Theme.Text, TextSize = 11,
 		TextTruncate = Enum.TextTruncate.AtEnd, TextYAlignment = Enum.TextYAlignment.Center,
-		Position = UDim2.new(0, 34, 0, 0), Size = UDim2.new(1, -52, 1, 0), Name = "WelcomeLabel",
+		Position = UDim2.new(0, 43, 0, 0), Size = UDim2.new(1, -62, 1, 0), Name = "WelcomeLabel",
 	})
 
 	task.spawn(function()
@@ -3458,7 +3481,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	ProfileOverlay.Activated:Connect(CloseProfile)
 
 	local SearchPopup = Custom:Create("Frame", {
-		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
+		BackgroundColor3 = Theme.Panel, BackgroundTransparency = 0, BorderSizePixel = 0,
 		ClipsDescendants = true, Position = UDim2.new(0, 0, 0, 28), Size = UDim2.new(1, 0, 0, 0),
 		Visible = false, ZIndex = 20, Name = "SearchPopup",
 	}, Side)
@@ -4352,13 +4375,13 @@ function Rexxzy_Library:CreateWindow(Config)
 		TabOrder = TabOrder + 1
 		local TabBtn = Custom:Create("TextButton", {
 			Text = "", AutoButtonColor = false, BackgroundTransparency = 1, BorderSizePixel = 0,
-			ClipsDescendants = true, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 36), Name = TabName .. "TabBtn",
+			ClipsDescendants = true, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 39), Name = TabName .. "TabBtn",
 		}, ScrollTab)
-		Custom:Corner(TabBtn, 8)
-		local TabStroke = Custom:Stroke(TabBtn, Theme.White, 0.85, 1)
+		Custom:Corner(TabBtn, 9)
+		local TabStroke = Custom:Stroke(TabBtn, Theme.Border, 0.72, 1)
 		TabStroke.Enabled = false
 		local TabFill = Custom:Create("Frame", {
-			BackgroundColor3 = Theme.Off, BackgroundTransparency = 1, BorderSizePixel = 0,
+			BackgroundColor3 = Theme.Selected, BackgroundTransparency = 1, BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 1, 0), Name = "Fill",
 		}, TabBtn)
 		Custom:Corner(TabFill, 8)
@@ -4386,8 +4409,8 @@ function Rexxzy_Library:CreateWindow(Config)
 			ScrollBarImageColor3 = Theme.White, ScrollBarImageTransparency = 0.6,
 			Name = TabName .. "Frame", Visible = false,
 		}, LayersReal)
-		Custom:Create("UIListLayout", { Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder }, TabFrame)
-		Custom:Create("UIPadding", { PaddingTop = UDim.new(0, 6), PaddingBottom = UDim.new(0, 14), PaddingLeft = UDim.new(0, 4), PaddingRight = UDim.new(0, 8) }, TabFrame)
+		Custom:Create("UIListLayout", { Padding = UDim.new(0, 11), SortOrder = Enum.SortOrder.LayoutOrder }, TabFrame)
+		Custom:Create("UIPadding", { PaddingTop = UDim.new(0, 8), PaddingBottom = UDim.new(0, 16), PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 9) }, TabFrame)
 
 		local TabFuncs = { Frame = TabFrame, Button = TabBtn, Name = TabName }
 
@@ -4396,7 +4419,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				Custom:Tween(TabFill, 0.12, { BackgroundTransparency = 0.72 })
 				TabLabel.TextColor3 = Theme.Text
 				TabStroke.Enabled = true
-				TabStroke.Transparency = 0.84
+				TabStroke.Transparency = 0.78
 				if TabIconImg then TabIconImg.SetColor(Theme.Text, true) end
 			end
 		end)
@@ -4426,10 +4449,10 @@ function Rexxzy_Library:CreateWindow(Config)
 			TabFrame.Position = UDim2.new(0, 0, 0, 10)
 			TabFrame.Visible = true
 			Custom:Tween(TabFrame, 0.2, { Position = UDim2.new(0, 0, 0, 0) })
-			Custom:Tween(TabFill, 0.16, { BackgroundTransparency = 0.18 })
-			Custom:Tween(TabIndicator, 0.16, { Size = UDim2.new(0, 2, 0, 16) })
+			Custom:Tween(TabFill, 0.16, { BackgroundTransparency = 0.38 })
+			Custom:Tween(TabIndicator, 0.16, { Size = UDim2.new(0, 3, 0, 18) })
 			TabStroke.Enabled = true
-			TabStroke.Transparency = 0.84
+			TabStroke.Transparency = 0.76
 			TabLabel.TextColor3 = Theme.White
 			if TabIconImg then TabIconImg.SetColor(Theme.White, true) end
 		end
@@ -4453,13 +4476,13 @@ function Rexxzy_Library:CreateWindow(Config)
 				AutomaticSize = Enum.AutomaticSize.Y, Size = UDim2.new(1, 0, 0, 0),
 				LayoutOrder = #TabFrame:GetChildren(), Name = SectionName .. "Section",
 			}, TabFrame)
-			Custom:Corner(SectionFrame, 10)
-			Custom:Stroke(SectionFrame, Theme.White, 0.85, 1)
+			Custom:Corner(SectionFrame, 12)
+			Custom:Stroke(SectionFrame, Theme.Border, 0.78, 1)
 			Custom:Create("UIListLayout", { Padding = UDim.new(0, 0), SortOrder = Enum.SortOrder.LayoutOrder }, SectionFrame)
 
 			local Header = Custom:Create("TextButton", {
 				Text = "", AutoButtonColor = false, BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 1,
-				Size = UDim2.new(1, 0, 0, 36), Name = "Header",
+				Size = UDim2.new(1, 0, 0, 40), Name = "Header",
 			}, SectionFrame)
 			local SecChevron = Custom:Create("Frame", {
 				AnchorPoint = Vector2.new(1, 0.5), BackgroundTransparency = 1, BorderSizePixel = 0, Rotation = 180,
@@ -4483,8 +4506,8 @@ function Rexxzy_Library:CreateWindow(Config)
 				BackgroundTransparency = 1, BorderSizePixel = 0, AutomaticSize = Enum.AutomaticSize.Y,
 				LayoutOrder = 2, Size = UDim2.new(1, 0, 0, 0), Name = "SectionContent",
 			}, SectionFrame)
-			Custom:Create("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder }, SectionContent)
-			Custom:Create("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), PaddingBottom = UDim.new(0, 12), PaddingTop = UDim.new(0, 4) }, SectionContent)
+			Custom:Create("UIListLayout", { Padding = UDim.new(0, 9), SortOrder = Enum.SortOrder.LayoutOrder }, SectionContent)
+			Custom:Create("UIPadding", { PaddingLeft = UDim.new(0, 13), PaddingRight = UDim.new(0, 13), PaddingBottom = UDim.new(0, 13), PaddingTop = UDim.new(0, 3) }, SectionContent)
 
 			local SectionOpen = true
 			local function SetSectionOpen(State, Animate)
