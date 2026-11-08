@@ -1,4 +1,4 @@
--- Just Indicator Is Update Or No AB
+-- Just Indicator Is Update Or No ABC
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -16,12 +16,12 @@ local REXXZY_DEVELOPER_TAG_TEXT = "🛠️ Developer"
 local REXXZY_DEVELOPER_TAG_MAX_DISTANCE = 180
 
 local RexxzyLogos = {
-    Veloria = "rbxassetid://91690039393292",
-    veloria = "rbxassetid://91690039393292",
-    Verlo = "rbxassetid://91690039393292",
-    verlo = "rbxassetid://91690039393292",
-    VH = "rbxassetid://91690039393292",
-    vh = "rbxassetid://91690039393292",
+    Veloria = "rbxassetid://131946786209484",
+    veloria = "rbxassetid://131946786209484",
+    Verlo = "rbxassetid://131946786209484",
+    verlo = "rbxassetid://131946786209484",
+    VH = "rbxassetid://131946786209484",
+    vh = "rbxassetid://131946786209484",
 }
 
 local function SafeGetExecutor()
@@ -4361,7 +4361,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		if StartBg == nil then StartBg = Config.BackgroundImage end
 		if StartBg == nil then StartBg = Config.Wallpaper end
 		if StartBg == nil then
-			StartBg = "https://cdn.phototourl.com/member/2026-11-06-532431b5-ad1e-464c-96ee-55e6789d2edc.png"
+			StartBg = "https://cdn.phototourl.com/member/2026-11-08-3ac07ab5-65ae-4fe9-94aa-7da9b50e1ace.png"
 		end
 		DefaultBackground = StartBg
 		if StartBg ~= nil and StartBg ~= "" and StartBg ~= false then task.defer(ApplyBackground, StartBg) end
@@ -7397,7 +7397,7 @@ function Rexxzy_Library:CreateKaitunGui(UserConfig)
 	local Cfg = {
 		Title = UserConfig.Title or UserConfig[1] or "Kaitun Auto Farm",
 		Status = UserConfig.Status or UserConfig[2] or "Waiting for teleport...",
-		Logo = UserConfig.Logo or UserConfig.Icon or RexxzyLogos.Veloria or RexxzyLogos.VH or "rbxassetid://91690039393292",
+		Logo = UserConfig.Logo or UserConfig.Icon or RexxzyLogos.Veloria or RexxzyLogos.VH or "rbxassetid://131946786209484",
 		LogoSize = math.clamp(tonumber(UserConfig.LogoSize) or 86, 40, 180),
 		Subtitle = UserConfig.Subtitle or "",
 
