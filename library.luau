@@ -1,4 +1,4 @@
--- Just Indicator Is Update Or No ABC
+-- Just Indicator Is Update Or No ABCD
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -6087,6 +6087,12 @@ function Rexxzy_Library:CreateWindow(Config)
 	return Funcs
 end
 
+--[[
+KEY SYSTEM TEMPLATE MODULE
+- UI and interaction logic are implemented below.
+- No real API, key provider, Discord invite, or key is pre-configured.
+- Fill your own values in KeySystem_Config_Template.lua.
+]]
 local KeySys = {}
 
 function KeySys.IsDict(T)
@@ -6107,50 +6113,20 @@ function KeySys.Merge(Base, User)
 	return Out
 end
 
+-- GENERIC PROVIDER PRESETS
+-- Replace the names, links, callbacks, and appearance in your own config.
 KeySys.ProviderPresets = {
-	linkvertise = {
-		Name = "Linkvertise", Type = "Free", Logo = "link",
-		Accent = Color3.fromRGB(255, 180, 50),
-		ButtonText = "Get Key (Linkvertise)",
-	},
-	workink = {
-		Name = "Work.ink", Type = "Free", Logo = "link",
-		Accent = Color3.fromRGB(80, 180, 255),
-		ButtonText = "Get Key (Work.ink)",
-	},
-	lootlabs = {
-		Name = "LootLabs", Type = "Free", Logo = "link",
-		Accent = Color3.fromRGB(120, 220, 120),
-		ButtonText = "Get Key (LootLabs)",
-	},
-	adblueprint = {
-		Name = "AdBlueprint", Type = "Free", Logo = "link",
-		Accent = Color3.fromRGB(200, 140, 255),
-		ButtonText = "Get Key (AdBlueprint)",
-	},
-	cuty = {
-		Name = "Cuty.io", Type = "Free", Logo = "link",
-		Accent = Color3.fromRGB(255, 120, 160),
-		ButtonText = "Get Key (Cuty)",
-	},
-	boost = {
-		Name = "Boost", Type = "Free", Logo = "zap",
-		Accent = Color3.fromRGB(255, 200, 80),
-		ButtonText = "Get Key (Boost)",
-	},
-	custom = {
-		Name = "Custom", Type = "Free", Logo = "key",
-		ButtonText = "Get Key",
+	free = {
+		Name = "YOUR_FREE_PROVIDER_NAME", Type = "Free", Logo = "key",
+		ButtonText = "YOUR_FREE_BUTTON_TEXT",
 	},
 	premium = {
-		Name = "Premium", Type = "Premium", Logo = "badge-check",
-		Accent = Color3.fromRGB(245, 245, 245),
-		ButtonText = "Premium Access",
+		Name = "YOUR_PREMIUM_PROVIDER_NAME", Type = "Premium", Logo = "badge-check",
+		ButtonText = "YOUR_PREMIUM_BUTTON_TEXT",
 	},
-	direct = {
-		Name = "Direct", Type = "Premium", Logo = "shield-check",
-		Accent = Color3.fromRGB(100, 220, 160),
-		ButtonText = "Get Premium Key",
+	custom = {
+		Name = "YOUR_CUSTOM_PROVIDER_NAME", Type = "Free", Logo = "key",
+		ButtonText = "YOUR_CUSTOM_BUTTON_TEXT",
 	},
 }
 
@@ -6180,9 +6156,9 @@ end
 
 function KeySys.Defaults()
 	return {
-		Title = "Access Verification",
-		Description = "Verify your key to continue.",
-		Icon = "key",
+		Title = "YOUR_HUB_NAME",
+		Description = "YOUR_KEY_SYSTEM_DESCRIPTION",
+		Icon = "YOUR_ICON_NAME",
 		
 		Style = "Full",
 		AccountIndependent = true,
@@ -6203,6 +6179,19 @@ function KeySys.Defaults()
 		},
 		Authentication = {
 			DefaultMode = "API",
+			AccessMode = {
+				Enabled = false, Default = "Free",
+				FreeLabel = "Free", PremiumLabel = "Premium",
+				FreeDescription = "YOUR_FREE_ACCESS_DESCRIPTION",
+				PremiumDescription = "YOUR_PREMIUM_ACCESS_DESCRIPTION",
+				FreePlaceholder = "YOUR_FREE_KEY_PLACEHOLDER", PremiumPlaceholder = "YOUR_PREMIUM_KEY_PLACEHOLDER",
+				FreeVerifyText = "YOUR_FREE_VERIFY_BUTTON_TEXT", PremiumVerifyText = "YOUR_PREMIUM_VERIFY_BUTTON_TEXT",
+				FreeAccent = Color3.fromRGB(245, 245, 245), PremiumAccent = Color3.fromRGB(255, 184, 0),
+			},
+			Keyless = {
+				Enabled = false, ButtonText = "Keyless Mode", LoadingText = "Loading Keyless...",
+				SuccessText = "Keyless access granted.", HideFreeKeyEntry = true, Timeout = 20,
+			},
 			Placeholder = "Enter your key...",
 			PasswordPlaceholder = "Enter the password...",
 			VerifyText = "Verify",
@@ -6223,6 +6212,7 @@ function KeySys.Defaults()
 			Messages = {
 				Empty = "Enter your key to continue.",
 				Invalid = "That key is not valid.",
+				WrongTier = "This key does not match the selected access mode.",
 				ApiError = "Could not reach the verification service.",
 				Timeout = "The request timed out. Try again.",
 				NotConfigured = "Verification is not configured.",
@@ -6239,8 +6229,8 @@ function KeySys.Defaults()
 			Password = { Enabled = false, Password = "", CaseSensitive = true },
 		},
 		Discord = {
-			Enabled = true, Text = "Need Support?", LinkText = "Discord", Color = Color3.fromRGB(88, 101, 242),
-			Icon = "message-circle", IconSize = 14, InviteURL = "",
+			Enabled = false, Text = "YOUR_SUPPORT_LABEL", LinkText = "YOUR_DISCORD_BUTTON_TEXT", Color = Color3.fromRGB(88, 101, 242),
+			Icon = "message-circle", IconSize = 14, InviteURL = "YOUR_DISCORD_INVITE_URL",
 			CopiedMessage = "Discord invite copied to clipboard.",
 			MissingMessage = "The Discord invite has not been configured.",
 		},
@@ -6255,7 +6245,7 @@ function KeySys.Defaults()
 		Behavior = {
 			CloseOnSuccess = true, SuccessDelay = 0.9, ClipboardFallback = "Show", Notifications = true,
 			NotificationDelay = 3, ReplaceExisting = true,
-			Persist = { Enabled = false, Name = "Default", Days = 0, AutoVerify = true },
+			Persist = { Enabled = false, Folder = "YOUR_LIBRARY_NAME", Name = "YOUR_CONFIG_NAME", Days = 0, AutoVerify = true },
 		},
 		Callbacks = {},
 	}
@@ -6309,12 +6299,30 @@ end
 
 function KeySys.Values(Key, Context)
 	local Send = Context.Send or {}
+	local GameName = "Unknown"
+	local Executor = "Unknown"
+	pcall(function()
+		local Info = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId)
+		if Info and Info.Name then GameName = tostring(Info.Name) end
+	end)
+	pcall(function()
+		if identifyexecutor then Executor = tostring(identifyexecutor())
+		elseif getexecutorname then Executor = tostring(getexecutorname()) end
+	end)
+	local Stamp = tostring(os.time())
+	local Nonce = Stamp .. "-" .. tostring(math.random(100000, 999999))
 	return {
 		key = Key,
 		hwid = (Send.HWID and Context.HWID) or "",
 		userid = (Send.Account and Context.UserId ~= nil) and tostring(Context.UserId) or "",
 		username = (Send.Account and Context.Username) or "",
 		multi = tostring(Context.Policy and Context.Policy.AllowMultipleAccounts == true),
+		tier = tostring(Context.AccessTier or ""),
+		placeid = tostring(game.PlaceId),
+		gamename = GameName,
+		executor = Executor,
+		nonce = Nonce,
+		timestamp = Stamp,
 	}
 end
 
@@ -6356,14 +6364,16 @@ function KeySys.MakeUrlVerifier(Spec)
 				return false, "rejected"
 			end
 		end
+		local ResponseData = nil
 		if type(Spec.SuccessJson) == "table" then
 			local Ok, Data = pcall(function() return HttpService:JSONDecode(R.Body) end)
-			if not Ok then return nil, "bad json" end
+			if not Ok or type(Data) ~= "table" then return nil, "bad json" end
 			local Want = Spec.SuccessJson.Value
 			if Want == nil then Want = true end
 			if KeySys.JsonPath(Data, Spec.SuccessJson.Field) ~= Want then return false, "rejected" end
+			ResponseData = Data
 		end
-		return true
+		return true, ResponseData
 	end
 end
 
@@ -6409,10 +6419,10 @@ function KeySys.Hwid(Cfg)
 	return nil
 end
 
-function KeySys.BuildContext(Cfg, Key, Mode)
+function KeySys.BuildContext(Cfg, Key, Mode, AccessTier)
 	local HM = KeySys.HwidMode(Cfg)
 	local Context = {
-		Key = Key, Mode = Mode,
+		Key = Key, Mode = Mode, AccessTier = AccessTier,
 		Policy = {
 			AccountIndependent = Cfg.AccountIndependent ~= false,
 			AllowMultipleAccounts = Cfg.AllowMultipleAccounts ~= false,
@@ -6458,6 +6468,10 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 	local Destroyed, Closing, Busy, Verified, SuccessFired, PersistTrial = false, false, false, false, false, false
 	local LastFail = -100
 	local Mode = "API"
+	local AccessCfg = type(Auth.AccessMode) == "table" and Auth.AccessMode or {}
+	local KeylessCfg = type(Auth.Keyless) == "table" and Auth.Keyless or {}
+	local AccessEnabled = AccessCfg.Enabled == true
+	local AccessTier = string.lower(tostring(AccessCfg.Default or "Free")) == "premium" and "Premium" or "Free"
 	local Intro = true
 	local TargetScale = 1
 
@@ -6503,7 +6517,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		local Args = table.pack(...)
 		task.spawn(function()
 			local Ok, Err = pcall(Fn, table.unpack(Args, 1, Args.n))
-			if not Ok then warn("[Rexxzy KeySystem] callback " .. Name .. " failed: " .. tostring(Err)) end
+			if not Ok then warn("[KeySystemTemplate] callback " .. Name .. " failed: " .. tostring(Err)) end
 		end)
 	end
 
@@ -6549,7 +6563,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 	end
 
 	local Gui = Custom:Create("ScreenGui", {
-		Name = "RexxzyKeySystem", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false,
+		Name = "KeySystemTemplate", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false,
 		IgnoreGuiInset = true, DisplayOrder = tonumber(Win.DisplayOrder) or 150,
 	}, Custom:GetGuiParent())
 	local BackdropGoal = Win.Backdrop == false and 1 or (tonumber(Win.BackdropTransparency) or 0.5)
@@ -6630,6 +6644,37 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		Name = "Description",
 	})
 
+	local AccessToggle, FreeModeBtn, PremiumModeBtn, AccessSlider
+	local FreeAccent = Col(AccessCfg.FreeAccent, CAccent)
+	local PremiumAccent = Col(AccessCfg.PremiumAccent, Color3.fromRGB(255, 184, 0))
+	if AccessEnabled then
+		AccessToggle = Custom:Create("Frame", {
+			BackgroundColor3 = CInput, BorderSizePixel = 0, LayoutOrder = 2,
+			Size = UDim2.new(1, 0, 0, 36), Name = "AccessModeToggle",
+		}, Main)
+		Custom:Corner(AccessToggle, 9)
+		Custom:Stroke(AccessToggle, CBorder, 0.78, 1)
+		AccessSlider = Custom:Create("Frame", {
+			BackgroundColor3 = AccessTier == "Premium" and PremiumAccent or FreeAccent,
+			BorderSizePixel = 0,
+			Position = AccessTier == "Premium" and UDim2.new(0.5, 2, 0, 3) or UDim2.fromOffset(3, 3),
+			Size = UDim2.new(0.5, -5, 1, -6), Name = "AccessSlider",
+		}, AccessToggle)
+		Custom:Corner(AccessSlider, 7)
+		FreeModeBtn = Custom:Create("TextButton", {
+			Text = tostring(AccessCfg.FreeLabel or "Free"), Font = FontBold, TextSize = 12,
+			TextColor3 = AccessTier == "Free" and Theme.Black or CSub,
+			BackgroundTransparency = 1, BorderSizePixel = 0, AutoButtonColor = false,
+			Position = UDim2.fromOffset(0, 0), Size = UDim2.new(0.5, 0, 1, 0), ZIndex = 2, Name = "FreeMode",
+		}, AccessToggle)
+		PremiumModeBtn = Custom:Create("TextButton", {
+			Text = tostring(AccessCfg.PremiumLabel or "Premium"), Font = FontBold, TextSize = 12,
+			TextColor3 = AccessTier == "Premium" and Theme.Black or CSub,
+			BackgroundTransparency = 1, BorderSizePixel = 0, AutoButtonColor = false,
+			Position = UDim2.new(0.5, 0, 0, 0), Size = UDim2.new(0.5, 0, 1, 0), ZIndex = 3, Name = "PremiumMode",
+		}, AccessToggle)
+	end
+
 	local CloseBtn
 	if Win.CloseButton ~= false then
 		CloseBtn = Custom:Create("TextButton", {
@@ -6655,11 +6700,24 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 			AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 11, 0.5, 0), Size = UDim2.new(0, 16, 0, 16), Color = CSub, Name = "InputIcon" .. Name,
 		})
 	end
+	local ShowPasteButton = AccessEnabled or Auth.ShowPasteButton == true
 	local InputBox = Custom:Create("TextBox", {
 		BackgroundTransparency = 1, BorderSizePixel = 0, ClearTextOnFocus = false, Font = FontBody, Text = "", PlaceholderText = "",
 		PlaceholderColor3 = CSub, TextColor3 = CInputText, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left,
-		Position = UDim2.new(0, 36, 0, 0), Size = UDim2.new(1, -46, 1, 0), ClipsDescendants = true, Name = "InputBox",
+		Position = UDim2.new(0, 36, 0, 0), Size = ShowPasteButton and UDim2.new(1, -88, 1, 0) or UDim2.new(1, -46, 1, 0),
+		ClipsDescendants = true, Name = "InputBox",
 	}, InputFrame)
+	local PasteBtn
+	if ShowPasteButton then
+		PasteBtn = Custom:Create("TextButton", {
+			Text = "Paste", Font = FontBold, TextSize = 10, TextColor3 = CAccent,
+			BackgroundColor3 = CSecondary, BackgroundTransparency = 0.08, BorderSizePixel = 0,
+			AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -6, 0.5, 0),
+			Size = UDim2.new(0, 46, 0, 26), Name = "PasteButton",
+		}, InputFrame)
+		Custom:Corner(PasteBtn, 6)
+		Custom:Stroke(PasteBtn, CBorder, 0.72, 1)
+	end
 
 	local StatusRow = Custom:Create("Frame", {
 		AutomaticSize = Enum.AutomaticSize.Y, BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 4,
@@ -6725,6 +6783,8 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		Size = UDim2.new(1, 0, 0, IsMini and 32 or 36), Name = "Verify",
 	}, Main)
 	Custom:Corner(VerifyBtn, IsMini and 7 or 8)
+	local VerifyStroke
+	if AccessEnabled then VerifyStroke = Custom:Stroke(VerifyBtn, FreeAccent, 0.48, 1) end
 	if CButton == Theme.White then Custom:AddGradient(VerifyBtn, 90) end
 	local VerifyInner, VerifyLabel, VerifyIcon = ButtonContent(VerifyBtn, "shield-check", "check", tostring(Auth.VerifyText), CButtonText, CButtonText)
 	local VerifySpin = Ic(VerifyInner, "loader", "info", {
@@ -6738,6 +6798,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 	}, Main)
 	Custom:Create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, IsMini and 5 or 6) }, GetKeyBox)
 	local ProviderButtons = {}
+	local SectionHeaders = {}
 	local KeyButtonCount = 0
 	local BtnH = IsMini and 30 or 34
 	local LayoutCursor = 0
@@ -6750,6 +6811,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 			BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = Order,
 			Size = UDim2.new(1, 0, 0, IsMini and 16 or 18), Name = "Section_" .. Label,
 		}, GetKeyBox)
+		SectionHeaders[Label] = Row
 		Custom:Label(Row, {
 			Font = FontBold, Text = string.upper(Label), TextColor3 = CSub, TextSize = IsMini and 9 or 10,
 			TextXAlignment = Enum.TextXAlignment.Left, Size = UDim2.new(1, 0, 1, 0), Name = "Label",
@@ -6777,7 +6839,12 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		table.insert(ProviderButtons, { Button = B, Provider = P, Ready = Ready })
 		KeyButtonCount = KeyButtonCount + 1
 	end
-	if GroupByType and HasFree and HasPremium then
+	if AccessEnabled then
+		for _, P in ipairs(Providers) do
+			LayoutCursor = LayoutCursor + 1
+			AddProviderButton(P, LayoutCursor)
+		end
+	elseif GroupByType and HasFree and HasPremium then
 		LayoutCursor = LayoutCursor + 1
 		AddSectionHeader(PremiumLabel, LayoutCursor)
 		for _, P in ipairs(Providers) do
@@ -6801,19 +6868,33 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		end
 	end
 
+	local KeylessRow = Custom:Create("Frame", {
+		BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 8,
+		Size = UDim2.new(1, 0, 0, 34), Visible = false, Name = "KeylessRow",
+	}, Main)
+	local KeylessBtn = Custom:Create("TextButton", {
+		Text = tostring(KeylessCfg.ButtonText or "Keyless Mode"), Font = FontBold, TextSize = 11,
+		TextColor3 = CText, BackgroundColor3 = CSecondary, BackgroundTransparency = 0.08,
+		BorderSizePixel = 0, AutoButtonColor = false, Size = UDim2.new(1, 0, 1, 0), Name = "KeylessButton",
+	}, KeylessRow)
+	Custom:Corner(KeylessBtn, 8)
+	Custom:Stroke(KeylessBtn, CBorder, 0.65, 1)
+	KeylessBtn.Visible = KeylessCfg.Enabled == true
+	KeylessRow.Visible = false
+
 	local HM = KeySys.HwidMode(Cfg)
 	local NoticeLines = {}
 	if HM ~= "Disabled" and Cfg.Device.Notice and Cfg.Device.Notice ~= "" then table.insert(NoticeLines, tostring(Cfg.Device.Notice)) end
 	if Cfg.AccountIndependent == false and Cfg.Account.Notice and Cfg.Account.Notice ~= "" then table.insert(NoticeLines, tostring(Cfg.Account.Notice)) end
 	local NoticeLabel = Custom:Label(Main, {
 		Font = FontBody, Text = table.concat(NoticeLines, " "), TextColor3 = CSub, TextSize = 10, TextWrapped = true,
-		AutomaticSize = Enum.AutomaticSize.Y, Size = UDim2.new(1, 0, 0, 12), LayoutOrder = 8, Visible = #NoticeLines > 0,
+		AutomaticSize = Enum.AutomaticSize.Y, Size = UDim2.new(1, 0, 0, 12), LayoutOrder = 9, Visible = #NoticeLines > 0,
 		TextXAlignment = Enum.TextXAlignment.Center, Name = "Notice",
 	})
 
 	local DiscordRow = Custom:Create("Frame", {
-		BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 9,
-		Size = UDim2.new(1, 0, 0, 22), Visible = DiscordCfg.Enabled ~= false, Name = "Discord",
+		BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 10,
+			Size = UDim2.new(1, 0, 0, 22), Visible = DiscordCfg.Enabled ~= false, Name = "Discord",
 	}, Main)
 	local DiscordColor = Col(DiscordCfg.Color, Color3.fromRGB(88, 101, 242))
 	local DiscordBtn = nil
@@ -6885,12 +6966,65 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		Anim(StatusLabel, 0.18, { TextTransparency = 0 })
 	end
 
+	local function TierHasProviders(Tier)
+		for _, Entry in ipairs(ProviderButtons) do
+			if Entry.Provider.Type == Tier then return true end
+		end
+		return false
+	end
+
+	local function UpdateAccessUI()
+		if not AccessEnabled then
+			GetKeyBox.Visible = Mode == "API" and KeyButtonCount > 0
+			return
+		end
+		local IsPremium = AccessTier == "Premium"
+		local ActiveAccent = IsPremium and PremiumAccent or FreeAccent
+		if AccessSlider then
+			Anim(AccessSlider, 0.2, {
+				Position = IsPremium and UDim2.new(0.5, 2, 0, 3) or UDim2.fromOffset(3, 3),
+				BackgroundColor3 = ActiveAccent,
+			})
+		end
+		if FreeModeBtn then FreeModeBtn.TextColor3 = IsPremium and CSub or Theme.Black end
+		if PremiumModeBtn then PremiumModeBtn.TextColor3 = IsPremium and Theme.Black or CSub end
+		for _, Entry in ipairs(ProviderButtons) do
+			Entry.Button.Visible = Entry.Provider.Type == AccessTier
+		end
+		InputBox.PlaceholderText = tostring(IsPremium and AccessCfg.PremiumPlaceholder or AccessCfg.FreePlaceholder)
+		VerifyLabel.Text = tostring(IsPremium and AccessCfg.PremiumVerifyText or AccessCfg.FreeVerifyText)
+		VerifyBtn.BackgroundColor3 = ActiveAccent
+		if VerifyStroke then VerifyStroke.Color = ActiveAccent end
+		local KeylessVisible = AccessTier == "Free" and KeylessCfg.Enabled == true
+		KeylessRow.Visible = KeylessVisible
+		local HideEntry = KeylessVisible and KeylessCfg.HideFreeKeyEntry ~= false
+		InputFrame.Visible = not HideEntry
+		VerifyBtn.Visible = not HideEntry
+		GetKeyBox.Visible = Mode == "API" and TierHasProviders(AccessTier) and not HideEntry
+		if KeylessBtn then KeylessBtn.Visible = KeylessVisible end
+		if not Busy then
+			local Description = tostring(IsPremium and AccessCfg.PremiumDescription or AccessCfg.FreeDescription or "")
+			SetStatus("idle", Description)
+		end
+	end
+
+	local function SetAccessTier(NewTier)
+		if not AccessEnabled then return false end
+		AccessTier = string.lower(tostring(NewTier or "Free")) == "premium" and "Premium" or "Free"
+		UpdateAccessUI()
+		return true
+	end
+
 	local function SetBusy(On, Verifying)
 		Busy = On
 		if Destroyed then return end
 		InputBox.TextEditable = not On
 		if Verifying then
-			VerifyLabel.Text = On and tostring(Auth.LoadingText) or tostring(Auth.VerifyText)
+			local IdleVerifyText = Auth.VerifyText
+			if AccessEnabled then
+				IdleVerifyText = AccessTier == "Premium" and AccessCfg.PremiumVerifyText or AccessCfg.FreeVerifyText
+			end
+			VerifyLabel.Text = On and tostring(Auth.LoadingText) or tostring(IdleVerifyText)
 			if VerifyIcon then VerifyIcon.Instance.Visible = not On end
 			if VerifySpin then
 				VerifySpin.Instance.Visible = On
@@ -6903,18 +7037,21 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		end
 	end
 
+	local PersistFolder = CleanName(tostring(PersistCfg.Folder or "YOUR_LIBRARY_NAME"))
+	local PersistDirectory = PersistFolder .. "/KeySystem"
+
 	local function PersistPath()
-		return "Rexxzy/KeySystem/" .. CleanName(tostring(PersistCfg.Name or "Default")) .. ".json"
+		return PersistDirectory .. "/" .. CleanName(tostring(PersistCfg.Name or "YOUR_CONFIG_NAME")) .. ".json"
 	end
 
 	local function SavePersist(Key)
 		if PersistCfg.Enabled ~= true or not FsReady() then return end
 		pcall(function()
 			if makefolder and isfolder then
-				if not isfolder("Rexxzy") then makefolder("Rexxzy") end
-				if not isfolder("Rexxzy/KeySystem") then makefolder("Rexxzy/KeySystem") end
+				if not isfolder(PersistFolder) then makefolder(PersistFolder) end
+				if not isfolder(PersistDirectory) then makefolder(PersistDirectory) end
 			end
-			writefile(PersistPath(), HttpService:JSONEncode({ Key = Key, Mode = Mode, Time = os.time() }))
+			writefile(PersistPath(), HttpService:JSONEncode({ Key = Key, Mode = Mode, AccessTier = AccessTier, Time = os.time() }))
 		end)
 	end
 
@@ -7004,8 +7141,10 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		if type(API.Verify) == "function" then table.insert(List, { Fn = API.Verify, Timeout = Timeout }) end
 		if type(API.VerifyUrl) == "table" then table.insert(List, { Fn = KeySys.MakeUrlVerifier(API.VerifyUrl), Timeout = Timeout }) end
 		for _, P in ipairs(Providers) do
-			if P.Verify then table.insert(List, { Fn = P.Verify, Provider = P, Timeout = P.Timeout or Timeout }) end
-			if P.VerifyUrl then table.insert(List, { Fn = KeySys.MakeUrlVerifier(P.VerifyUrl), Provider = P, Timeout = P.Timeout or Timeout }) end
+			if not AccessEnabled or P.Type == AccessTier then
+				if P.Verify then table.insert(List, { Fn = P.Verify, Provider = P, Timeout = P.Timeout or Timeout }) end
+				if P.VerifyUrl then table.insert(List, { Fn = KeySys.MakeUrlVerifier(P.VerifyUrl), Provider = P, Timeout = P.Timeout or Timeout }) end
+			end
 		end
 		return List
 	end
@@ -7016,7 +7155,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 			Reject("not_configured", Msg.NotConfigured, Key)
 			return
 		end
-		local Context = KeySys.BuildContext(Cfg, Key, "API")
+		local Context = KeySys.BuildContext(Cfg, Key, "API", AccessEnabled and AccessTier or nil)
 		if Context.Policy.HWIDMode == "Strict" and not Context.HWID then
 			Reject("device_unavailable", Msg.DeviceUnavailable, Key)
 			return
@@ -7043,10 +7182,20 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 			local function Try()
 				Attempt = Attempt + 1
 				local Ctx = KeySys.WithProvider(Context, Entry.Provider)
-				KeySys.RunWithTimeout(Entry.Timeout, function() return Entry.Fn(Key, Ctx) end, function(Status, Ok)
+				KeySys.RunWithTimeout(Entry.Timeout, function() return Entry.Fn(Key, Ctx) end, function(Status, Ok, Meta)
 					if Dead() then return end
 					if Status == "done" and Ok == true then
-						Accept(Key, { Mode = "API", Provider = Entry.Provider and Entry.Provider.Id or nil })
+						local ReturnedTier = nil
+						if type(Meta) == "string" then ReturnedTier = Meta
+						elseif type(Meta) == "table" then
+							ReturnedTier = Meta.tier or Meta.Tier or Meta.accessTier or Meta.AccessTier
+							if ReturnedTier == nil and type(Meta.premium) == "boolean" then ReturnedTier = Meta.premium and "Premium" or "Free" end
+						end
+						if AccessEnabled and ReturnedTier ~= nil and string.lower(tostring(ReturnedTier)) ~= string.lower(AccessTier) then
+							Reject("wrong_tier", Msg.WrongTier, Key, true)
+							return
+						end
+						Accept(Key, { Mode = "API", Provider = Entry.Provider and Entry.Provider.Id or nil, AccessTier = AccessEnabled and AccessTier or nil, Response = Meta })
 						return
 					end
 					if Status == "done" and Ok == false then
@@ -7067,6 +7216,48 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 			Try()
 		end
 		Step()
+	end
+
+	local function RunKeyless()
+		if Dead() or not AccessEnabled or AccessTier ~= "Free" or KeylessCfg.Enabled ~= true then return false end
+		if Busy then
+			SetStatus("warning", Msg.Busy)
+			return false
+		end
+		local Callback = type(KeylessCfg.Callback) == "function" and KeylessCfg.Callback or Callbacks.OnKeyless
+		if type(Callback) ~= "function" then
+			local Text = tostring(Msg.NotConfigured)
+			SetStatus("warning", Text)
+			Notify("warning", Text)
+			Fire("OnFailure", Text, "keyless_not_configured")
+			return false
+		end
+		SetBusy(true, false)
+		SetStatus("loading", tostring(KeylessCfg.LoadingText or "Loading Keyless..."))
+		local Context = KeySys.BuildContext(Cfg, "", "Keyless", AccessTier)
+		KeySys.RunWithTimeout(math.clamp(tonumber(KeylessCfg.Timeout) or 20, 2, 120), function()
+			return Callback(Context)
+		end, function(Status, Result, Detail)
+			if Dead() then return end
+			SetBusy(false, false)
+			if Status == "done" and Result ~= false then
+				local Text = tostring(KeylessCfg.SuccessText or "Keyless access granted.")
+				SetStatus("success", Text)
+				Notify("success", Text)
+				Fire("OnKeylessSuccess", Context, Result, Detail)
+				if KeylessCfg.CloseOnSuccess ~= false and Behavior.CloseOnSuccess ~= false then
+					task.delay(tonumber(Behavior.SuccessDelay) or 0.5, function()
+						if not Dead() then Self:Destroy() end
+					end)
+				end
+			else
+				local Text = Status == "timeout" and tostring(Msg.Timeout) or tostring(Detail or Result or Msg.ApiError)
+				SetStatus("error", Text)
+				Notify("error", Text)
+				Fire("OnFailure", Text, Status == "timeout" and "timeout" or "keyless_failed")
+			end
+		end)
+		return true
 	end
 
 	local function StartVerify(Raw)
@@ -7101,7 +7292,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 			if Mode == "Password" then VerifyPassword(Key) else VerifyApi(Key) end
 		end)
 		if not Ok then
-			warn("[Rexxzy KeySystem] verification error: " .. tostring(Err))
+			warn("[KeySystemTemplate] verification error: " .. tostring(Err))
 			Reject("api_error", Msg.ApiError, Key)
 		end
 	end
@@ -7126,6 +7317,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 
 	local function RequestKey(P)
 		if Dead() or Verified then return false end
+		if AccessEnabled and P.Type ~= AccessTier then return false end
 		if Busy then
 			SetStatus("warning", Msg.Busy)
 			return false
@@ -7169,7 +7361,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 			Deliver(P.Url)
 			return true
 		end
-		local Context = KeySys.WithProvider(KeySys.BuildContext(Cfg, "", "API"), P)
+		local Context = KeySys.WithProvider(KeySys.BuildContext(Cfg, "", "API", AccessEnabled and AccessTier or nil), P)
 		local Attempt = 0
 		local function Try()
 			Attempt = Attempt + 1
@@ -7200,10 +7392,12 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		if NewMode == "API" and not ApiOn then return false end
 		Mode = NewMode
 		for Name, Obj in pairs(InputIcons) do Obj.Instance.Visible = (Name == Mode) end
-		InputBox.PlaceholderText = tostring(Mode == "Password" and Auth.PasswordPlaceholder or Auth.Placeholder)
-		GetKeyBox.Visible = Mode == "API" and KeyButtonCount > 0
+		if not AccessEnabled then
+			InputBox.PlaceholderText = tostring(Mode == "Password" and Auth.PasswordPlaceholder or Auth.Placeholder)
+		end
+		UpdateAccessUI()
 		LinkBox.Visible = false
-		if not Busy and not Verified then SetStatus("idle", "") end
+		if not Busy and not Verified and not AccessEnabled then SetStatus("idle", "") end
 		return true
 	end
 
@@ -7271,6 +7465,9 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 	function Self:SetStatus(Kind, Text) SetStatus(Kind, Text) end
 	function Self:SetMode(NewMode) return SetMode(NewMode) end
 	function Self:GetMode() return Mode end
+	function Self:SetAccessTier(Tier) return SetAccessTier(Tier) end
+	function Self:GetAccessTier() return AccessTier end
+	function Self:RunKeyless() return RunKeyless() end
 	function Self:SetKey(Text) if not Destroyed then InputBox.Text = tostring(Text or "") end end
 	function Self:GetInput() return Destroyed and "" or InputBox.Text end
 	function Self:Verify(Key)
@@ -7299,6 +7496,41 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		CircleClick(VerifyBtn)
 		StartVerify(InputBox.Text)
 	end))
+	if FreeModeBtn then
+		Track(FreeModeBtn.Activated:Connect(function()
+			if not Busy then SetAccessTier("Free") end
+		end))
+	end
+	if PremiumModeBtn then
+		Track(PremiumModeBtn.Activated:Connect(function()
+			if not Busy then SetAccessTier("Premium") end
+		end))
+	end
+	if PasteBtn then
+		Track(PasteBtn.Activated:Connect(function()
+			local Getter = getclipboard or readclipboard or (Clipboard and Clipboard.get)
+			if type(Getter) ~= "function" then
+				SetStatus("warning", tostring(Msg.ClipboardFailed))
+				return
+			end
+			local Ok, Value = pcall(Getter)
+			local Text = Ok and tostring(Value or "") or ""
+			Text = string.gsub(Text, "[%c%z]", "")
+			Text = KeySys.Trim(Text):sub(1, math.clamp(tonumber(Auth.MaxLength) or 512, 1, 2048))
+			if Text ~= "" then
+				InputBox.Text = Text
+				SetStatus("info", tostring(Msg.KeyReceived or "Key pasted."))
+			else
+				SetStatus("warning", tostring(Msg.ClipboardFailed))
+			end
+		end))
+	end
+	if KeylessBtn then
+		Track(KeylessBtn.Activated:Connect(function()
+			CircleClick(KeylessBtn)
+			RunKeyless()
+		end))
+	end
 	HoverFx(VerifyBtn, nil, 0, 0.12, 0, 0)
 	for _, Entry in ipairs(ProviderButtons) do
 		Track(Entry.Button.Activated:Connect(function()
@@ -7354,6 +7586,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		if InputIcons.Password then InputIcons.Password.Instance.Visible = false end
 		GetKeyBox.Visible = false
 	end
+	if AccessEnabled then SetAccessTier(AccessTier) end
 	if not ApiOn and not PwOn then SetStatus("warning", Msg.NoMethod) end
 
 	task.spawn(function()
@@ -7376,6 +7609,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 		if Saved and PersistCfg.AutoVerify ~= false then
 			local SavedMode = Saved.Mode == "Password" and "Password" or "API"
 			if (SavedMode == "Password" and PwOn) or (SavedMode == "API" and ApiOn) then
+				if AccessEnabled and Saved.AccessTier ~= nil then SetAccessTier(Saved.AccessTier) end
 				SetMode(SavedMode)
 				InputBox.Text = Saved.Key
 				PersistTrial = true
