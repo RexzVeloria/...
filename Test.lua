@@ -1,4 +1,4 @@
--- Just Indicator Is Update Or No ABCDE
+-- Just Indicator Is Update Or No ABCDEF
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -2642,7 +2642,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	local IsMobileCtx = UserInputService.TouchEnabled
 	
 	local MobileLayout = IsMobileCtx and Config.MobileResponsive ~= false
-	local TabWidth = IsMobileCtx and math.min(_CfgTabWidth, 126) or _CfgTabWidth
+	local TabWidth = IsMobileCtx and math.min(math.max(_CfgTabWidth, 118), 136) or math.max(_CfgTabWidth, 128)
 	local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(900, 560)
 	local Keybind = Config[5] or Config.Keybind or Enum.KeyCode.RightControl
 	local Icon = Config[6] or Config.Icon or "hub"
@@ -2882,42 +2882,21 @@ function Rexxzy_Library:CreateWindow(Config)
 	}, TitleHolder)
 	Custom:Create("UIPadding", { PaddingLeft = UDim.new(0, 9) }, TitleHolder)
 
-	local IconSlot = Custom:Create("Frame", {
-		BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = 1, Size = UDim2.new(0, 30, 0, 30),
-		Visible = false, Name = "IconSlot",
-	}, TitleHolder)
-	local function ApplyTitleIcon(Src)
-		for _, Child in ipairs(IconSlot:GetChildren()) do Child:Destroy() end
-		if Src == nil or Src == "" or Src == false then
-			IconSlot.Visible = false
-			return
-		end
-		local Obj = Custom:MakeIcon(IconSlot, Src, { Size = UDim2.new(0, 30, 0, 30), Color = Theme.White, Name = "Icon" })
-		if Obj then
-			IconSlot.Visible = true
-			if Obj.Kind == "image" then
-				Obj.Image.ScaleType = Enum.ScaleType.Crop
-				Custom:Corner(Obj.Image, 6)
-			end
-		else
-			IconSlot.Visible = false
-		end
-	end
-	ApplyTitleIcon(Icon)
+	-- The application logo lives in SidebarLogoTile, not in the title bar.
 
 	local TextLabel = Custom:Label(TitleHolder, {
-		Text = Title, TextColor3 = Theme.White, TextSize = 17, Font = Enum.Font.GothamBold, LayoutOrder = 2,
-		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 20), Name = "Title",
+		Text = Title, TextColor3 = Theme.White, TextSize = 19, Font = Enum.Font.GothamBold, LayoutOrder = 1,
+		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 24), Name = "Title",
 	})
 	Custom:AddGradient(TextLabel, 0)
 
 	local Separator = Custom:Label(TitleHolder, {
-		Text = "|", TextColor3 = Theme.Black, TextSize = 14, LayoutOrder = 3,
+		Text = "|", TextColor3 = Theme.Black, TextSize = 15, LayoutOrder = 2,
 		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 20), Name = "Separator",
 	})
 
 	local TextLabel1 = Custom:Label(TitleHolder, {
-		Font = Enum.Font.Gotham, Text = Desc, TextColor3 = Theme.Sub, TextSize = 10, LayoutOrder = 4,
+		Font = Enum.Font.Gotham, Text = Desc, TextColor3 = Theme.Sub, TextSize = 11, LayoutOrder = 3,
 		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 20), Name = "Description",
 	})
 
@@ -2929,7 +2908,7 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local TagHolder = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(1, 0.5), BackgroundTransparency = 1, BorderSizePixel = 0,
-		Position = UDim2.new(1, -70, 0.5, 0), Size = UDim2.new(0, 0, 0, 18),
+		Position = UDim2.new(1, -84, 0.5, 0), Size = UDim2.new(0, 0, 0, 20),
 		AutomaticSize = Enum.AutomaticSize.X, Name = "Tags",
 	}, Top)
 	Custom:Create("UIListLayout", {
@@ -2938,7 +2917,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	}, TagHolder)
 
 	local function SyncTitleWidth()
-		TitleHolder.Size = UDim2.new(1, -(76 + TagHolder.AbsoluteSize.X + 8), 1, 0)
+		TitleHolder.Size = UDim2.new(1, -(92 + TagHolder.AbsoluteSize.X + 8), 1, 0)
 	end
 	TagHolder:GetPropertyChangedSignal("AbsoluteSize"):Connect(SyncTitleWidth)
 	SyncTitleWidth()
@@ -3034,13 +3013,13 @@ function Rexxzy_Library:CreateWindow(Config)
 	local Close = Custom:Create("TextButton", {
 		Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0.5), BackgroundColor3 = Theme.Red,
 		BorderSizePixel = 0, ClipsDescendants = true, Position = UDim2.new(1, -8, 0.5, 0),
-		Size = UDim2.new(0, 26, 0, 26), Name = "Close",
+		Size = UDim2.new(0, 32, 0, 32), Name = "Close",
 	}, Top)
 	Custom:Corner(Close, 6)
 	for _, Rot in ipairs({ 45, -45 }) do
 		local Bar = Custom:Create("Frame", {
 			AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.White, BorderSizePixel = 0,
-			Position = UDim2.new(0.5, 0, 0.5, 0), Rotation = Rot, Size = UDim2.new(0, 11, 0, 2), Name = "XBar",
+			Position = UDim2.new(0.5, 0, 0.5, 0), Rotation = Rot, Size = UDim2.new(0, 14, 0, 2), Name = "XBar",
 		}, Close)
 		Custom:Round(Bar)
 	end
@@ -3049,14 +3028,14 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local Min = Custom:Create("TextButton", {
 		Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0.5), BackgroundColor3 = Theme.Black,
-		BackgroundTransparency = 0, BorderSizePixel = 0, ClipsDescendants = true, Position = UDim2.new(1, -38, 0.5, 0),
-		Size = UDim2.new(0, 26, 0, 26), Name = "Min",
+		BackgroundTransparency = 0, BorderSizePixel = 0, ClipsDescendants = true, Position = UDim2.new(1, -46, 0.5, 0),
+		Size = UDim2.new(0, 32, 0, 32), Name = "Min",
 	}, Top)
 	Custom:Corner(Min, 6)
 	local MinStroke = Custom:Stroke(Min, Theme.White, 0.8, 1)
 	local MinBar = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.White, BorderSizePixel = 0,
-		Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 9, 0, 2), Name = "MinBar",
+		Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 12, 0, 2), Name = "MinBar",
 	}, Min)
 	Custom:Round(MinBar)
 	Min.MouseEnter:Connect(function()
@@ -3088,21 +3067,43 @@ function Rexxzy_Library:CreateWindow(Config)
 	local SidebarBrand = Custom:Create("Frame", {
 		BackgroundTransparency = 1, BorderSizePixel = 0,
 		Position = SidebarHeroMode and UDim2.new(0, 8, 0, 55) or UDim2.new(0, 10, 0, 8),
-		Size = SidebarHeroMode and UDim2.new(0, TabWidth, 0, 72) or UDim2.new(1, -20, 0, 50),
+		Size = SidebarHeroMode and UDim2.new(0, TabWidth, 0, 84) or UDim2.new(1, -20, 0, 56),
 		Name = "SidebarBrand",
 	}, SidebarHeroMode and Main or Side)
+	local SidebarLogoTile = Custom:Create("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = SidebarHeroMode and UDim2.new(0, 76, 0, 76) or UDim2.new(0, 56, 0, 56),
+		BackgroundColor3 = Theme.Field, BackgroundTransparency = 0, BorderSizePixel = 0,
+		Name = "SidebarLogoTile",
+	}, SidebarBrand)
+	Custom:Corner(SidebarLogoTile, 11)
+	Custom:Stroke(SidebarLogoTile, Theme.Border, 0.55, 1)
 	local SidebarIconProps = {
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = SidebarHeroMode and UDim2.new(0, 66, 0, 66) or UDim2.new(0, 42, 0, 42),
+		Size = SidebarHeroMode and UDim2.new(0, 68, 0, 68) or UDim2.new(0, 48, 0, 48),
 		Color = Theme.White, Name = "SidebarLogo",
 	}
-	local SidebarLogo = Custom:MakeIcon(SidebarBrand, Icon, SidebarIconProps)
+	local SidebarLogo = Custom:MakeIcon(SidebarLogoTile, Icon, SidebarIconProps)
 	if not SidebarLogo then
-		SidebarLogo = Custom:MakeIcon(SidebarBrand, "paw", SidebarIconProps)
+		SidebarLogo = Custom:MakeIcon(SidebarLogoTile, "paw", SidebarIconProps)
 	end
 	if SidebarLogo and SidebarLogo.Kind == "image" then
 		SidebarLogo.Image.ScaleType = Enum.ScaleType.Fit
 		Custom:Corner(SidebarLogo.Image, 9)
+	end
+	local function ApplySidebarLogo(Source)
+		if SidebarLogo then pcall(function() SidebarLogo:Destroy() end) end
+		local Props = {
+			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = SidebarHeroMode and UDim2.new(0, 68, 0, 68) or UDim2.new(0, 48, 0, 48),
+			Color = Theme.White, Name = "SidebarLogo",
+		}
+		SidebarLogo = Custom:MakeIcon(SidebarLogoTile, Source, Props)
+		if not SidebarLogo then SidebarLogo = Custom:MakeIcon(SidebarLogoTile, "paw", Props) end
+		if SidebarLogo and SidebarLogo.Kind == "image" then
+			SidebarLogo.Image.ScaleType = Enum.ScaleType.Fit
+			Custom:Corner(SidebarLogo.Image, 9)
+		end
 	end
 
 	local SearchBoxContainer = Custom:Create("Frame", {
@@ -3143,16 +3144,16 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local PageHeaderIcon = Custom:MakeIcon(Layers, "paw", {
 		AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 18, 0, 32),
-		Size = UDim2.new(0, 23, 0, 23), Color = Theme.White, Name = "PageHeaderIcon",
+		Size = UDim2.new(0, 25, 0, 25), Color = Theme.White, Name = "PageHeaderIcon",
 	})
 	local NameTab = Custom:Label(Layers, {
-		Text = "", TextColor3 = Theme.White, TextSize = 24, Font = Enum.Font.GothamBold,
+		Text = "", TextColor3 = Theme.White, TextSize = 26, Font = Enum.Font.GothamBold,
 		Position = UDim2.new(0, 50, 0, 13), Size = UDim2.new(1, -68, 0, 38), Name = "NameTab",
 	})
 	Custom:AddGradient(NameTab, 0)
 	local PageHeaderAccent = Custom:MakeIcon(Layers, "paw", {
 		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -20, 0, 31),
-		Size = UDim2.new(0, 26, 0, 26), Color = Theme.White, Name = "PageHeaderAccent",
+		Size = UDim2.new(0, 28, 0, 28), Color = Theme.White, Name = "PageHeaderAccent",
 	})
 
 	local PageHeaderDivider = Custom:Create("Frame", {
@@ -3173,7 +3174,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		Position = UDim2.new(0, 6, 0, SidebarHeroMode and 54 or 113),
 		Size = UDim2.new(1, -12, 1, SidebarHeroMode and -124 or -183), Name = "ScrollTab",
 	}, Side)
-	Custom:Create("UIListLayout", { Padding = UDim.new(0, 7), SortOrder = Enum.SortOrder.LayoutOrder }, ScrollTab)
+	Custom:Create("UIListLayout", { Padding = UDim.new(0, 9), SortOrder = Enum.SortOrder.LayoutOrder }, ScrollTab)
 	Custom:Create("UIPadding", {
 		PaddingTop = UDim.new(0, 7), PaddingBottom = UDim.new(0, 7),
 		PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 2),
@@ -3557,11 +3558,12 @@ function Rexxzy_Library:CreateWindow(Config)
 		Side.Size = UDim2.new(0, TabWidth, 1, UseHero and -140 or -64)
 		SidebarBrand.Parent = UseHero and Main or Side
 		SidebarBrand.Position = UseHero and UDim2.new(0, 8, 0, 55) or UDim2.new(0, 10, 0, 8)
-		SidebarBrand.Size = UseHero and UDim2.new(0, TabWidth, 0, 72) or UDim2.new(1, -20, 0, 50)
+		SidebarBrand.Size = UseHero and UDim2.new(0, TabWidth, 0, 84) or UDim2.new(1, -20, 0, 56)
+		SidebarLogoTile.Size = UseHero and UDim2.new(0, 76, 0, 76) or UDim2.new(0, 56, 0, 56)
 		if SidebarLogo and SidebarLogo.Instance then
 			SidebarLogo.Instance.AnchorPoint = Vector2.new(0.5, 0.5)
 			SidebarLogo.Instance.Position = UDim2.new(0.5, 0, 0.5, 0)
-			SidebarLogo.Instance.Size = UseHero and UDim2.new(0, 66, 0, 66) or UDim2.new(0, 42, 0, 42)
+			SidebarLogo.Instance.Size = UseHero and UDim2.new(0, 68, 0, 68) or UDim2.new(0, 48, 0, 48)
 		end
 		SearchBoxContainer.Position = UDim2.new(0, 9, 0, UseHero and 9 or 67)
 		ScrollTab.Position = UDim2.new(0, 6, 0, UseHero and 54 or 113)
@@ -4426,7 +4428,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		})
 	end
 
-	function Funcs:SetIcon(Src) ApplyTitleIcon(Src) end
+	function Funcs:SetIcon(Src) ApplySidebarLogo(Src) end
 	function Funcs:SetBackground(Src, Opts) return ApplyBackground(Src, Opts) end
 	function Funcs:ClearBackground() ApplyBackground(nil) end
 	function Funcs:OpenProfile() OpenProfile() end
@@ -4458,7 +4460,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		TabOrder = TabOrder + 1
 		local TabBtn = Custom:Create("TextButton", {
 			Text = "", AutoButtonColor = false, BackgroundTransparency = 1, BorderSizePixel = 0,
-			ClipsDescendants = true, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 47), Name = TabName .. "TabBtn",
+			ClipsDescendants = true, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 52), Name = TabName .. "TabBtn",
 		}, ScrollTab)
 		Custom:Corner(TabBtn, 9)
 		local TabStroke = Custom:Stroke(TabBtn, Theme.Border, 0.72, 1)
@@ -4474,15 +4476,15 @@ function Rexxzy_Library:CreateWindow(Config)
 		}, TabBtn)
 		Custom:Round(TabIndicator)
 		local TabIconImg = Custom:MakeIcon(TabBtn, TabIcon, {
-			AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 13, 0.5, 0), Size = UDim2.new(0, 18, 0, 18),
+			AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 14, 0.5, 0), Size = UDim2.new(0, 20, 0, 20),
 			Color = Theme.Sub, Name = "TabIcon",
 		})
 		local HasIcon = TabIconImg ~= nil
 		local TabLabel = Custom:Label(TabBtn, {
-			Text = TabName, TextColor3 = Theme.Sub, TextSize = 12, Font = Enum.Font.GothamSemibold,
+			Text = TabName, TextColor3 = Theme.Sub, TextSize = 13, Font = Enum.Font.GothamSemibold,
 			TextTruncate = Enum.TextTruncate.AtEnd,
-			Position = UDim2.new(0, HasIcon and 42 or 15, 0, 0),
-			Size = UDim2.new(1, HasIcon and -52 or -22, 1, 0), Name = "TabLabel",
+			Position = UDim2.new(0, HasIcon and 44 or 16, 0, 0),
+			Size = UDim2.new(1, HasIcon and -56 or -24, 1, 0), Name = "TabLabel",
 		})
 
 		local TabFrame = Custom:Create("ScrollingFrame", {
