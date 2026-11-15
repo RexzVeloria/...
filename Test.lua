@@ -1,4 +1,4 @@
--- Just Indicator Is Update Or No ABCDEF
+-- Just Indicator Is Update Or No ABCDEFG
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -2642,7 +2642,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	local IsMobileCtx = UserInputService.TouchEnabled
 	
 	local MobileLayout = IsMobileCtx and Config.MobileResponsive ~= false
-	local TabWidth = IsMobileCtx and math.min(math.max(_CfgTabWidth, 118), 136) or math.max(_CfgTabWidth, 128)
+	local TabWidth = IsMobileCtx and math.min(math.max(_CfgTabWidth, 118), 136) or math.max(_CfgTabWidth, 144)
 	local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(900, 560)
 	local Keybind = Config[5] or Config.Keybind or Enum.KeyCode.RightControl
 	local Icon = Config[6] or Config.Icon or "hub"
