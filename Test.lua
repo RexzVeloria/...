@@ -1,4 +1,4 @@
--- Just Indicator Is Update Or No ABCD
+-- Just Indicator Is Update Or No ABCD KONSDRFD
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -337,26 +337,32 @@ function RexxzyWebhook:AttachToLibrary(lib, configNameOrObj)
 end
 
 local Theme = {
-	-- Modern graphite / monochrome theme with restrained contrast.
-	Accent = Color3.fromRGB(242, 245, 248),
-	AccentSoft = Color3.fromRGB(174, 182, 193),
-	Dark = Color3.fromRGB(5, 7, 10),
-	Panel = Color3.fromRGB(11, 14, 18),
-	Field = Color3.fromRGB(19, 23, 29),
-	Card = Color3.fromRGB(15, 19, 25),
-	Text = Color3.fromRGB(244, 247, 250),
-	Sub = Color3.fromRGB(145, 154, 166),
-	Off = Color3.fromRGB(39, 46, 56),
-	Hover = Color3.fromRGB(29, 35, 43),
-	Selected = Color3.fromRGB(31, 39, 48),
-	Border = Color3.fromRGB(48, 57, 69),
-	Red = Color3.fromRGB(40, 45, 53),
-	RedHover = Color3.fromRGB(59, 67, 78),
-	White = Color3.fromRGB(244, 247, 250),
-	Black = Color3.fromRGB(7, 9, 12),
-	Success = Color3.fromRGB(83, 205, 151),
-	Version = Color3.fromRGB(245, 190, 55),
+	-- Default colored theme: deep ocean surfaces with teal accents and warm gold details.
+	-- Every entry can be overridden per window with Config.Theme or Config.Colors.
+	Accent = Color3.fromRGB(0, 217, 166),
+	AccentSoft = Color3.fromRGB(34, 211, 238),
+	Dark = Color3.fromRGB(9, 11, 16),
+	Panel = Color3.fromRGB(18, 22, 29),
+	Field = Color3.fromRGB(24, 29, 37),
+	Card = Color3.fromRGB(24, 29, 37),
+	Text = Color3.fromRGB(244, 246, 248),
+	Sub = Color3.fromRGB(156, 163, 175),
+	Off = Color3.fromRGB(39, 45, 55),
+	Hover = Color3.fromRGB(32, 39, 48),
+	Selected = Color3.fromRGB(21, 44, 43),
+	Border = Color3.fromRGB(48, 59, 69),
+	Red = Color3.fromRGB(202, 100, 108),
+	RedHover = Color3.fromRGB(222, 119, 126),
+	White = Color3.fromRGB(244, 246, 248),
+	Black = Color3.fromRGB(9, 11, 16),
+	Success = Color3.fromRGB(0, 217, 166),
+	Version = Color3.fromRGB(244, 185, 66),
 }
+
+local ThemeDefaults = {}
+for Key, Value in pairs(Theme) do
+	ThemeDefaults[Key] = Value
+end
 
 local Custom = {}
 do
@@ -364,24 +370,24 @@ do
 	Custom.Theme = Theme
 	Custom.DefaultIcon = "rbxassetid://18505728250"
 	Custom.GradientWhite = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(248, 249, 252)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(202, 205, 213)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(245, 255, 253)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(105, 232, 217)),
 	})
 	Custom.GradientBorder = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(0.25, Color3.fromRGB(40, 40, 40)),
-		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(210, 210, 210)),
-		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(40, 40, 40)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(125, 245, 225)),
+		ColorSequenceKeypoint.new(0.25, Color3.fromRGB(22, 69, 76)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(55, 214, 196)),
+		ColorSequenceKeypoint.new(0.75, Color3.fromRGB(18, 48, 57)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(125, 245, 225)),
 	})
 	Custom.GradientWindow = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(7, 9, 12)),
-		ColorSequenceKeypoint.new(0.55, Color3.fromRGB(9, 12, 16)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 16, 21)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(7, 17, 22)),
+		ColorSequenceKeypoint.new(0.55, Color3.fromRGB(9, 27, 34)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(14, 39, 47)),
 	})
 	Custom.GradientLine = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 140, 140)),
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(105, 232, 217)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(53, 214, 196)),
 	})
 	Custom.FadeEnds = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
@@ -2066,10 +2072,10 @@ function Rexxzy_Library:SetNotification(Config)
 	if not TypeIcons[NType] then NType = "info" end
 	local TypeTitles = { success = "Success", error = "Error", warning = "Warning", info = "Information" }
 	local TypeColors = {
-		success = Color3.fromRGB(112, 216, 148),
-		error = Color3.fromRGB(238, 104, 104),
-		warning = Color3.fromRGB(232, 184, 103),
-		info = Theme.White,
+		success = Theme.Success,
+		error = Theme.Red,
+		warning = Theme.Version,
+		info = Theme.Accent,
 	}
 	local Head = tostring(Config.Title or TypeTitles[NType])
 	local IconName = Config.Icon or TypeIcons[NType]
@@ -2695,6 +2701,67 @@ end)
 
 function Rexxzy_Library:CreateWindow(Config)
 	Config = type(Config) == "table" and Config or {}
+
+	-- Reset to defaults for each new window, then apply per-window overrides.
+	for Key, Value in pairs(ThemeDefaults) do Theme[Key] = Value end
+	local ThemeConfig = type(Config.Theme) == "table" and Config.Theme
+		or (type(Config.Colors) == "table" and Config.Colors)
+		or (type(Config.ThemeColors) == "table" and Config.ThemeColors)
+		or nil
+	local function ParseThemeColor(Value)
+		if typeof(Value) == "Color3" then return Value end
+		if type(Value) == "string" then
+			local Hex = Value:gsub("^#", ""):gsub("^0x", "")
+			if #Hex == 6 and Hex:match("^%x+$") then
+				local R = tonumber(Hex:sub(1, 2), 16)
+				local G = tonumber(Hex:sub(3, 4), 16)
+				local B = tonumber(Hex:sub(5, 6), 16)
+				return Color3.fromRGB(R, G, B)
+			end
+		elseif type(Value) == "table" then
+			local R = tonumber(Value.R or Value.r or Value[1])
+			local G = tonumber(Value.G or Value.g or Value[2])
+			local B = tonumber(Value.B or Value.b or Value[3])
+			if R and G and B then
+				if math.max(R, G, B) <= 1 then
+					return Color3.new(math.clamp(R, 0, 1), math.clamp(G, 0, 1), math.clamp(B, 0, 1))
+				end
+				return Color3.fromRGB(math.clamp(math.floor(R), 0, 255), math.clamp(math.floor(G), 0, 255), math.clamp(math.floor(B), 0, 255))
+			end
+		end
+		return nil
+	end
+	if ThemeConfig then
+		for Key, Value in pairs(ThemeConfig) do
+			if Theme[Key] ~= nil then
+				local Color = ParseThemeColor(Value)
+				if Color then Theme[Key] = Color end
+			end
+		end
+	end
+	Custom.ColorRGB = Theme.Accent
+	-- Rebuild gradients too, so custom palettes stay consistent across the whole UI.
+	Custom.GradientWhite = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Theme.White),
+		ColorSequenceKeypoint.new(1, Theme.AccentSoft),
+	})
+	Custom.GradientBorder = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Theme.AccentSoft),
+		ColorSequenceKeypoint.new(0.25, Theme.Dark),
+		ColorSequenceKeypoint.new(0.5, Theme.Accent),
+		ColorSequenceKeypoint.new(0.75, Theme.Panel),
+		ColorSequenceKeypoint.new(1, Theme.AccentSoft),
+	})
+	Custom.GradientWindow = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Theme.Black),
+		ColorSequenceKeypoint.new(0.55, Theme.Dark),
+		ColorSequenceKeypoint.new(1, Theme.Panel),
+	})
+	Custom.GradientLine = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Theme.AccentSoft),
+		ColorSequenceKeypoint.new(1, Theme.Accent),
+	})
+
 	local Title = Config[1] or Config.Title or ""
 	local Desc = Config[2] or Config.Description or Config.Discord or ""
 	local _CfgTabWidth = Config[3] or Config["Tab Width"] or 176
@@ -2718,7 +2785,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	
 	local DeveloperTagEnabled = true
 	local DeveloperTagText = REXXZY_DEVELOPER_TAG_TEXT
-	local DeveloperTagColor = Color3.fromRGB(245, 245, 245)
+	local DeveloperTagColor = Theme.Accent
 	local DeveloperTagDistance = REXXZY_DEVELOPER_TAG_MAX_DISTANCE
 	local DeveloperIdLookup = {}
 	local DeveloperPlayerConnections = {}
@@ -2752,7 +2819,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			Size = UDim2.fromOffset(154, 29), StudsOffset = Vector3.new(0, 2.85, 0),
 		}, Character)
 		local Badge = Custom:Create("Frame", {
-			Name = "Badge", BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+			Name = "Badge", BackgroundColor3 = Theme.Panel,
 			BackgroundTransparency = 0.08, BorderSizePixel = 0,
 			Size = UDim2.new(1, 0, 1, 0),
 		}, Billboard)
@@ -2911,7 +2978,7 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local TopBarHeight = IsMobileCtx and 58 or 66
 	local Top = Custom:Create("Frame", {
-		BackgroundTransparency = 1, BorderSizePixel = 0,
+		BackgroundColor3 = Theme.Panel, BackgroundTransparency = 0.02, BorderSizePixel = 0,
 		Size = UDim2.new(1, 0, 0, TopBarHeight), Name = "Top",
 	}, Main)
 
@@ -3255,9 +3322,21 @@ function Rexxzy_Library:CreateWindow(Config)
 		Name = "Layers",
 	}, Main)
 
+	-- Keep the user wallpaper strictly inside the central page viewport.
+	-- Header, sidebar and footer therefore keep their theme colors and never
+	-- inherit/take on the image the user chooses for the content background.
+	BgImage.Parent = Layers
+	BgImage.Position = UDim2.new(0, 0, 0, 0)
+	BgImage.Size = UDim2.new(1, 0, 1, 0)
+	BgImage.ZIndex = 1
+	BgDim.Parent = Layers
+	BgDim.Position = UDim2.new(0, 0, 0, 0)
+	BgDim.Size = UDim2.new(1, 0, 1, 0)
+	BgDim.ZIndex = 1
+
 	local PageHeaderIcon = Custom:MakeIcon(Layers, "home", {
 		AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 18, 0, 29),
-		Size = UDim2.new(0, 23, 0, 23), Color = Theme.White, Name = "PageHeaderIcon",
+		Size = UDim2.new(0, 23, 0, 23), Color = Theme.Accent, Name = "PageHeaderIcon",
 	})
 	local NameTab = Custom:Label(Layers, {
 		Text = "", TextColor3 = Theme.White, TextSize = 22,
@@ -3267,7 +3346,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	})
 	local PageHeaderAccent = Custom:MakeIcon(Layers, "sparkle", {
 		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -19, 0, 29),
-		Size = UDim2.new(0, 19, 0, 19), Color = Theme.Sub, Name = "PageHeaderAccent",
+		Size = UDim2.new(0, 19, 0, 19), Color = Theme.AccentSoft, Name = "PageHeaderAccent",
 	})
 	local PageHeaderDivider = Custom:Create("Frame", {
 		BackgroundColor3 = Theme.Border, BackgroundTransparency = 0.15,
@@ -3307,7 +3386,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		Size = UDim2.new(1, 0, 0, 1), Name = "FooterTopLine",
 	}, FooterBar)
 	local FooterBottomLine = Custom:Create("Frame", {
-		BackgroundColor3 = Theme.Success, BackgroundTransparency = 0.18,
+		BackgroundColor3 = Theme.Accent, BackgroundTransparency = 0.12,
 		BorderSizePixel = 0, AnchorPoint = Vector2.new(0, 1),
 		Position = UDim2.new(0, 0, 1, 0), Size = UDim2.new(1, 0, 0, 3),
 		Name = "FooterBottomLine",
@@ -3359,7 +3438,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	FooterVersion.Visible = false
 	local FooterVersionText = Custom:Label(FooterVersion, {
 		Text = tostring(Config.Version or Config.Build or ""),
-		TextColor3 = Color3.fromRGB(20, 22, 25), TextSize = IsMobileCtx and 8 or 10,
+		TextColor3 = Theme.Dark, TextSize = IsMobileCtx and 8 or 10,
 		Font = Enum.Font.GothamBold, TextXAlignment = Enum.TextXAlignment.Center,
 		TextYAlignment = Enum.TextYAlignment.Center,
 		Size = UDim2.new(1, -14, 1, 0), Position = UDim2.new(0, 7, 0, 0),
@@ -3839,7 +3918,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		Position = BubblePos, Size = UDim2.new(0, BubbleSize, 0, BubbleSize), Visible = false,
 	}, RexxzyGui)
 	Custom:Round(Bubble)
-	local BubbleStroke = Custom:Stroke(Bubble, Color3.fromRGB(255, 255, 255), 0, 1.5)
+	local BubbleStroke = Custom:Stroke(Bubble, Theme.Accent, 0, 1.5)
 	local BubbleContent = nil
 	local function ApplyBubble(Src)
 		if BubbleContent then BubbleContent:Destroy() end
@@ -4689,7 +4768,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		}, TabBtn)
 		Custom:Corner(TabFill, 8)
 		local TabIndicator = Custom:Create("Frame", {
-			Name = "Indicator", BackgroundColor3 = Theme.White, BorderSizePixel = 0,
+			Name = "Indicator", BackgroundColor3 = Theme.Accent, BorderSizePixel = 0,
 			Position = UDim2.new(0, 4, 0.5, 0), AnchorPoint = Vector2.new(0, 0.5), Size = UDim2.new(0, 2, 0, 0),
 		}, TabBtn)
 		Custom:Round(TabIndicator)
@@ -4753,7 +4832,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			if PageHeaderIcon then pcall(function() PageHeaderIcon.Destroy() end) end
 			PageHeaderIcon = Custom:MakeIcon(Layers, TabIcon, {
 				AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 18, 0, 29),
-				Size = UDim2.new(0, 23, 0, 23), Color = Theme.White, Name = "PageHeaderIcon",
+				Size = UDim2.new(0, 23, 0, 23), Color = Theme.Accent, Name = "PageHeaderIcon",
 			})
 			TabFrame.Position = UDim2.new(0, 0, 0, 10)
 			TabFrame.Visible = true
@@ -4763,7 +4842,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			TabStroke.Enabled = true
 			TabStroke.Transparency = 0.76
 			TabLabel.TextColor3 = Theme.White
-			if TabIconImg then TabIconImg.SetColor(Theme.White, true) end
+			if TabIconImg then TabIconImg.SetColor(Theme.AccentSoft, true) end
 		end
 
 		TabFuncs.Fill = TabFill
@@ -7993,11 +8072,11 @@ function Rexxzy_Library:CreateKaitunGui(UserConfig)
 
 		Background = Col(UserConfig.Background, Theme.Black),
 		BackgroundTransparency = typeof(UserConfig.BackgroundTransparency) == "number" and UserConfig.BackgroundTransparency or 0,
-		Accent = Col(UserConfig.Accent, Theme.White),
+		Accent = Col(UserConfig.Accent, Theme.Accent),
 		Text = Col(UserConfig.Text, Theme.Text),
 		SubText = Col(UserConfig.SubText, Theme.Sub),
-		ProgressColor = Col(UserConfig.ProgressColor, Theme.White),
-		ProgressTrack = Col(UserConfig.ProgressTrack, Color3.fromRGB(40, 40, 40)),
+		ProgressColor = Col(UserConfig.ProgressColor, Theme.Accent),
+		ProgressTrack = Col(UserConfig.ProgressTrack, Theme.Field),
 
 		Timer = type(UserConfig.Timer) == "table" and UserConfig.Timer or {
 			Enabled = UserConfig.Timer ~= false,
@@ -8015,7 +8094,7 @@ function Rexxzy_Library:CreateKaitunGui(UserConfig)
 			Enabled = UserConfig.Discord ~= false and (UserConfig.DiscordUrl or UserConfig.Discord) ~= nil,
 			Text = "Join Discord",
 			Url = typeof(UserConfig.Discord) == "string" and UserConfig.Discord or (UserConfig.DiscordUrl or ""),
-			Color = Color3.fromRGB(160, 160, 160),
+			Color = Theme.Accent,
 		},
 
 		IgnoreGuiInset = UserConfig.IgnoreGuiInset ~= false,
@@ -8043,12 +8122,12 @@ function Rexxzy_Library:CreateKaitunGui(UserConfig)
 	Cfg.Progress.Height = math.clamp(tonumber(Cfg.Progress.Height) or 4, 2, 12)
 
 	if type(Cfg.Discord) ~= "table" then
-		Cfg.Discord = { Enabled = false, Text = "Join Discord", Url = "", Color = Color3.fromRGB(160, 160, 160) }
+		Cfg.Discord = { Enabled = false, Text = "Join Discord", Url = "", Color = Theme.Accent }
 	end
 	Cfg.Discord.Enabled = Cfg.Discord.Enabled ~= false and tostring(Cfg.Discord.Url or "") ~= ""
 	Cfg.Discord.Text = tostring(Cfg.Discord.Text or "Join Discord")
 	Cfg.Discord.Url = tostring(Cfg.Discord.Url or "")
-	Cfg.Discord.Color = Col(Cfg.Discord.Color, Color3.fromRGB(160, 160, 160))
+	Cfg.Discord.Color = Col(Cfg.Discord.Color, Theme.Accent)
 
 	local Self = {}
 	local Conns, Tweens = {}, {}
@@ -8222,7 +8301,7 @@ function Rexxzy_Library:CreateKaitunGui(UserConfig)
 		Size = UDim2.new(CurrentProgress, 0, 1, 0),
 	}, TrackBar)
 	Custom:Corner(FillBar, math.floor(Cfg.Progress.Height / 2 + 0.5))
-	if Cfg.ProgressColor == Theme.White or Cfg.ProgressColor == Color3.fromRGB(245, 245, 245) then
+	if Cfg.ProgressColor == Theme.Accent then
 		Custom:AddGradient(FillBar, 90, Custom.GradientWhite)
 	end
 
