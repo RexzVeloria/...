@@ -1,4 +1,4 @@
--- Just Indicator Is Update Or No ABCDEFG
+-- Just Indicator Is Update 
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -3971,7 +3971,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	local ActiveTab = nil
 	local TabOrder = 0
 
-	-- Compact layout revision: footer Discord + live FPS/PING, transparent drag/resize hit areas, VLH footer caption, and plain dialogs.
+	-- Compact data revision: compact row text blocks, inferred icons, refreshable dropdowns, and live data tables.
 -- Generic visual category header. Call it where needed; names such as CORE/TOOLS
 	-- are supplied by the library user and are not built-in navigation entries.
 	function Funcs:AddTabDivider(DividerText)
@@ -4570,8 +4570,8 @@ function Rexxzy_Library:CreateWindow(Config)
 			ScrollBarImageColor3 = Theme.White, ScrollBarImageTransparency = 0.6,
 			Name = TabName .. "Frame", Visible = false,
 		}, LayersReal)
-		Custom:Create("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }, TabFrame)
-		Custom:Create("UIPadding", { PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 8), PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 6) }, TabFrame)
+		Custom:Create("UIListLayout", { Padding = UDim.new(0, 3), SortOrder = Enum.SortOrder.LayoutOrder }, TabFrame)
+		Custom:Create("UIPadding", { PaddingTop = UDim.new(0, 3), PaddingBottom = UDim.new(0, 4), PaddingLeft = UDim.new(0, 3), PaddingRight = UDim.new(0, 3) }, TabFrame)
 
 		local TabFuncs = { Frame = TabFrame, Button = TabBtn, Name = TabName }
 
@@ -4642,21 +4642,37 @@ function Rexxzy_Library:CreateWindow(Config)
 				LayoutOrder = #TabFrame:GetChildren(), Name = SectionName .. "Section",
 			}, TabFrame)
 			Custom:Create("UIListLayout", {
-				Padding = UDim.new(0, 3), SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder,
 			}, SectionFrame)
 
 			local Header = Custom:Create("TextButton", {
 				Text = "", AutoButtonColor = false, BackgroundTransparency = 1, BorderSizePixel = 0,
-				LayoutOrder = 1, Size = UDim2.new(1, 0, 0, 21), Name = "Header",
+				LayoutOrder = 1, Size = UDim2.new(1, 0, 0, 18), Name = "Header",
 			}, SectionFrame)
-			local SectionIcon = Custom:MakeIcon(Header, SectionConfig.Icon or "sliders-horizontal", {
+			local SectionIconName = SectionConfig.Icon
+			if not SectionIconName or SectionIconName == "" then
+				local SectionHint = string.lower(tostring(SectionName) .. " " .. tostring(TabName))
+				local IconRules = {
+					{ "search", "search" }, { "finder", "search" }, { "overview", "grid" },
+					{ "home", "home" }, { "control", "adjustments" }, { "setting", "settings" },
+					{ "config", "settings" }, { "player", "users" }, { "pet", "paw" },
+					{ "event", "calendar" }, { "activity", "activity" }, { "tool", "wrench" },
+					{ "data", "database" }, { "table", "grid" }, { "log", "list" },
+				}
+				for _, Rule in ipairs(IconRules) do
+					if string.find(SectionHint, Rule[1], 1, true) then SectionIconName = Rule[2] break end
+				end
+				SectionIconName = SectionIconName or "layers"
+			end
+			SectionIconName = SectionIconName or "layers"
+			local SectionIcon = Custom:MakeIcon(Header, SectionIconName, {
 				AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 2, 0.5, 0),
-				Size = UDim2.new(0, 15, 0, 15), Color = Theme.White, Name = "SectionIcon",
+				Size = UDim2.new(0, 13, 0, 13), Color = Theme.White, Name = "SectionIcon",
 			})
 			local HeaderLabel = Custom:Label(Header, {
-				Text = SectionName, TextColor3 = Theme.White, TextSize = 11,
+				Text = SectionName, TextColor3 = Theme.White, TextSize = 10,
 				Font = Enum.Font.GothamBold, TextTruncate = Enum.TextTruncate.AtEnd,
-				Position = UDim2.new(0, 26, 0, 0), Size = UDim2.new(1, -52, 1, 0), Name = "SectionTitle",
+				Position = UDim2.new(0, 22, 0, 0), Size = UDim2.new(1, -46, 1, 0), Name = "SectionTitle",
 			})
 			local SecChevron = Custom:Create("Frame", {
 				AnchorPoint = Vector2.new(1, 0.5), BackgroundTransparency = 1, BorderSizePixel = 0,
@@ -4683,8 +4699,8 @@ function Rexxzy_Library:CreateWindow(Config)
 				Padding = UDim.new(0, 0), SortOrder = Enum.SortOrder.LayoutOrder,
 			}, SectionContent)
 			Custom:Create("UIPadding", {
-				PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 5),
-				PaddingBottom = UDim.new(0, 3), PaddingTop = UDim.new(0, 3),
+				PaddingLeft = UDim.new(0, 3), PaddingRight = UDim.new(0, 3),
+				PaddingBottom = UDim.new(0, 2), PaddingTop = UDim.new(0, 2),
 			}, SectionContent)
 
 			local SectionOpen = true
@@ -4724,7 +4740,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local Tile = Custom:Create("Frame", {
 					BackgroundColor3 = Theme.Field, BackgroundTransparency = 0.08, BorderSizePixel = 0,
 					AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 8, 0.5, 0),
-					Size = UDim2.new(0, math.max(24, PixelSize - 3), 0, math.max(24, PixelSize - 3)), Name = "LeadingIconTile",
+					Size = UDim2.new(0, math.max(20, PixelSize - 10), 0, math.max(20, PixelSize - 10)), Name = "LeadingIconTile",
 				}, Parent)
 				Custom:Corner(Tile, 8)
 				Custom:Stroke(Tile, Theme.Border, 0.4, 1)
@@ -4733,7 +4749,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				if IconName ~= "BtnTileIcon" then
 					IconObj = Custom:MakeIcon(Tile, Source or "circle", {
 						AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
-						Size = UDim2.new(0, math.floor(PixelSize * 0.48), 0, math.floor(PixelSize * 0.48)),
+						Size = UDim2.new(0, math.max(10, math.floor(PixelSize * 0.42)), 0, math.max(10, math.floor(PixelSize * 0.42))),
 						Color = Theme.White, Name = IconName or "LeadingIcon",
 					})
 				end
@@ -4750,7 +4766,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				end
 				ButtonDesc = tostring(ButtonDesc)
 				local HasDesc = ButtonDesc ~= ""
-				local Btn, BtnStroke = Custom:Card(SectionContent, HasDesc and 48 or 40, ButtonName .. "Btn", true)
+				local Btn, BtnStroke = Custom:Card(SectionContent, HasDesc and 43 or 34, ButtonName .. "Btn", true)
 				Place(Btn)
 				local BtnIconSrc = ButtonConfig.Icon
 				if BtnIconSrc == nil then BtnIconSrc = "mouse-pointer" end
@@ -4760,26 +4776,26 @@ function Rexxzy_Library:CreateWindow(Config)
 					BtnTile = AddLeadingIcon(Btn, BtnIconSrc, 32, "BtnTileIcon")
 				end
 				local BtnLabel = Custom:Label(Btn, {
-					Text = ButtonName, TextTruncate = Enum.TextTruncate.AtEnd, TextSize = 12,
-					Position = UDim2.new(0, HasLeading and 58 or 12, 0, HasDesc and 8 or 0),
-					Size = UDim2.new(1, HasLeading and -78 or -40, 0, 16), Name = "BtnLabel",
+					Text = ButtonName, TextTruncate = Enum.TextTruncate.AtEnd, TextSize = 10,
+					Position = UDim2.new(0, HasLeading and 43 or 10, 0, HasDesc and 5 or 0),
+					Size = UDim2.new(1, HasLeading and -55 or -30, 0, 14), Name = "BtnLabel",
 				})
 				if HasDesc then
 					Custom:Label(Btn, {
-						Font = Enum.Font.Gotham, Text = ButtonDesc, TextColor3 = Theme.Sub, TextSize = 10,
+						Font = Enum.Font.Gotham, Text = ButtonDesc, TextColor3 = Theme.Sub, TextSize = 9,
 						TextTruncate = Enum.TextTruncate.AtEnd,
-						Position = UDim2.new(0, HasLeading and 58 or 12, 0, 29),
-						Size = UDim2.new(1, HasLeading and -78 or -40, 0, 14), Name = "BtnDesc",
+						Position = UDim2.new(0, HasLeading and 43 or 10, 0, 23),
+						Size = UDim2.new(1, HasLeading and -55 or -30, 0, 12), Name = "BtnDesc",
 					})
 				else
-					BtnLabel.Size = UDim2.new(1, HasLeading and -78 or -32, 1, 0)
+					BtnLabel.Size = UDim2.new(1, HasLeading and -55 or -30, 1, 0)
 				end
 				-- Keep the icon as a direct Btn child so existing icon-inspection code remains compatible.
 				local BtnIconObj = nil
 				if HasLeading then
 					BtnIconObj = Custom:MakeIcon(Btn, BtnIconSrc, {
-						AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0, 28, 0.5, 0),
-						Size = UDim2.new(0, 20, 0, 20), Color = Theme.White, Name = "BtnIcon",
+						AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0, 19, 0.5, 0),
+						Size = UDim2.new(0, 14, 0, 14), Color = Theme.White, Name = "BtnIcon",
 					})
 					if BtnIconObj and BtnIconObj.Instance then
 						BtnIconObj.Instance.ZIndex = 3
@@ -4796,7 +4812,7 @@ function Rexxzy_Library:CreateWindow(Config)
 					if BtnTile then BtnTile.Visible = Src ~= nil and Src ~= false and Src ~= "" end
 					if Src and Src ~= "" then
 						if not BtnTile then BtnTile = AddLeadingIcon(Btn, Src, 32, "BtnTileIcon") end
-						BtnIconObj = Custom:MakeIcon(Btn, Src, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0, 28, 0.5, 0), Size = UDim2.new(0, 20, 0, 20), Color = Theme.White, Name = "BtnIcon" })
+						BtnIconObj = Custom:MakeIcon(Btn, Src, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0, 19, 0.5, 0), Size = UDim2.new(0, 14, 0, 14), Color = Theme.White, Name = "BtnIcon" })
 					end
 				end }
 			end
@@ -4808,25 +4824,25 @@ function Rexxzy_Library:CreateWindow(Config)
 				local ToggleDesc = ToggleConfig.Content or ToggleConfig.Description or ToggleConfig[4]
 				local HasDesc = type(ToggleDesc) == "string" and ToggleDesc ~= ""
 				Default = Default and true or false
-				local ToggleFrame, ToggleStroke = Custom:Card(SectionContent, HasDesc and 48 or 40, ToggleName .. "Toggle", true)
+				local ToggleFrame, ToggleStroke = Custom:Card(SectionContent, HasDesc and 43 or 34, ToggleName .. "Toggle", true)
 				Place(ToggleFrame)
 				AddLeadingIcon(ToggleFrame, ToggleConfig.Icon or "toggle-right", 32, "ToggleIcon")
 				local ToggleLabel = Custom:Label(ToggleFrame, {
 					Text = ToggleName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 58, 0, HasDesc and 8 or 0), Size = UDim2.new(1, -130, 0, 16), Name = "ToggleLabel",
+					Position = UDim2.new(0, 43, 0, HasDesc and 5 or 0), Size = UDim2.new(1, -112, 0, 14), Name = "ToggleLabel",
 				})
 				if HasDesc then
 					Custom:Label(ToggleFrame, {
-						Font = Enum.Font.Gotham, Text = ToggleDesc, TextColor3 = Theme.Sub, TextSize = 9,
+						Font = Enum.Font.Gotham, Text = ToggleDesc, TextColor3 = Theme.Sub, TextSize = 8,
 						TextTruncate = Enum.TextTruncate.AtEnd,
-						Position = UDim2.new(0, 58, 0, 29), Size = UDim2.new(1, -130, 0, 14), Name = "ToggleDesc",
+						Position = UDim2.new(0, 43, 0, 23), Size = UDim2.new(1, -112, 0, 12), Name = "ToggleDesc",
 					})
 				else
-					ToggleLabel.Size = UDim2.new(1, -130, 1, 0)
+					ToggleLabel.Size = UDim2.new(1, -112, 1, 0)
 				end
 				local SwitchBg = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(1, 0.5), BackgroundColor3 = Theme.Off, BorderSizePixel = 0,
-					Position = UDim2.new(1, -12, 0.5, 0), Size = UDim2.new(0, 44, 0, 24), Name = "SwitchBg",
+					Position = UDim2.new(1, -9, 0.5, 0), Size = UDim2.new(0, 36, 0, 20), Name = "SwitchBg",
 				}, ToggleFrame)
 				Custom:Round(SwitchBg)
 				local SwitchStroke = Custom:Stroke(SwitchBg, Theme.White, 0, 1)
@@ -4838,14 +4854,14 @@ function Rexxzy_Library:CreateWindow(Config)
 				Custom:AddGradient(SwitchFill, 90)
 				local SwitchDot = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(0, 0.5), BackgroundColor3 = Theme.Sub, BorderSizePixel = 0,
-					Position = UDim2.new(0, 4, 0.5, 0), Size = UDim2.new(0, 16, 0, 16), ZIndex = 2, Name = "SwitchDot",
+					Position = UDim2.new(0, 4, 0.5, 0), Size = UDim2.new(0, 13, 0, 13), ZIndex = 2, Name = "SwitchDot",
 				}, SwitchBg)
 				Custom:Round(SwitchDot)
 				local ToggleState = Default
 				local function UpdateToggle(State, Animate)
 					ToggleState = State
 					local Fill = State and 0 or 1
-					local Dot = State and UDim2.new(1, -20, 0.5, 0) or UDim2.new(0, 4, 0.5, 0)
+					local Dot = State and UDim2.new(1, -16, 0.5, 0) or UDim2.new(0, 4, 0.5, 0)
 					local DotColor = State and Theme.Black or Theme.Sub
 					local StrokeT = 0
 					if Animate then
@@ -4899,25 +4915,25 @@ function Rexxzy_Library:CreateWindow(Config)
 					return math.clamp((v - MinVal) / Range, 0, 1)
 				end
 
-				local SliderFrame, SliderStroke = Custom:Card(SectionContent, 54, SliderName .. "Slider", false)
+				local SliderFrame, SliderStroke = Custom:Card(SectionContent, 47, SliderName .. "Slider", false)
 				Place(SliderFrame)
-				AddLeadingIcon(SliderFrame, SliderConfig.Icon or "sliders-horizontal", 32, "SliderIcon")
+				AddLeadingIcon(SliderFrame, SliderConfig.Icon or "adjustments", 28, "SliderIcon")
 				Custom:Label(SliderFrame, {
 					Text = SliderName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 58, 0, 7), Size = UDim2.new(1, -126, 0, 15), Name = "SliderLabel",
+					Position = UDim2.new(0, 43, 0, 5), Size = UDim2.new(1, -105, 0, 13), Name = "SliderLabel",
 				})
 				local CurrentValue = Snap(Default)
 				local ValueLabel = Custom:Label(SliderFrame, {
 					Text = string.format(Fmt, CurrentValue) .. Suffix, TextColor3 = Theme.White, TextXAlignment = Enum.TextXAlignment.Right,
-					Position = UDim2.new(1, -68, 0, 7), Size = UDim2.new(0, 58, 0, 15), Name = "ValueLabel",
+					Position = UDim2.new(1, -62, 0, 5), Size = UDim2.new(0, 52, 0, 13), Name = "ValueLabel",
 				})
 				local Hit = Custom:Create("TextButton", {
 					Text = "", AutoButtonColor = false, BackgroundTransparency = 1, BorderSizePixel = 0,
-					AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 58, 1, -6), Size = UDim2.new(1, -70, 0, 20), Name = "Hit",
+					AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 43, 1, -4), Size = UDim2.new(1, -53, 0, 17), Name = "Hit",
 				}, SliderFrame)
 				local BarBg = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(0, 0.5), BackgroundColor3 = Theme.Off, BorderSizePixel = 0,
-					Position = UDim2.new(0, 0, 0.5, 0), Size = UDim2.new(1, 0, 0, 5), Name = "BarBg",
+					Position = UDim2.new(0, 0, 0.5, 0), Size = UDim2.new(1, 0, 0, 4), Name = "BarBg",
 				}, Hit)
 				Custom:Round(BarBg)
 				local BarFill = Custom:Create("Frame", {
@@ -4928,7 +4944,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				Custom:AddGradient(BarFill, 0)
 				local SliderDot = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.White, BorderSizePixel = 0,
-					Position = UDim2.new(ToPercent(CurrentValue), 0, 0.5, 0), Size = UDim2.new(0, 13, 0, 13), ZIndex = 2, Name = "SliderDot",
+					Position = UDim2.new(ToPercent(CurrentValue), 0, 0.5, 0), Size = UDim2.new(0, 11, 0, 11), ZIndex = 2, Name = "SliderDot",
 				}, BarBg)
 				Custom:Round(SliderDot)
 				local DotStroke = Custom:Stroke(SliderDot, Theme.Black, 0.6, 1.5)
@@ -4959,7 +4975,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local function SetDragging(State)
 					Dragging = State
 					TabFrame.ScrollingEnabled = not State
-					Custom:Tween(SliderDot, 0.12, { Size = State and UDim2.new(0, 17, 0, 17) or UDim2.new(0, 13, 0, 13) })
+					Custom:Tween(SliderDot, 0.12, { Size = State and UDim2.new(0, 14, 0, 14) or UDim2.new(0, 11, 0, 11) })
 					Custom:Tween(DotStroke, 0.12, { Thickness = State and 2.5 or 1.5 })
 				end
 				Hit.InputBegan:Connect(function(i)
@@ -4992,18 +5008,18 @@ function Rexxzy_Library:CreateWindow(Config)
 				local Placeholder = InputConfig[2] or InputConfig.Placeholder or "Enter text..."
 				local Default = InputConfig[3] or InputConfig.Default or ""
 				local Callback = InputConfig[4] or InputConfig.Callback or function() end
-				local InputFrame, InputStroke = Custom:Card(SectionContent, 54, InputName .. "Input", false)
+				local InputFrame, InputStroke = Custom:Card(SectionContent, 47, InputName .. "Input", false)
 				Place(InputFrame)
 				AddLeadingIcon(InputFrame, InputConfig.Icon or "keyboard", 32, "InputIcon")
 				Custom:Label(InputFrame, {
 					Text = InputName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 58, 0, 5), Size = UDim2.new(1, -70, 0, 14), Name = "InputLabel",
+					Position = UDim2.new(0, 43, 0, 4), Size = UDim2.new(1, -55, 0, 12), Name = "InputLabel",
 				})
 				local InputBox = Custom:Create("TextBox", {
 					Font = Enum.Font.Gotham, Text = tostring(Default), PlaceholderText = Placeholder, PlaceholderColor3 = Theme.Sub,
 					TextColor3 = Theme.Text, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, ClearTextOnFocus = false,
 					BackgroundColor3 = Theme.Field, BorderSizePixel = 0, ClipsDescendants = true,
-					Position = UDim2.new(0, 58, 1, -30), Size = UDim2.new(1, -70, 0, 24), Name = "InputBox",
+					Position = UDim2.new(0, 43, 1, -27), Size = UDim2.new(1, -55, 0, 21), Name = "InputBox",
 				}, InputFrame)
 				Custom:Corner(InputBox, 7)
 				local BoxStroke = Custom:Stroke(InputBox, Theme.White, 0.88, 1)
@@ -5043,8 +5059,9 @@ function Rexxzy_Library:CreateWindow(Config)
 				local ConfirmDelete = DropdownConfig.ConfirmDelete ~= false
 				local DeleteIcon = DropdownConfig.DeleteIcon or "trash"
 				local EmptyText = DropdownConfig.Empty
+				local DataSource = DropdownConfig.DataSource or DropdownConfig.Provider or DropdownConfig.GetOptions
 
-				local HEAD, ROW, MAXLIST, FILTERH = 36, 27, 132, 26
+				local HEAD, ROW, MAXLIST, FILTERH = 32, 25, 120, 24
 				local DropdownFrame, DropdownStroke = Custom:Card(SectionContent, HEAD, DropdownName .. "Dropdown", false)
 				Place(DropdownFrame)
 				DropdownFrame.ClipsDescendants = true
@@ -5053,10 +5070,10 @@ function Rexxzy_Library:CreateWindow(Config)
 					Text = "", AutoButtonColor = false, BackgroundTransparency = 1, BorderSizePixel = 0,
 					Size = UDim2.new(1, 0, 0, HEAD), Name = "DropdownBtn",
 				}, DropdownFrame)
-				AddLeadingIcon(DropdownBtn, DropdownConfig.Icon or (Multi and "list-checks" or "list-filter"), 28, "DropdownIcon")
+				AddLeadingIcon(DropdownBtn, DropdownConfig.Icon or (Multi and "list" or "list"), 28, "DropdownIcon")
 				Custom:Label(DropdownBtn, {
 					Text = DropdownName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 48, 0, 0), Size = UDim2.new(0.5, -48, 1, 0), Name = "DdLabel",
+					Position = UDim2.new(0, 42, 0, 0), Size = UDim2.new(0.5, -42, 1, 0), Name = "DdLabel",
 				})
 				local ValueLabel = Custom:Label(DropdownBtn, {
 					Text = "Select...", TextColor3 = Theme.Sub, TextXAlignment = Enum.TextXAlignment.Right,
@@ -5086,7 +5103,7 @@ function Rexxzy_Library:CreateWindow(Config)
 						Font = Enum.Font.Gotham, Text = "", PlaceholderText = "Filter...", PlaceholderColor3 = Theme.Sub,
 						TextColor3 = Theme.Text, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, ClearTextOnFocus = false,
 						BackgroundColor3 = Theme.Field, BorderSizePixel = 0, ClipsDescendants = true,
-						Position = UDim2.new(0, 6, 0, 6), Size = UDim2.new(1, -12, 0, FILTERH - 4), Name = "Filter",
+						Position = UDim2.new(0, 6, 0, 5), Size = UDim2.new(1, -12, 0, FILTERH - 5), Name = "Filter",
 					}, Body)
 					Custom:Round(FilterBox)
 					Custom:Stroke(FilterBox, Theme.White, 0.88, 1)
@@ -5106,12 +5123,24 @@ function Rexxzy_Library:CreateWindow(Config)
 				local Selected = {}
 				local OptionFrames = {}
 				local OptionOrder = {}
+				local OptionValues = {}
+				local OptionValueLookup = {}
 
 				local function Chosen()
 					local Out = {}
 					for _, Name in ipairs(OptionOrder) do
-						if Selected[Name] then table.insert(Out, Name) end
+						if Selected[Name] then
+							local Value = OptionValues[Name]
+							if Value == nil then Value = Name end
+							table.insert(Out, Value)
+						end
 					end
+					return Out
+				end
+
+				local function ChosenLabels()
+					local Out = {}
+					for _, Name in ipairs(OptionOrder) do if Selected[Name] then table.insert(Out, Name) end end
 					return Out
 				end
 
@@ -5147,7 +5176,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				end
 
 				local function ShowValue()
-					local List2 = Chosen()
+					local List2 = ChosenLabels()
 					if #List2 == 0 then
 						ValueLabel.Text = "Select..."
 						ValueLabel.TextColor3 = Theme.Sub
@@ -5176,8 +5205,9 @@ function Rexxzy_Library:CreateWindow(Config)
 					local New = {}
 					local Count = 0
 					for _, Raw in ipairs(Values) do
-						local Name = tostring(Raw)
-						if OptionFrames[Name] and not New[Name] then
+						local RawKey = tostring(Raw)
+						local Name = OptionFrames[RawKey] and RawKey or OptionValueLookup[RawKey]
+						if Name and OptionFrames[Name] and not New[Name] then
 							if Multi then
 								if not MaxSel or Count < MaxSel then New[Name] = true Count = Count + 1 end
 							elseif Count == 0 then
@@ -5233,8 +5263,23 @@ function Rexxzy_Library:CreateWindow(Config)
 					if EmptyLabel then EmptyLabel:Destroy() EmptyLabel = nil end
 					OptionFrames = {}
 					OptionOrder = {}
+					OptionValues = {}
+					OptionValueLookup = {}
 					for i, Raw in ipairs(NewOptions) do
-						local OptionText = tostring(Raw)
+						local OptionText, OptionValue
+						if type(Raw) == "table" then
+							OptionText = tostring(Raw.Label or Raw.Name or Raw.Text or Raw.Value or Raw.Id or i)
+							OptionValue = Raw.Value
+							if OptionValue == nil then OptionValue = Raw.Id end
+							if OptionValue == nil then OptionValue = Raw.Name end
+							if OptionValue == nil then OptionValue = OptionText end
+						else
+							OptionText = tostring(Raw)
+							OptionValue = Raw
+						end
+						OptionValues[OptionText] = OptionValue
+						OptionValueLookup[tostring(OptionValue)] = OptionText
+						OptionValueLookup[OptionText] = OptionText
 						if not OptionFrames[OptionText] then
 							local OFrame = Custom:Create("TextButton", {
 								Text = "", AutoButtonColor = false, BackgroundColor3 = Theme.White, BackgroundTransparency = 1,
@@ -5299,7 +5344,9 @@ function Rexxzy_Library:CreateWindow(Config)
 									if not Allowed then Disarm() return end
 									local WasSelected = Selected[OptionText]
 									local Left = {}
-									for _, N in ipairs(OptionOrder) do if N ~= OptionText then table.insert(Left, N) end end
+									for _, N in ipairs(OptionOrder) do
+										if N ~= OptionText then table.insert(Left, { Label = N, Value = OptionValues[N] }) end
+									end
 									local Pick = {}
 									for N in pairs(Selected) do if N ~= OptionText then table.insert(Pick, N) end end
 									Selected = {}
@@ -5349,13 +5396,17 @@ function Rexxzy_Library:CreateWindow(Config)
 					ToggleList(not IsOpen)
 				end)
 				RegisterSearch(DropdownName, DropdownFrame, Where, SelectTab, EnsureOpen, TabFrame)
-				return {
+				local DropdownApi
+				DropdownApi = {
 					Dropdown = DropdownFrame,
 					Set = function(Value)
 						local V = Normalize(Value)
 						if #V > 0 then
 							local Any = false
-							for _, x in ipairs(V) do if OptionFrames[tostring(x)] then Any = true end end
+							for _, x in ipairs(V) do
+								local Key = tostring(x)
+								if OptionFrames[Key] or OptionValueLookup[Key] then Any = true end
+							end
 							if not Any then return end
 						end
 						SetSelection(V, false)
@@ -5363,13 +5414,54 @@ function Rexxzy_Library:CreateWindow(Config)
 					Get = function() return Chosen() end,
 					Clear = function() SetSelection({}, false) end,
 					Refresh = function(NewOptions, Keep)
+						if type(NewOptions) == "function" then
+							local Ok, Result = pcall(NewOptions)
+							if not Ok or type(Result) ~= "table" then return false end
+							NewOptions = Result
+						end
+						if type(NewOptions) ~= "table" then NewOptions = Options end
+						Options = NewOptions
 						if not Keep then Selected = {} end
-						Build(NewOptions or {})
+						Build(NewOptions)
 						if IsOpen then Resize() end
+						return true
+					end,
+					SetOptions = function(NewOptions, Keep) return DropdownApi.Refresh(NewOptions, Keep) end,
+					Update = function(NewOptions, Keep) return DropdownApi.Refresh(NewOptions, Keep) end,
+					RefreshFrom = function(Source, Keep)
+						local Result = Source
+						if type(Source) == "function" then
+							local Ok, Value = pcall(Source)
+							if not Ok then return false end
+							Result = Value
+						end
+						if type(Result) ~= "table" then return false end
+						return DropdownApi.Refresh(Result, Keep)
+					end,
+					GetOptions = function() return Options end,
+					Sync = function(Source, Interval, Keep)
+						local Active = true
+						local Connection = { Connected = true }
+						task.spawn(function()
+							while Active and DropdownFrame.Parent do
+								DropdownApi.RefreshFrom(Source, Keep)
+								task.wait(math.max(tonumber(Interval) or 1, 0.25))
+							end
+							Connection.Connected = false
+						end)
+						function Connection:Disconnect() Active = false self.Connected = false end
+						return Connection
 					end,
 					Open = function() ToggleList(true) end,
 					Close = function() ToggleList(false) end,
 				}
+				if type(DataSource) == "function" then
+					DropdownApi.RefreshFrom(DataSource, true)
+					if tonumber(DropdownConfig.RefreshInterval) then
+						DropdownApi.Sync(DataSource, DropdownConfig.RefreshInterval, true)
+					end
+				end
+				return DropdownApi
 			end
 
 			local function CopyComponentConfig(Source)
@@ -5403,15 +5495,15 @@ function Rexxzy_Library:CreateWindow(Config)
 				local Callback = type(MultiInputConfig.Callback) == "function" and MultiInputConfig.Callback or function() end
 				local OnChange = type(MultiInputConfig.OnChange) == "function" and MultiInputConfig.OnChange or nil
 				local CallbackOnChange = MultiInputConfig.CallbackOnChange == true
-				local RowHeight = 38
-				local CardHeight = 30 + (#Fields * RowHeight) + 38
+				local RowHeight = 31
+				local CardHeight = 27 + (#Fields * RowHeight) + 30
 				local InputFrame, InputStroke = Custom:Card(SectionContent, CardHeight, MultiInputName .. "MultiInput", false)
 				Place(InputFrame)
 				InputFrame.ClipsDescendants = true
-				AddLeadingIcon(InputFrame, MultiInputConfig.Icon or "list-plus", 32, "MultiInputIcon")
+				AddLeadingIcon(InputFrame, MultiInputConfig.Icon or "list", 28, "MultiInputIcon")
 				Custom:Label(InputFrame, {
 					Text = MultiInputName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 58, 0, 6), Size = UDim2.new(1, -70, 0, 16), Name = "MultiInputTitle",
+					Position = UDim2.new(0, 43, 0, 5), Size = UDim2.new(1, -55, 0, 13), Name = "MultiInputTitle",
 				})
 				local InputObjects = {}
 				local OrderedKeys = {}
@@ -5420,11 +5512,11 @@ function Rexxzy_Library:CreateWindow(Config)
 					local FieldName = tostring(Spec.Name or Spec.Label or Spec[1] or ("Field " .. Index))
 					local FieldKey = tostring(Spec.Key or FieldName)
 					if InputObjects[FieldKey] then FieldKey = FieldKey .. "_" .. tostring(Index) end
-					local Y = 27 + ((Index - 1) * RowHeight)
+					local Y = 23 + ((Index - 1) * RowHeight)
 					Custom:Label(InputFrame, {
 						Text = FieldName, TextTruncate = Enum.TextTruncate.AtEnd,
 						TextColor3 = Theme.Sub, TextSize = 9,
-						Position = UDim2.new(0, 58, 0, Y), Size = UDim2.new(0.34, -60, 0, 28), Name = "FieldLabel_" .. Index,
+						Position = UDim2.new(0, 43, 0, Y), Size = UDim2.new(0.34, -47, 0, 24), Name = "FieldLabel_" .. Index,
 					})
 					local InputBox = Custom:Create("TextBox", {
 						Font = Enum.Font.Gotham, Text = tostring(Spec.Default or ""),
@@ -5432,7 +5524,7 @@ function Rexxzy_Library:CreateWindow(Config)
 						PlaceholderColor3 = Theme.Sub, TextColor3 = Theme.Text, TextSize = 10,
 						TextXAlignment = Enum.TextXAlignment.Left, ClearTextOnFocus = false,
 						BackgroundColor3 = Theme.Field, BorderSizePixel = 0, ClipsDescendants = true,
-						Position = UDim2.new(0.34, 4, 0, Y + 1), Size = UDim2.new(0.66, -64, 0, 26),
+						Position = UDim2.new(0.34, 2, 0, Y + 1), Size = UDim2.new(0.66, -48, 0, 22),
 						Name = "MultiInput_" .. Index,
 					}, InputFrame)
 					Custom:Corner(InputBox, 6)
@@ -5461,7 +5553,7 @@ function Rexxzy_Library:CreateWindow(Config)
 					Text = tostring(MultiInputConfig.ApplyText or "APPLY"), Font = Enum.Font.GothamBold,
 					TextColor3 = Theme.Text, TextSize = 9, AutoButtonColor = false,
 					BackgroundColor3 = Theme.Field, BackgroundTransparency = 0.04, BorderSizePixel = 0,
-					Position = UDim2.new(0, 58, 1, -31), Size = UDim2.new(1, -70, 0, 24), Name = "MultiInputApply",
+					Position = UDim2.new(0, 43, 1, -25), Size = UDim2.new(1, -55, 0, 20), Name = "MultiInputApply",
 				}, InputFrame)
 				Custom:Corner(ApplyButton, 6)
 				Custom:Stroke(ApplyButton, Theme.White, 0.88, 1)
@@ -5504,12 +5596,12 @@ function Rexxzy_Library:CreateWindow(Config)
 				local DefaultKey = KeybindConfig[2] or KeybindConfig.Default or Enum.KeyCode.E
 				local Callback = KeybindConfig[3] or KeybindConfig.Callback or function() end
 				if type(DefaultKey) == "string" then DefaultKey = Enum.KeyCode[DefaultKey] or Enum.KeyCode.E end
-				local KeybindFrame, KeybindStroke = Custom:Card(SectionContent, 40, KeybindName .. "Keybind", false)
+				local KeybindFrame, KeybindStroke = Custom:Card(SectionContent, 34, KeybindName .. "Keybind", false)
 				Place(KeybindFrame)
-				AddLeadingIcon(KeybindFrame, KeybindConfig.Icon or "keyboard", 34, "KeybindIcon")
+				AddLeadingIcon(KeybindFrame, KeybindConfig.Icon or "keyboard", 28, "KeybindIcon")
 				Custom:Label(KeybindFrame, {
 					Text = KeybindName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 54, 0, 0), Size = UDim2.new(1, -126, 1, 0), Name = "KeybindLabel",
+					Position = UDim2.new(0, 43, 0, 0), Size = UDim2.new(1, -112, 1, 0), Name = "KeybindLabel",
 				})
 				local KeyBtn = Custom:Create("TextButton", {
 					Font = Enum.Font.GothamBold, Text = DefaultKey.Name, TextColor3 = Theme.White, TextSize = 10,
@@ -5569,37 +5661,62 @@ function Rexxzy_Library:CreateWindow(Config)
 			end
 
 			local function BuildTextBlock(Config, DefaultTitle, Tag)
-				if type(Config) == "table" and Config[1] and Config[2] then
-					Config = { Title = Config[1], Text = Config[2] }
-				end
+				if type(Config) ~= "table" then Config = { Text = tostring(Config or "") } end
+				if Config[1] and Config[2] then Config = { Title = Config[1], Text = Config[2], Icon = Config.Icon } end
 				local BlockName = Config[1] or Config.Title or DefaultTitle
-				local BlockText = Config[2] or Config.Text or ""
-				local Frame = Custom:Card(SectionContent, 40, BlockName .. Tag, false)
+				local BlockText = Config[2] or Config.Text or Config.Description or ""
+				local HasBody = tostring(BlockText) ~= ""
+				local RowHeight = HasBody and 42 or 32
+				local Frame = Custom:Card(SectionContent, RowHeight, BlockName .. Tag, false)
 				Place(Frame)
-				Frame.AutomaticSize = Enum.AutomaticSize.Y
-				AddLeadingIcon(Frame, (type(Config) == "table" and Config.Icon) or (Tag == "ReadMe" and "book-open" or "info"), 32, Tag .. "Icon")
-				Custom:Create("UIListLayout", { Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder }, Frame)
-				Custom:Create("UIPadding", {
-					PaddingTop = UDim.new(0, 6), PaddingBottom = UDim.new(0, 7), PaddingLeft = UDim.new(0, 56), PaddingRight = UDim.new(0, 10),
+				Frame.Size = UDim2.new(1, 0, 0, RowHeight)
+				Frame.AutomaticSize = Enum.AutomaticSize.None
+				local TileSize = HasBody and 25 or 23
+				local Tile = Custom:Create("Frame", {
+					AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 7, 0.5, 0),
+					Size = UDim2.new(0, TileSize, 0, TileSize), BackgroundColor3 = Theme.Field,
+					BackgroundTransparency = 0, BorderSizePixel = 0, Name = Tag .. "IconTile",
 				}, Frame)
+				Custom:Corner(Tile, 6)
+				Custom:Stroke(Tile, Theme.Border, 0.45, 1)
+				local IconSource = Config.Icon or (Tag == "ReadMe" and "book-open" or "info")
+				Custom:MakeIcon(Tile, IconSource, {
+					AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
+					Size = UDim2.new(0, 13, 0, 13), Color = Theme.Text, Name = Tag .. "Icon",
+				})
+				local TextLeft = TileSize + 16
 				local TitleLabel = Custom:Label(Frame, {
-					Text = BlockName, TextColor3 = Theme.White, LayoutOrder = 1,
-					Size = UDim2.new(1, 0, 0, 14), Name = "Title",
+					Text = tostring(BlockName), TextColor3 = Theme.White, TextSize = 10,
+					Font = Enum.Font.GothamSemibold, TextTruncate = Enum.TextTruncate.AtEnd,
+					Position = UDim2.new(0, TextLeft, 0, HasBody and 7 or 0),
+					Size = UDim2.new(1, -TextLeft - 8, 0, 13), Name = "Title",
 				})
-				Custom:AddGradient(TitleLabel, 0)
-				local Body = Custom:Label(Frame, {
-					Font = Enum.Font.Gotham, Text = tostring(BlockText), TextColor3 = Theme.Sub, TextSize = 10, TextWrapped = true,
-					TextYAlignment = Enum.TextYAlignment.Top, LayoutOrder = 2, AutomaticSize = Enum.AutomaticSize.Y,
-					Size = UDim2.new(1, 0, 0, 12), Name = "Body",
-				})
-				return Frame, Body
+				local Body
+				if HasBody then
+					Body = Custom:Label(Frame, {
+						Font = Enum.Font.Gotham, Text = tostring(BlockText), TextColor3 = Theme.Sub,
+						TextSize = 9, TextTruncate = Enum.TextTruncate.AtEnd,
+						Position = UDim2.new(0, TextLeft, 0, 23),
+						Size = UDim2.new(1, -TextLeft - 8, 0, 12), Name = "Body",
+					})
+				end
+				return Frame, Body, TitleLabel
 			end
 
 			function SecFuncs:AddParagraph(ParagraphConfig)
-				local PF, Body = BuildTextBlock(ParagraphConfig, "Paragraph", "Paragraph")
+				local PF, Body, TitleLabel = BuildTextBlock(ParagraphConfig, "Paragraph", "Paragraph")
 				return {
 					Paragraph = PF,
-					Set = function(Text) Body.Text = tostring(Text) end,
+					Set = function(Text) if Body then Body.Text = tostring(Text) end end,
+					SetTitle = function(Text) TitleLabel.Text = tostring(Text) end,
+					SetText = function(Text)
+						Text = tostring(Text or "")
+						if not Body and Text ~= "" then
+							Body = Custom:Label(PF, { Font = Enum.Font.Gotham, Text = Text, TextColor3 = Theme.Sub, TextSize = 9,
+								TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.new(0, 48, 0, 23), Size = UDim2.new(1, -56, 0, 12), Name = "Body" })
+							PF.Size = UDim2.new(1, 0, 0, 42)
+						elseif Body then Body.Text = Text end
+					end,
 				}
 			end
 
@@ -5650,16 +5767,166 @@ function Rexxzy_Library:CreateWindow(Config)
 				return { Line = LF }
 			end
 
+			function SecFuncs:AddTable(TableConfig)
+				TableConfig = type(TableConfig) == "table" and TableConfig or {}
+				local TableName = tostring(TableConfig.Name or TableConfig.Title or "Table")
+				local Columns = TableConfig.Columns or TableConfig.Headers or {}
+				local Data = TableConfig.Data or TableConfig.Rows or {}
+				if type(Columns) ~= "table" then Columns = {} end
+				if type(Data) ~= "table" then Data = {} end
+				local DataSource = TableConfig.DataSource or TableConfig.Provider or TableConfig.GetData
+				local RowHeight = math.clamp(tonumber(TableConfig.RowHeight) or 24, 20, 34)
+				local HeaderHeight = 25
+				local MaxRows = math.clamp(math.floor(tonumber(TableConfig.MaxVisibleRows) or 5), 1, 12)
+				local TableFrame = Custom:Card(SectionContent, HeaderHeight + RowHeight * math.max(1, math.min(#Data, MaxRows)) + 6, TableName .. "Table", false)
+				Place(TableFrame)
+				TableFrame.ClipsDescendants = true
+				local Header = Custom:Create("Frame", { BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, HeaderHeight), Name = "TableHeader" }, TableFrame)
+				local TableIcon = Custom:MakeIcon(Header, TableConfig.Icon or "grid", {
+					AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 8, 0.5, 0),
+					Size = UDim2.new(0, 13, 0, 13), Color = Theme.Text, Name = "TableIcon",
+				})
+				Custom:Label(Header, { Text = TableName, TextColor3 = Theme.Text, TextSize = 10,
+					Position = UDim2.new(0, 28, 0, 0), Size = UDim2.new(1, -62, 1, 0), Name = "TableTitle" })
+				local RefreshButton = Custom:Create("TextButton", { Text = "", AutoButtonColor = false,
+					BackgroundTransparency = 1, BorderSizePixel = 0, AnchorPoint = Vector2.new(1, 0.5),
+					Position = UDim2.new(1, -7, 0.5, 0), Size = UDim2.new(0, 22, 0, 22), Name = "TableRefreshButton" }, Header)
+				Custom:MakeIcon(RefreshButton, "refresh-cw", { AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 12, 0, 12), Color = Theme.Sub, Name = "RefreshIcon" })
+				local View = Custom:Create("ScrollingFrame", { Active = true, BackgroundTransparency = 1, BorderSizePixel = 0,
+					Position = UDim2.new(0, 4, 0, HeaderHeight), Size = UDim2.new(1, -8, 0, RowHeight * math.max(1, math.min(#Data, MaxRows))),
+					CanvasSize = UDim2.new(0, 0, 0, 0), AutomaticCanvasSize = Enum.AutomaticSize.Y,
+					ScrollBarThickness = 2, ScrollBarImageColor3 = Theme.White, ScrollingDirection = Enum.ScrollingDirection.Y, Name = "TableRows" }, TableFrame)
+				local RowsLayout = Custom:Create("UIListLayout", { Padding = UDim.new(0, 1), SortOrder = Enum.SortOrder.LayoutOrder }, View)
+				local EmptyLabel
+				local RowFrames = {}
+				local function ResolveColumns(Rows)
+					if #Columns > 0 then return Columns end
+					local First = Rows[1]
+					local Out = {}
+					if type(First) == "table" then
+						if #First > 0 then for I = 1, #First do table.insert(Out, "Column " .. I) end
+						else
+							local Keys = {}
+							for K in pairs(First) do table.insert(Keys, tostring(K)) end
+							table.sort(Keys)
+							for _, K in ipairs(Keys) do table.insert(Out, K) end
+						end
+					else
+						Out = { "Value" }
+					end
+					return Out
+				end
+				local function ColumnName(Column, Index)
+					if type(Column) == "table" then return tostring(Column.Name or Column.Label or Column.Key or ("Column " .. Index)) end
+					return tostring(Column)
+				end
+				local function CellValue(Row, Column, Index)
+					if type(Row) ~= "table" then return Index == 1 and tostring(Row) or "" end
+					local Key = type(Column) == "table" and (Column.Key or Column.Name or Column.Label) or Column
+					local Value = Row[Key]
+					if Value == nil then Value = Row[Index] end
+					return Value == nil and "" or tostring(Value)
+				end
+				local function ClearRows()
+					for _, Row in ipairs(RowFrames) do if Row and Row.Parent then Row:Destroy() end end
+					RowFrames = {}
+					if EmptyLabel then EmptyLabel:Destroy() EmptyLabel = nil end
+				end
+				local function BuildRows(NewData)
+					Data = type(NewData) == "table" and NewData or {}
+					ClearRows()
+					local ActiveColumns = ResolveColumns(Data)
+					local Count = math.max(1, #ActiveColumns)
+					local Widths = type(TableConfig.Widths) == "table" and TableConfig.Widths or {}
+					local HeaderRow = Custom:Create("Frame", { BackgroundColor3 = Theme.Field, BackgroundTransparency = 0.15,
+						BorderSizePixel = 0, Size = UDim2.new(1, 0, 0, RowHeight), LayoutOrder = 1, Name = "ColumnHeaders" }, View)
+					Custom:Corner(HeaderRow, 4)
+					table.insert(RowFrames, HeaderRow)
+					local function WidthAt(I)
+						local W = tonumber(Widths[I])
+						return W and W > 0 and W <= 1 and W or (1 / Count)
+					end
+					local function MakeCells(Parent, Row, IsHeader, Order)
+						local Offset = 0
+						for I, Column in ipairs(ActiveColumns) do
+							local W = WidthAt(I)
+							local Value = IsHeader and ColumnName(Column, I) or CellValue(Row, Column, I)
+							Custom:Label(Parent, { Text = Value, TextColor3 = IsHeader and Theme.Text or Theme.Sub,
+								Font = IsHeader and Enum.Font.GothamSemibold or Enum.Font.Gotham, TextSize = 9,
+								TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.new(Offset, 5, 0, 0),
+								Size = UDim2.new(W, -8, 1, 0), Name = "Cell_" .. I })
+							Offset = Offset + W
+						end
+					end
+					MakeCells(HeaderRow, nil, true, 1)
+					for I, Row in ipairs(Data) do
+						local RowButton = Custom:Create("TextButton", { Text = "", AutoButtonColor = false,
+							BackgroundColor3 = Theme.Panel, BackgroundTransparency = 0, BorderSizePixel = 0,
+							Size = UDim2.new(1, 0, 0, RowHeight), LayoutOrder = I + 1, Name = "DataRow_" .. I }, View)
+						if I % 2 == 0 then RowButton.BackgroundColor3 = Theme.Field end
+						MakeCells(RowButton, Row, false, I)
+						table.insert(RowFrames, RowButton)
+						if type(TableConfig.OnRowClick) == "function" then
+							RowButton.Activated:Connect(function() pcall(TableConfig.OnRowClick, Row, I) end)
+						end
+					end
+					if #Data == 0 then
+						EmptyLabel = Custom:Label(View, { Text = tostring(TableConfig.Empty or "No data"), TextColor3 = Theme.Sub,
+							TextSize = 9, TextXAlignment = Enum.TextXAlignment.Center, Size = UDim2.new(1, 0, 0, RowHeight), Name = "EmptyLabel" })
+					end
+					local VisibleRows = math.max(1, math.min(#Data, MaxRows))
+					View.Size = UDim2.new(1, -8, 0, VisibleRows * RowHeight + math.min(#Data, MaxRows))
+					TableFrame.Size = UDim2.new(1, 0, 0, HeaderHeight + VisibleRows * RowHeight + math.min(#Data, MaxRows) + 4)
+				end
+				BuildRows(Data)
+				local TableApi
+				TableApi = {
+					Frame = TableFrame, Table = TableFrame,
+					Refresh = function(NewData)
+						if type(NewData) == "function" then local Ok, Result = pcall(NewData); if not Ok then return false end; NewData = Result end
+						if type(NewData) ~= "table" then return false end
+						BuildRows(NewData)
+						return true
+					end,
+					SetData = function(NewData) return TableApi.Refresh(NewData) end,
+					Update = function(NewData) return TableApi.Refresh(NewData) end,
+					RefreshFrom = function(Source) return TableApi.Refresh(Source) end,
+					GetData = function() return Data end,
+					Sync = function(Source, Interval)
+						local Active = true
+						local Connection = { Connected = true }
+						task.spawn(function()
+							while Active and TableFrame.Parent do
+								TableApi.Refresh(Source)
+								task.wait(math.max(tonumber(Interval) or 1, 0.25))
+							end
+							Connection.Connected = false
+						end)
+						function Connection:Disconnect() Active = false self.Connected = false end
+						return Connection
+					end,
+				}
+				RefreshButton.Activated:Connect(function() TableApi.Refresh(type(DataSource) == "function" and DataSource or Data) end)
+				if type(DataSource) == "function" then
+					TableApi.Refresh(DataSource)
+					if tonumber(TableConfig.RefreshInterval) then TableApi.Sync(DataSource, TableConfig.RefreshInterval) end
+				end
+				return TableApi
+			end
+
+			SecFuncs.AddDataTable = SecFuncs.AddTable
+
 			function SecFuncs:AddSocial(SocialConfig)
 				local SocialName = SocialConfig[1] or SocialConfig.Name or "Social"
 				local SocialUrl = SocialConfig[2] or SocialConfig.Url or ""
 				local SocialIcon = SocialConfig[3] or SocialConfig.Icon or ""
 				local SF, SStroke = Custom:Card(SectionContent, 40, SocialName .. "Social", true)
 				Place(SF)
-				AddLeadingIcon(SF, SocialIcon ~= "" and SocialIcon or "external-link", 34, "SocialIcon")
+				AddLeadingIcon(SF, SocialIcon ~= "" and SocialIcon or "external-link", 28, "SocialIcon")
 				Custom:Label(SF, {
 					Text = SocialName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 54, 0, 0), Size = UDim2.new(1, -70, 1, 0), Name = "SocialLabel",
+					Position = UDim2.new(0, 43, 0, 0), Size = UDim2.new(1, -58, 1, 0), Name = "SocialLabel",
 				})
 				Custom:Hover(SF, SStroke)
 				SF.Activated:Connect(function()
@@ -5680,10 +5947,10 @@ function Rexxzy_Library:CreateWindow(Config)
 				local CopyText = CopyConfig[2] or CopyConfig.Text or ""
 				local CF, CStroke = Custom:Card(SectionContent, 40, CopyName .. "Copy", false)
 				Place(CF)
-				AddLeadingIcon(CF, CopyConfig.Icon or "copy", 34, "CopyIcon")
+				AddLeadingIcon(CF, CopyConfig.Icon or "copy", 28, "CopyIcon")
 				Custom:Label(CF, {
 					Text = CopyName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 54, 0, 0), Size = UDim2.new(1, -126, 1, 0), Name = "CopyLabel",
+					Position = UDim2.new(0, 43, 0, 0), Size = UDim2.new(1, -112, 1, 0), Name = "CopyLabel",
 				})
 				local CopyBtn = Custom:Create("TextButton", {
 					Font = Enum.Font.GothamBold, Text = "Copy", TextColor3 = Theme.White, TextSize = 10, AutoButtonColor = false,
@@ -5714,10 +5981,10 @@ function Rexxzy_Library:CreateWindow(Config)
 				local Callback = CPConfig[3] or CPConfig.Callback or function() end
 				local CPFrame, CPStroke = Custom:Card(SectionContent, 40, CPName .. "ColorPicker", true)
 				Place(CPFrame)
-				AddLeadingIcon(CPFrame, CPConfig.Icon or "pipette", 34, "ColorPickerIcon")
+				AddLeadingIcon(CPFrame, CPConfig.Icon or "palette", 28, "ColorPickerIcon")
 				Custom:Label(CPFrame, {
 					Text = CPName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 54, 0, 0), Size = UDim2.new(1, -162, 1, 0), Name = "ColorLabel",
+					Position = UDim2.new(0, 43, 0, 0), Size = UDim2.new(1, -150, 1, 0), Name = "ColorLabel",
 				})
 				local Swatch = Custom:Create("Frame", {
 					AnchorPoint = Vector2.new(1, 0.5), BackgroundColor3 = Default, BorderSizePixel = 0,
@@ -5947,10 +6214,10 @@ function Rexxzy_Library:CreateWindow(Config)
 				if PMax <= 0 then PMax = 100 end
 				local PF, PStroke = Custom:Card(SectionContent, 44, PName .. "Progress", false)
 				Place(PF)
-				AddLeadingIcon(PF, PConfig.Icon or "chart-no-axes-column-increasing", 30, "ProgressIcon")
+				AddLeadingIcon(PF, PConfig.Icon or "activity", 26, "ProgressIcon")
 				Custom:Label(PF, {
 					Text = PName, TextTruncate = Enum.TextTruncate.AtEnd,
-					Position = UDim2.new(0, 56, 0, 4), Size = UDim2.new(1, -116, 0, 14), Name = "ProgressLabel",
+					Position = UDim2.new(0, 43, 0, 4), Size = UDim2.new(1, -103, 0, 13), Name = "ProgressLabel",
 				})
 				local Percent = Custom:Label(PF, {
 					Text = "0%", TextColor3 = Theme.White, TextXAlignment = Enum.TextXAlignment.Right,
@@ -5958,7 +6225,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				})
 				local Track2 = Custom:Create("Frame", {
 					BackgroundColor3 = Theme.Off, BorderSizePixel = 0,
-					Position = UDim2.new(0, 56, 1, -13), Size = UDim2.new(1, -68, 0, 5), Name = "ProgressTrack",
+					Position = UDim2.new(0, 43, 1, -12), Size = UDim2.new(1, -55, 0, 4), Name = "ProgressTrack",
 				}, PF)
 				Custom:Round(Track2)
 				local Fill = Custom:Create("Frame", {
