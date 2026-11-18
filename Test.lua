@@ -1,4 +1,4 @@
--- Just Indicator Is Update Or No ABCDEFG
+-- Just Indicator Is Update Or No ABCDEFGHIJKAJSJSJSUEUUWWUUWHWHWHWUWUWUWUWUWUWUU
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -430,10 +430,13 @@ do
 		}, inst)
 	end
 
+	-- Static interaction mode: apply visual state changes immediately, without tween animation.
 	function Custom:Tween(inst, Time, Props, Style, Direction)
-		local tw = TweenService:Create(inst, TweenInfo.new(Time, Style or Enum.EasingStyle.Quad, Direction or Enum.EasingDirection.Out), Props)
-		tw:Play()
-		return tw
+		if not inst or not inst.Parent or type(Props) ~= "table" then return nil end
+		for Property, Value in pairs(Props) do
+			pcall(function() inst[Property] = Value end)
+		end
+		return nil
 	end
 
 	function Custom:Label(Parent, Props)
@@ -494,32 +497,9 @@ do
 		end)
 	end
 
+	-- Deliberately no highlight pulse or temporary glow in the static UI.
 	function Custom:Highlight(Frame)
-		if not Frame or not Frame.Parent then return end
-		local Stroke = Frame:FindFirstChildOfClass("UIStroke")
-		local Created = false
-		if not Stroke then
-			Stroke = Custom:Stroke(Frame, Theme.White, 0.92, 1)
-			Created = true
-		end
-		local OT, OC, OTh = Stroke.Transparency, Stroke.Color, Stroke.Thickness
-		Stroke.Color = Theme.White
-		Stroke.Thickness = 1.6
-		Stroke.Transparency = 1
-		Custom:Tween(Stroke, 0.25, { Transparency = 0 })
-		task.spawn(function()
-			task.wait(0.9)
-			if not Stroke.Parent then return end
-			local Back = Custom:Tween(Stroke, 0.6, { Transparency = Created and 1 or OT })
-			Back.Completed:Wait()
-			if not Stroke.Parent then return end
-			if Created then
-				Stroke:Destroy()
-			else
-				Stroke.Color = OC
-				Stroke.Thickness = OTh
-			end
-		end)
+		return false
 	end
 
 	function Custom:GetGuiParent()
@@ -538,28 +518,9 @@ end
 
 Custom:EnabledAFK()
 
+-- Ripple click effects are disabled; button actions remain fully functional.
 local function CircleClick(Button, X, Y)
-	task.spawn(function()
-		if not Button or not Button.Parent then return end
-		if X == nil or Y == nil then
-			local ok, M = pcall(function() return UserInputService:GetMouseLocation() end)
-			if ok and M then X, Y = M.X, M.Y end
-		end
-		local Pos, Size = Button.AbsolutePosition, Button.AbsoluteSize
-		local NX = (X or (Pos.X + Size.X / 2)) - Pos.X
-		local NY = (Y or (Pos.Y + Size.Y / 2)) - Pos.Y
-		if NX < 0 or NY < 0 or NX > Size.X or NY > Size.Y then NX, NY = Size.X / 2, Size.Y / 2 end
-		Button.ClipsDescendants = true
-		local Circle = Custom:Create("Frame", {
-			AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.White, BackgroundTransparency = 0.85,
-			BorderSizePixel = 0, Position = UDim2.new(0, NX, 0, NY), Size = UDim2.new(0, 0, 0, 0), Name = "Ripple",
-		}, Button)
-		Custom:Round(Circle)
-		local Max = math.max(Size.X, Size.Y) * 2.4
-		local Tw = Custom:Tween(Circle, 0.5, { Size = UDim2.new(0, Max, 0, Max), BackgroundTransparency = 1 })
-		Tw.Completed:Wait()
-		Circle:Destroy()
-	end)
+	return false
 end
 local HttpFetch 
 local Icons = {}
@@ -2124,13 +2085,9 @@ function Rexxzy_Library:SetNotification(Config)
 	table.insert(ActiveNotificationRecords, Record)
 	Custom:Tween(Card, AnimT, { Position = UDim2.new(0, 0, 0, 0) }, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
 
-	task.spawn(function()
-		if not (Bar and Bar.Parent) then return end
-		BarTween = TweenService:Create(Bar, TweenInfo.new(Delay, Enum.EasingStyle.Linear), { Size = UDim2.new(0, 0, 1, 0) })
-		BarTween:Play()
-		BarTween.Completed:Connect(function(State)
-			if State == Enum.PlaybackState.Completed and not Closed then Record.Close() end
-		end)
+	-- Keep the notification timeout, but do not animate a shrinking progress bar.
+	task.delay(Delay, function()
+		if not Closed then Record.Close() end
 	end)
 	return NF
 end
@@ -2750,11 +2707,12 @@ function Rexxzy_Library:CreateWindow(Config)
 	end))
 	RefreshDeveloperTags()
 
+	-- Continuous decorative loops are disabled in the static layout.
 	local function Loop(inst, props, time, reverses, style)
-		local tw = TweenService:Create(inst, TweenInfo.new(time, style or Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, reverses or false, 0), props)
-		tw:Play()
-		table.insert(Loops, tw)
-		return tw
+		if inst and type(props) == "table" then
+			for Property, Value in pairs(props) do pcall(function() inst[Property] = Value end) end
+		end
+		return nil
 	end
 
 	local RexxzyGui = Custom:Create("ScreenGui", {
@@ -2787,7 +2745,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, BorderSizePixel = 0,
 		Position = UDim2.new(0.5, 0, 0.5, 0), Size = SizeUi, Name = "DropShadowHolder",
 	}, RexxzyGui)
-	local WindowScale = Custom:Create("UIScale", { Scale = Base * 0.9 }, DropShadowHolder)
+	local WindowScale = Custom:Create("UIScale", { Scale = Base }, DropShadowHolder)
 
 	local Main = Custom:Create("Frame", {
 		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
@@ -3092,8 +3050,9 @@ function Rexxzy_Library:CreateWindow(Config)
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
 		Size = UDim2.new(0, 42, 0, 42),
 		BackgroundColor3 = Theme.Field, BackgroundTransparency = 0, BorderSizePixel = 0,
-		Name = "SidebarLogoTile",
+		ClipsDescendants = true, Name = "SidebarLogoTile",
 	}, SidebarBrand)
+	-- Keep the header/sidebar logo tile square with modest rounded corners.
 	Custom:Corner(SidebarLogoTile, 9)
 	Custom:Stroke(SidebarLogoTile, Theme.Border, 0.55, 1)
 	local SidebarIconProps = {
@@ -3102,11 +3061,10 @@ function Rexxzy_Library:CreateWindow(Config)
 	}
 	local SidebarLogo = Custom:MakeIcon(SidebarLogoTile, Icon, SidebarIconProps)
 	if not SidebarLogo then
-		SidebarLogo = Custom:MakeIcon(SidebarLogoTile, "paw", SidebarIconProps)
+		SidebarLogo = Custom:MakeIcon(SidebarLogoTile, "hexagon", SidebarIconProps)
 	end
 	if SidebarLogo and SidebarLogo.Kind == "image" then
 		SidebarLogo.Image.ScaleType = Enum.ScaleType.Fit
-		Custom:Corner(SidebarLogo.Image, 8)
 	end
 	local function ApplySidebarLogo(Source)
 		if SidebarLogo then pcall(function() SidebarLogo:Destroy() end) end
@@ -3115,10 +3073,9 @@ function Rexxzy_Library:CreateWindow(Config)
 			Size = UDim2.new(0, 36, 0, 36), Color = Theme.White, Name = "SidebarLogo",
 		}
 		SidebarLogo = Custom:MakeIcon(SidebarLogoTile, Source, Props)
-		if not SidebarLogo then SidebarLogo = Custom:MakeIcon(SidebarLogoTile, "paw", Props) end
+		if not SidebarLogo then SidebarLogo = Custom:MakeIcon(SidebarLogoTile, "hexagon", Props) end
 		if SidebarLogo and SidebarLogo.Kind == "image" then
 			SidebarLogo.Image.ScaleType = Enum.ScaleType.Fit
-			Custom:Corner(SidebarLogo.Image, 8)
 		end
 	end
 
@@ -3163,28 +3120,13 @@ function Rexxzy_Library:CreateWindow(Config)
 		Size = UDim2.new(1, -(TabWidth + 1), 1, -128), Name = "Layers",
 	}, Main)
 
-	local PageHeaderIcon = Custom:MakeIcon(Layers, "paw", {
-		AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 18, 0, 32),
-		Size = UDim2.new(0, 25, 0, 25), Color = Theme.White, Name = "PageHeaderIcon",
-	})
+	-- No decorative page-header icons: they previously left two stray paw marks.
 	local NameTab = Custom:Label(Layers, {
 		Text = "", TextColor3 = Theme.White, TextSize = 26, Font = Enum.Font.GothamBold,
-		Position = UDim2.new(0, 50, 0, 13), Size = UDim2.new(1, -68, 0, 38), Name = "NameTab",
+		Position = UDim2.new(0, 18, 0, 13), Size = UDim2.new(1, -36, 0, 38), Name = "NameTab",
 	})
 	Custom:AddGradient(NameTab, 0)
-	local PageHeaderAccent = Custom:MakeIcon(Layers, "paw", {
-		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -20, 0, 31),
-		Size = UDim2.new(0, 28, 0, 28), Color = Theme.White, Name = "PageHeaderAccent",
-	})
-
-	local PageHeaderDivider = Custom:Create("Frame", {
-		BackgroundColor3 = Theme.White, BackgroundTransparency = 1, BorderSizePixel = 0,
-		Position = UDim2.new(0, 18, 0, 62), Size = UDim2.new(1, -36, 0, 1),
-		Visible = false, Name = "PageHeaderDivider",
-	}, Layers)
-	PageHeaderIcon.Visible = false
 	NameTab.Visible = false
-	PageHeaderAccent.Visible = false
 
 	local LayersReal = Custom:Create("Frame", {
 		BackgroundTransparency = 1, BorderSizePixel = 0, ClipsDescendants = true,
@@ -3810,15 +3752,12 @@ function Rexxzy_Library:CreateWindow(Config)
 		Opened = State
 		if State then
 			Bubble.Visible = false
+			WindowScale.Scale = Base
 			DropShadowHolder.Visible = true
-			Custom:Tween(WindowScale, 0.3, { Scale = Base }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 		else
-			Custom:Tween(WindowScale, 0.15, { Scale = Base * 0.9 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-			task.delay(0.15, function()
-				if Destroyed or Opened then return end
-				DropShadowHolder.Visible = false
-				Bubble.Visible = ShouldShowBubble()
-			end)
+			WindowScale.Scale = Base
+			DropShadowHolder.Visible = false
+			Bubble.Visible = ShouldShowBubble()
 		end
 	end
 
@@ -4650,7 +4589,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				Text = "", AutoButtonColor = false, BackgroundTransparency = 1, BorderSizePixel = 0,
 				LayoutOrder = 1, Size = UDim2.new(1, 0, 0, 28), Name = "Header",
 			}, SectionFrame)
-			local SectionIcon = Custom:MakeIcon(Header, SectionConfig.Icon or "paw", {
+			local SectionIcon = Custom:MakeIcon(Header, SectionConfig.Icon or "sliders-horizontal", {
 				AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 2, 0.5, 0),
 				Size = UDim2.new(0, 19, 0, 19), Color = Theme.White, Name = "SectionIcon",
 			})
@@ -4732,7 +4671,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local IconObj = nil
 				-- AddButton keeps its icon as a direct child for public UI inspection compatibility.
 				if IconName ~= "BtnTileIcon" then
-					IconObj = Custom:MakeIcon(Tile, Source or "paw", {
+					IconObj = Custom:MakeIcon(Tile, Source or "circle", {
 						AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
 						Size = UDim2.new(0, math.floor(PixelSize * 0.52), 0, math.floor(PixelSize * 0.52)),
 						Color = Theme.White, Name = IconName or "LeadingIcon",
@@ -6249,59 +6188,12 @@ function Rexxzy_Library:CreateWindow(Config)
 	end
 
 	
-	local SplashEnabled = Config.Splash ~= false
-	local SplashDuration = math.clamp(tonumber(Config.SplashDuration) or 0.95, 0.35, 3)
-	if SplashEnabled then
-		DropShadowHolder.Visible = false
-		WindowScale.Scale = Base * 0.88
-		local SplashGui = Custom:Create("ScreenGui", {
-			Name = "RexxzySplash", ZIndexBehavior = Enum.ZIndexBehavior.Sibling, ResetOnSpawn = false,
-			IgnoreGuiInset = true, DisplayOrder = 200,
-		}, Custom:GetGuiParent())
-		local SplashBg = Custom:Create("Frame", {
-			BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 1, 0), Name = "SplashBg",
-		}, SplashGui)
-		local LogoHold = Custom:Create("Frame", {
-			AnchorPoint = Vector2.new(0.5, 0.5), BackgroundTransparency = 1, BorderSizePixel = 0,
-			Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 96, 0, 96), Name = "LogoHold",
-		}, SplashBg)
-		local SplashScale = Custom:Create("UIScale", { Scale = 0.82 }, LogoHold)
-		local LogoImg = Custom:Create("ImageLabel", {
-			BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0),
-			Image = RexxzyLogos.VH or "rbxassetid://99716974769256",
-			ImageTransparency = 1, ScaleType = Enum.ScaleType.Fit, Name = "VHLogo",
-		}, LogoHold)
-		local Brand = Custom:Label(SplashBg, {
-			Text = tostring(Config.SplashText or Title or "VH"),
-			TextColor3 = Theme.Text, TextSize = 14, TextTransparency = 1,
-			TextXAlignment = Enum.TextXAlignment.Center,
-			AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.5, 58),
-			Size = UDim2.new(0, 220, 0, 22), Name = "SplashBrand",
-		})
-		task.spawn(function()
-			Custom:Tween(LogoImg, 0.35, { ImageTransparency = 0 })
-			Custom:Tween(Brand, 0.35, { TextTransparency = 0.15 })
-			Custom:Tween(SplashScale, 0.45, { Scale = 1 }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-			task.wait(SplashDuration)
-			if Destroyed then
-				pcall(function() SplashGui:Destroy() end)
-				return
-			end
-			Custom:Tween(LogoImg, 0.28, { ImageTransparency = 1 })
-			Custom:Tween(Brand, 0.28, { TextTransparency = 1 })
-			Custom:Tween(SplashBg, 0.3, { BackgroundTransparency = 1 })
-			task.wait(0.32)
-			pcall(function() SplashGui:Destroy() end)
-			if Destroyed then return end
-			DropShadowHolder.Visible = true
-			Custom:Tween(WindowScale, 0.4, { Scale = Base }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-		end)
-	else
-		Custom:Tween(WindowScale, 0.4, { Scale = Base }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-	end
+	-- No splash/intro screen: show the finished library immediately.
+	DropShadowHolder.Visible = true
+	WindowScale.Scale = Base
 
-	task.delay(3 + (SplashEnabled and SplashDuration or 0), function()
+	-- Preserve the original short safety window before config autosave is armed.
+	task.delay(3, function()
 		if not Rexxzy_Library.AutoLoading then Rexxzy_Library.Armed = true end
 	end)
 
@@ -6721,7 +6613,7 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 	local FontBold = typeof(App.FontBold) == "EnumItem" and App.FontBold or Enum.Font.GothamBold
 	local IconSize = math.clamp(tonumber(App.IconSize) or 16, 10, 32)
 	local IconRight = string.lower(tostring(App.IconAlign or "left")) == "right"
-	local AnimOn = App.Animations ~= false and App.ReducedMotion ~= true
+	local AnimOn = false -- All key-system motion effects are disabled by default.
 	local Mult = math.clamp((tonumber(App.AnimationTime) or 0.2) / 0.2, 0.25, 5)
 	local Pad = math.clamp(tonumber(Win.Padding) or 14, 6, 32)
 
@@ -7160,17 +7052,9 @@ function Rexxzy_Library:CreateKeySystem(UserConfig)
 	local function Spin(Inst, On)
 		if not Inst then return end
 		local Cur = Spinners[Inst]
-		if On then
-			if Cur or not AnimOn then return end
-			Inst.Rotation = 0
-			local Tw = TweenService:Create(Inst, TweenInfo.new(0.9, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, false, 0), { Rotation = 360 })
-			Spinners[Inst] = Tw
-			Tw:Play()
-		elseif Cur then
-			Cur:Cancel()
-			Spinners[Inst] = nil
-			Inst.Rotation = 0
-		end
+		if Cur then pcall(function() Cur:Cancel() end) end
+		Spinners[Inst] = nil
+		Inst.Rotation = 0
 	end
 
 	local function SetStatus(Kind, Text)
@@ -7886,7 +7770,7 @@ function Rexxzy_Library:CreateKaitunGui(UserConfig)
 		IgnoreGuiInset = UserConfig.IgnoreGuiInset ~= false,
 		DisplayOrder = math.clamp(tonumber(UserConfig.DisplayOrder) or 250, 1, 999),
 		ZIndexBehavior = UserConfig.ZIndexBehavior or Enum.ZIndexBehavior.Sibling,
-		Animations = UserConfig.Animations ~= false,
+		Animations = false, -- Static UI: never animate the status/Kaitun window.
 		CloseOnClick = UserConfig.CloseOnClick == true,
 		Name = tostring(UserConfig.Name or "RexxzyKaitunGui"),
 	}
@@ -8000,7 +7884,7 @@ function Rexxzy_Library:CreateKaitunGui(UserConfig)
 		BorderSizePixel = 0,
 		Size = UDim2.new(0, Cfg.LogoSize, 0, Cfg.LogoSize),
 	}, Center)
-	local LogoScale = Custom:Create("UIScale", { Scale = 0.92 }, LogoHold)
+	local LogoScale = Custom:Create("UIScale", { Scale = 1 }, LogoHold)
 	local LogoImg = Custom:Create("ImageLabel", {
 		Name = "Logo",
 		BackgroundTransparency = 1,
@@ -8022,6 +7906,7 @@ function Rexxzy_Library:CreateKaitunGui(UserConfig)
 		Image = "rbxassetid://5028857084",
 		ImageColor3 = Cfg.Accent,
 		ImageTransparency = 0.82,
+		Visible = false, -- No decorative glow layer.
 		ZIndex = 0,
 	}, LogoHold)
 
