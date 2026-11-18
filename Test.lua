@@ -1,8 +1,4 @@
 -- Just Indicator Is Update Or No ABCDEFG
--- Just Indicator Is Update Or No ABCDEFG
--- Just Indicator Is Update Or No ABCDEFG
--- Just Indicator Is Update Or No ABCDEFG
--- Just Indicator Is Update Or No ABCDEFG
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -2828,6 +2824,13 @@ function Rexxzy_Library:CreateWindow(Config)
 		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 		Size = UDim2.new(1, 0, 0, 50), Name = "Top",
 	}, Main)
+	-- Invisible hit area for dragging: no visible handle, but the full free
+	-- portion of the topbar remains draggable on mouse and touch.
+	local DragHandle = Custom:Create("TextButton", {
+		Name = "DragHandle", Text = "", AutoButtonColor = false, Selectable = false,
+		Active = true, BackgroundTransparency = 1, BorderSizePixel = 0,
+		Position = UDim2.new(0, 0, 0, 0), Size = UDim2.new(1, 0, 1, 0),
+	}, Top)
 
 	Custom:Create("Frame", {
 		BackgroundColor3 = Theme.White, BackgroundTransparency = 0.82, BorderSizePixel = 0,
@@ -3163,21 +3166,14 @@ function Rexxzy_Library:CreateWindow(Config)
 		Position = UDim2.new(0, 0, 0, 0), Size = UDim2.new(0, TabWidth, 1, 0), Name = "AvatarFooter",
 	}, BottomBar)
 
-	local FooterCenterText = tostring(Config.FooterCenterText or Config.VersionText or "")
-	if FooterCenterText ~= "" then
-		local FooterCenterPill = Custom:Create("Frame", {
-			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(0, 150, 0, 25),
-			BackgroundColor3 = typeof(Config.FooterCenterColor) == "Color3" and Config.FooterCenterColor or Theme.White,
-			BorderSizePixel = 0, Name = "FooterCenterPill",
-		}, BottomBar)
-		Custom:Corner(FooterCenterPill, 20)
-		Custom:Label(FooterCenterPill, {
-			Text = FooterCenterText, TextColor3 = Theme.Black, TextSize = 11,
-			TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Center,
-			Size = UDim2.new(1, -18, 1, 0), Position = UDim2.new(0, 9, 0, 0), Name = "FooterCenterLabel",
-		})
-	end
+	-- VLH is a quiet footer caption, not a badge/pill. Set Config.VLH = "Free 0.1".
+	local VLH = tostring(Config.VLH or Config.FooterCenterText or Config.VersionText or "Free 0.1")
+	local VLHLabel = Custom:Label(BottomBar, {
+		Text = VLH, Font = Enum.Font.Gotham, TextColor3 = Theme.Sub, TextSize = 9,
+		TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Center,
+		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
+		Size = UDim2.new(0, 120, 0, 18), Name = "VLHFooterLabel",
+	})
 
 	local FooterRightText = tostring(Config.FooterRightText or "")
 	if FooterRightText ~= "" then
@@ -3653,6 +3649,16 @@ function Rexxzy_Library:CreateWindow(Config)
 		LayersReal.Position = UDim2.new(0, 9, 0, 0)
 		LayersReal.Size = UDim2.new(1, -18, 1, 0)
 		AvatarFooter.Size = UDim2.new(0, TabWidth, 1, 0)
+		if VLHLabel and VLHLabel.Parent then
+			local FooterWidth = BottomBar.AbsoluteSize.X / math.max(WindowScale.Scale, 0.01)
+			local LeftEdge = TabWidth + 96
+			local RightEdge = FooterWidth - 140
+			local FreeWidth = math.max(0, RightEdge - LeftEdge)
+			local MidX = LeftEdge + FreeWidth / 2
+			VLHLabel.Position = UDim2.new(0, MidX, 0.5, 0)
+			VLHLabel.Size = UDim2.new(0, math.min(120, FreeWidth), 0, 18)
+			VLHLabel.Visible = FreeWidth >= 44
+		end
 	end
 	Track(DropShadowHolder:GetPropertyChangedSignal("Size"):Connect(function()
 		task.defer(RefreshSidebarLayout)
@@ -3850,7 +3856,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	end))
 
 	local Dragging, DragStart, StartPos = false, nil, nil
-	Top.InputBegan:Connect(function(i)
+	DragHandle.InputBegan:Connect(function(i)
 		if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
 			Dragging = true DragStart = i.Position StartPos = DropShadowHolder.Position
 			i.Changed:Connect(function() if i.UserInputState == Enum.UserInputState.End then Dragging = false end end)
@@ -3965,7 +3971,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	local ActiveTab = nil
 	local TabOrder = 0
 
-	-- Compact layout revision: reduced control heights, footer Discord link, live FPS/PING, and plain dialogs.
+	-- Compact layout revision: footer Discord + live FPS/PING, transparent drag/resize hit areas, VLH footer caption, and plain dialogs.
 -- Generic visual category header. Call it where needed; names such as CORE/TOOLS
 	-- are supplied by the library user and are not built-in navigation entries.
 	function Funcs:AddTabDivider(DividerText)
@@ -4079,20 +4085,13 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local ResizeEnabled = Config.Resizable ~= false and Config.Resizeable ~= false
 	local ResizeGrip = Custom:Create("TextButton", {
-		Name = "ResizeGrip", Text = "◢", Font = Enum.Font.GothamBold, TextSize = 14,
-		TextColor3 = Theme.Sub, TextTransparency = 0.08, AutoButtonColor = false,
-		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
-		AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -3, 1, -3),
-		Size = UDim2.new(0, 20, 0, 20), ZIndex = 48, Visible = ResizeEnabled,
+		-- Visible stays true so Roblox can hit-test it; all rendered pixels are hidden.
+		Name = "ResizeGrip", Text = "", TextTransparency = 1, AutoButtonColor = false,
+		Selectable = false, Active = true,
+		BackgroundTransparency = 1, BorderSizePixel = 0,
+		AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, 0, 1, 0),
+		Size = UDim2.new(0, 24, 0, 24), ZIndex = 48, Visible = ResizeEnabled,
 	}, Main)
-	Custom:Corner(ResizeGrip, 5)
-	Custom:Stroke(ResizeGrip, Theme.White, 0.82, 1)
-	ResizeGrip.MouseEnter:Connect(function()
-		Custom:Tween(ResizeGrip, 0.12, { BackgroundTransparency = 0, TextColor3 = Theme.White })
-	end)
-	ResizeGrip.MouseLeave:Connect(function()
-		Custom:Tween(ResizeGrip, 0.15, { BackgroundTransparency = 0, TextColor3 = Theme.White })
-	end)
 
 	local Resizing, ResizeStart, ResizeStartSize, ResizeStartPos = false, nil, nil, nil
 	Track(ResizeGrip.InputBegan:Connect(function(Input)
@@ -4123,8 +4122,8 @@ function Rexxzy_Library:CreateWindow(Config)
 		DropShadowHolder.Size = UDim2.fromOffset(math.floor(Width), math.floor(Height))
 		if ResizeStartPos then
 			DropShadowHolder.Position = UDim2.new(
-				ResizeStartPos.X.Scale, ResizeStartPos.X.Offset + (Width - ResizeStartSize.X) / 2,
-				ResizeStartPos.Y.Scale, ResizeStartPos.Y.Offset + (Height - ResizeStartSize.Y) / 2
+				ResizeStartPos.X.Scale, ResizeStartPos.X.Offset + (Width - ResizeStartSize.X) * ScaleNow / 2,
+				ResizeStartPos.Y.Scale, ResizeStartPos.Y.Offset + (Height - ResizeStartSize.Y) * ScaleNow / 2
 			)
 		end
 	end))
