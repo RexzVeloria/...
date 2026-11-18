@@ -1,4 +1,8 @@
 -- Just Indicator Is Update Or No ABCDEFG
+-- Just Indicator Is Update Or No ABCDEFG
+-- Just Indicator Is Update Or No ABCDEFG
+-- Just Indicator Is Update Or No ABCDEFG
+-- Just Indicator Is Update Or No ABCDEFG
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -7,6 +11,7 @@ local UserInputService = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 local HttpService = game:GetService("HttpService")
 local TextService = game:GetService("TextService")
+local GuiService = game:GetService("GuiService")
 local Player = Players.LocalPlayer
 
 local REXXZY_DEVELOPER_USER_IDS = {
@@ -2610,7 +2615,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	local IsMobileCtx = UserInputService.TouchEnabled
 	
 	local MobileLayout = IsMobileCtx and Config.MobileResponsive ~= false
-	local TabWidth = IsMobileCtx and math.min(math.max(_CfgTabWidth, 118), 136) or math.max(_CfgTabWidth, 148)
+	local TabWidth = IsMobileCtx and math.min(math.max(_CfgTabWidth, 108), 126) or math.min(math.max(_CfgTabWidth, 130), 150)
 	local SizeUi = Config[4] or Config.SizeUi or UDim2.fromOffset(900, 560)
 	local Keybind = Config[5] or Config.Keybind or Enum.KeyCode.RightControl
 	local Icon = Config[6] or Config.Icon or "hub"
@@ -2731,7 +2736,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		IgnoreGuiInset = true, DisplayOrder = 100,
 	}, Custom:GetGuiParent())
 
-	local Base = tonumber(Config.Scale or Config.UIScale) or 1.0
+	local Base = tonumber(Config.Scale or Config.UIScale) or 0.84
 	do
 		local Screen = RexxzyGui.AbsoluteSize
 		if MobileLayout and Screen and Screen.X > 0 and Screen.Y > 0 then
@@ -2740,7 +2745,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			local MobileW = math.floor(math.min(Screen.X * 0.92, 650))
 			local MobileH = math.floor(math.min(Screen.Y * 0.86, 780))
 			SizeUi = UDim2.fromOffset(math.max(1, MobileW), math.max(1, MobileH))
-			Base = 0.96
+			Base = 0.82
 		else
 			if Screen and Screen.X > 0 and Screen.Y > 0 then
 				local FitX = IsMobileCtx and 0.98 or 0.94
@@ -2821,18 +2826,18 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local Top = Custom:Create("Frame", {
 		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
-		Size = UDim2.new(1, 0, 0, 58), Name = "Top",
+		Size = UDim2.new(1, 0, 0, 50), Name = "Top",
 	}, Main)
 
 	Custom:Create("Frame", {
 		BackgroundColor3 = Theme.White, BackgroundTransparency = 0.82, BorderSizePixel = 0,
-		Position = UDim2.new(0, 0, 0, 58), Size = UDim2.new(1, 0, 0, 1), Name = "DecideFrame",
+		Position = UDim2.new(0, 0, 0, 50), Size = UDim2.new(1, 0, 0, 1), Name = "DecideFrame",
 	}, Main)
 	-- No glow line: a single quiet divider keeps the header clean.
 
 	local TitleHolder = Custom:Create("Frame", {
 		BackgroundTransparency = 1, BorderSizePixel = 0, ClipsDescendants = true,
-		Position = UDim2.new(0, 60, 0, 0), Size = UDim2.new(1, -188, 1, 0), Name = "TitleHolder",
+		Position = UDim2.new(0, 52, 0, 0), Size = UDim2.new(1, -166, 1, 0), Name = "TitleHolder",
 	}, Top)
 	Custom:Create("UIListLayout", {
 		FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder,
@@ -2843,18 +2848,18 @@ function Rexxzy_Library:CreateWindow(Config)
 	-- The application mark sits at the left edge of the topbar.
 
 	local TextLabel = Custom:Label(TitleHolder, {
-		Text = Title, TextColor3 = Theme.White, TextSize = 17, Font = Enum.Font.GothamBold, LayoutOrder = 1,
+		Text = Title, TextColor3 = Theme.White, TextSize = 14, Font = Enum.Font.GothamBold, LayoutOrder = 1,
 		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 24), Name = "Title",
 	})
 	Custom:AddGradient(TextLabel, 0)
 
 	local Separator = Custom:Label(TitleHolder, {
-		Text = "|", TextColor3 = Theme.Sub, TextSize = 13, LayoutOrder = 2,
+		Text = "|", TextColor3 = Theme.Sub, TextSize = 11, LayoutOrder = 2,
 		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 20), Name = "Separator",
 	})
 
 	local TextLabel1 = Custom:Label(TitleHolder, {
-		Font = Enum.Font.Gotham, Text = Desc, TextColor3 = Theme.Sub, TextSize = 10, LayoutOrder = 3,
+		Font = Enum.Font.Gotham, Text = Desc, TextColor3 = Theme.Sub, TextSize = 9, LayoutOrder = 3,
 		AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.new(0, 0, 0, 20), Name = "Description",
 	})
 
@@ -2884,7 +2889,7 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local TagHolder = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(1, 0.5), BackgroundTransparency = 1, BorderSizePixel = 0,
-		Position = UDim2.new(1, -122, 0.5, 0), Size = UDim2.new(0, 0, 0, 20),
+		Position = UDim2.new(1, -104, 0.5, 0), Size = UDim2.new(0, 0, 0, 18),
 		AutomaticSize = Enum.AutomaticSize.X, Name = "Tags",
 	}, Top)
 	Custom:Create("UIListLayout", {
@@ -2896,7 +2901,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		if HeaderCenter.Visible then
 			TitleHolder.Size = UDim2.new(0.34, -56, 1, 0)
 		else
-			TitleHolder.Size = UDim2.new(1, -(188 + TagHolder.AbsoluteSize.X), 1, 0)
+			TitleHolder.Size = UDim2.new(1, -(154 + TagHolder.AbsoluteSize.X), 1, 0)
 		end
 	end
 	TagHolder:GetPropertyChangedSignal("AbsoluteSize"):Connect(SyncTitleWidth)
@@ -2992,8 +2997,8 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local Close = Custom:Create("TextButton", {
 		Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0.5), BackgroundColor3 = Theme.Red,
-		BorderSizePixel = 0, ClipsDescendants = true, Position = UDim2.new(1, -8, 0.5, 0),
-		Size = UDim2.new(0, 30, 0, 30), Name = "Close",
+		BorderSizePixel = 0, ClipsDescendants = true, Position = UDim2.new(1, -6, 0.5, 0),
+		Size = UDim2.new(0, 24, 0, 24), Name = "Close",
 	}, Top)
 	Custom:Corner(Close, 6)
 	for _, Rot in ipairs({ 45, -45 }) do
@@ -3003,19 +3008,19 @@ function Rexxzy_Library:CreateWindow(Config)
 		}, Close)
 		Custom:Round(Bar)
 	end
-	Close.MouseEnter:Connect(function() Custom:Tween(Close, 0.15, { BackgroundColor3 = Theme.RedHover }) end)
-	Close.MouseLeave:Connect(function() Custom:Tween(Close, 0.2, { BackgroundColor3 = Theme.Red }) end)
+	Close.MouseEnter:Connect(function() Close.BackgroundColor3 = Theme.Selected end)
+	Close.MouseLeave:Connect(function() Close.BackgroundColor3 = Theme.Field end)
 
 	local Min = Custom:Create("TextButton", {
 		Text = "", AutoButtonColor = false, AnchorPoint = Vector2.new(1, 0.5), BackgroundColor3 = Theme.Black,
-		BackgroundTransparency = 0, BorderSizePixel = 0, ClipsDescendants = true, Position = UDim2.new(1, -46, 0.5, 0),
-		Size = UDim2.new(0, 30, 0, 30), Name = "Min",
+		BackgroundTransparency = 0, BorderSizePixel = 0, ClipsDescendants = true, Position = UDim2.new(1, -36, 0.5, 0),
+		Size = UDim2.new(0, 24, 0, 24), Name = "Min",
 	}, Top)
 	Custom:Corner(Min, 6)
 	local MinStroke = Custom:Stroke(Min, Theme.White, 0.8, 1)
 	local MinBar = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.White, BorderSizePixel = 0,
-		Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 12, 0, 2), Name = "MinBar",
+		Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 10, 0, 2), Name = "MinBar",
 	}, Min)
 	Custom:Round(MinBar)
 	Min.MouseEnter:Connect(function()
@@ -3033,8 +3038,8 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	-- Sidebar starts directly below the topbar and ends above the shared footer.
 	-- Category labels are inserted by AddTabDivider; CORE/TOOLS are not hard-coded tabs.
-	local SidebarTop = 64
-	local SidebarBottom = 64
+	local SidebarTop = 54
+	local SidebarBottom = 48
 	local Side = Custom:Create("Frame", {
 		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
 		ClipsDescendants = true, Position = UDim2.new(0, 0, 0, SidebarTop),
@@ -3047,7 +3052,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	}, Top)
 	local SidebarLogoTile = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = UDim2.new(0, 40, 0, 40),
+		Size = UDim2.new(0, 34, 0, 34),
 		BackgroundColor3 = Theme.Field, BackgroundTransparency = 0, BorderSizePixel = 0,
 		ClipsDescendants = true, Name = "SidebarLogoTile",
 	}, SidebarBrand)
@@ -3056,7 +3061,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	Custom:Stroke(SidebarLogoTile, Theme.Border, 0.55, 1)
 	local SidebarIconProps = {
 		AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = UDim2.new(0, 33, 0, 33), Color = Theme.White, Name = "SidebarLogo",
+		Size = UDim2.new(0, 28, 0, 28), Color = Theme.White, Name = "SidebarLogo",
 	}
 	local SidebarLogo = Custom:MakeIcon(SidebarLogoTile, Icon, SidebarIconProps)
 	if not SidebarLogo then
@@ -3069,7 +3074,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		if SidebarLogo then pcall(function() SidebarLogo:Destroy() end) end
 		local Props = {
 			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(0, 33, 0, 33), Color = Theme.White, Name = "SidebarLogo",
+			Size = UDim2.new(0, 28, 0, 28), Color = Theme.White, Name = "SidebarLogo",
 		}
 		SidebarLogo = Custom:MakeIcon(SidebarLogoTile, Source, Props)
 		if not SidebarLogo then SidebarLogo = Custom:MakeIcon(SidebarLogoTile, "hexagon", Props) end
@@ -3087,7 +3092,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	local SearchBoxContainer = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(0, 1), BackgroundColor3 = Theme.Field, BackgroundTransparency = 0,
 		BorderSizePixel = 0, Position = UDim2.new(0, 8, 1, -8),
-		Size = UDim2.new(1, -16, 0, 42), Name = "SBC",
+		Size = UDim2.new(1, -16, 0, 32), Name = "SBC",
 	}, Side)
 	Custom:Corner(SearchBoxContainer, 8)
 	local SearchStroke = Custom:Stroke(SearchBoxContainer, Theme.Border, 0.7, 1)
@@ -3115,8 +3120,8 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local Layers = Custom:Create("Frame", {
 		BackgroundTransparency = 1, BorderSizePixel = 0, ClipsDescendants = true,
-		Position = UDim2.new(0, TabWidth + 1, 0, 58),
-		Size = UDim2.new(1, -(TabWidth + 1), 1, -114), Name = "Layers",
+		Position = UDim2.new(0, TabWidth + 1, 0, 50),
+		Size = UDim2.new(1, -(TabWidth + 1), 1, -96), Name = "Layers",
 	}, Main)
 
 	-- No decorative page-header icons: they previously left two stray paw marks.
@@ -3129,7 +3134,7 @@ function Rexxzy_Library:CreateWindow(Config)
 
 	local LayersReal = Custom:Create("Frame", {
 		BackgroundTransparency = 1, BorderSizePixel = 0, ClipsDescendants = true,
-		Position = UDim2.new(0, 14, 0, 0), Size = UDim2.new(1, -28, 1, 0), Name = "LayersReal",
+		Position = UDim2.new(0, 9, 0, 0), Size = UDim2.new(1, -18, 1, 0), Name = "LayersReal",
 	}, Layers)
 
 	local ScrollTab = Custom:Create("ScrollingFrame", {
@@ -3137,17 +3142,17 @@ function Rexxzy_Library:CreateWindow(Config)
 		AutomaticCanvasSize = Enum.AutomaticSize.Y, ScrollBarThickness = 3, ScrollBarImageColor3 = Theme.Sub,
 		ScrollBarImageTransparency = 0.55, ScrollingDirection = Enum.ScrollingDirection.Y,
 		Position = UDim2.new(0, 7, 0, 7),
-		Size = UDim2.new(1, -14, 1, -65), Name = "ScrollTab",
+		Size = UDim2.new(1, -14, 1, -49), Name = "ScrollTab",
 	}, Side)
-	Custom:Create("UIListLayout", { Padding = UDim.new(0, 7), SortOrder = Enum.SortOrder.LayoutOrder }, ScrollTab)
+	Custom:Create("UIListLayout", { Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder }, ScrollTab)
 	Custom:Create("UIPadding", {
-		PaddingTop = UDim.new(0, 7), PaddingBottom = UDim.new(0, 7),
+		PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 5),
 		PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 2),
 	}, ScrollTab)
 
 	local BottomBar = Custom:Create("Frame", {
 		BackgroundColor3 = Theme.Black, BackgroundTransparency = 0, BorderSizePixel = 0,
-		Position = UDim2.new(0, 0, 1, -56), Size = UDim2.new(1, 0, 0, 56), Name = "BottomBar",
+		Position = UDim2.new(0, 0, 1, -46), Size = UDim2.new(1, 0, 0, 46), Name = "BottomBar",
 	}, Main)
 	Custom:Create("Frame", {
 		BackgroundColor3 = Theme.Border, BackgroundTransparency = 0.45, BorderSizePixel = 0,
@@ -3162,7 +3167,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	if FooterCenterText ~= "" then
 		local FooterCenterPill = Custom:Create("Frame", {
 			AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
-			Size = UDim2.new(0, 190, 0, 32),
+			Size = UDim2.new(0, 150, 0, 25),
 			BackgroundColor3 = typeof(Config.FooterCenterColor) == "Color3" and Config.FooterCenterColor or Theme.White,
 			BorderSizePixel = 0, Name = "FooterCenterPill",
 		}, BottomBar)
@@ -3177,8 +3182,8 @@ function Rexxzy_Library:CreateWindow(Config)
 	local FooterRightText = tostring(Config.FooterRightText or "")
 	if FooterRightText ~= "" then
 		local FooterRightPill = Custom:Create("Frame", {
-			AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -12, 0.5, 0),
-			Size = UDim2.new(0, tonumber(Config.FooterRightWidth) or 120, 0, 32),
+			AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -146, 0.5, 0),
+			Size = UDim2.new(0, tonumber(Config.FooterRightWidth) or 96, 0, 24),
 			BackgroundColor3 = Theme.Field, BackgroundTransparency = 0, BorderSizePixel = 0,
 			Name = "FooterRightPill",
 		}, BottomBar)
@@ -3199,7 +3204,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	local AvatarImage = Custom:Create("ImageLabel", {
 		Image = "rbxasset://textures/ui/GuiImagePlaceholder.png", AnchorPoint = Vector2.new(0, 0.5),
 		BackgroundColor3 = Theme.Panel, BorderSizePixel = 0,
-		Position = UDim2.new(0, 13, 0.5, 0), Size = UDim2.new(0, 38, 0, 38), Name = "AvatarImage",
+		Position = UDim2.new(0, 10, 0.5, 0), Size = UDim2.new(0, 30, 0, 30), Name = "AvatarImage",
 	}, AvatarFooter)
 	Custom:Round(AvatarImage)
 	Custom:Stroke(AvatarImage, Theme.White, 0.4, 1.2)
@@ -3207,7 +3212,7 @@ function Rexxzy_Library:CreateWindow(Config)
 	local HeaderProfileButton = Custom:Create("ImageButton", {
 		AutoButtonColor = false, BackgroundColor3 = Theme.Field, BackgroundTransparency = 0,
 		BorderSizePixel = 0, AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1, -84, 0.5, 0), Size = UDim2.new(0, 30, 0, 30),
+		Position = UDim2.new(1, -68, 0.5, 0), Size = UDim2.new(0, 24, 0, 24),
 		Image = AvatarImage.Image, ScaleType = Enum.ScaleType.Crop, Name = "HeaderProfileButton",
 	}, Top)
 	Custom:Corner(HeaderProfileButton, 8)
@@ -3218,15 +3223,86 @@ function Rexxzy_Library:CreateWindow(Config)
 		return Name:sub(1, 3) .. "***"
 	end
 	Custom:Label(AvatarFooter, {
-		Text = Player.DisplayName, TextColor3 = Theme.Text, TextSize = 12,
+		Text = Player.DisplayName, TextColor3 = Theme.Text, TextSize = 10,
 		TextTruncate = Enum.TextTruncate.AtEnd, TextYAlignment = Enum.TextYAlignment.Center,
-		Position = UDim2.new(0, 66, 0, 10), Size = UDim2.new(1, -82, 0, 19), Name = "WelcomeLabel",
+		Position = UDim2.new(0, 48, 0, 6), Size = UDim2.new(1, -56, 0, 16), Name = "WelcomeLabel",
 	})
 	Custom:Label(AvatarFooter, {
-		Text = "@" .. CensorName(Player.Name), TextColor3 = Theme.Sub, TextSize = 11,
+		Text = "@" .. CensorName(Player.Name), TextColor3 = Theme.Sub, TextSize = 9,
 		TextTruncate = Enum.TextTruncate.AtEnd, TextYAlignment = Enum.TextYAlignment.Center,
-		Position = UDim2.new(0, 66, 0, 31), Size = UDim2.new(1, -82, 0, 16), Name = "WelcomeSubtitle",
+		Position = UDim2.new(0, 48, 0, 23), Size = UDim2.new(1, -56, 0, 14), Name = "WelcomeSubtitle",
 	})
+
+	local DiscordInviteURL = "https://discord.gg/GrWpVXbWfj"
+	local DiscordFooterButton = Custom:Create("TextButton", {
+		Text = "", AutoButtonColor = false, BackgroundColor3 = Theme.Field, BorderSizePixel = 0,
+		Position = UDim2.new(0, TabWidth + 10, 0.5, 0), AnchorPoint = Vector2.new(0, 0.5),
+		Size = UDim2.new(0, 76, 0, 26), Name = "DiscordFooterButton",
+	}, BottomBar)
+	Custom:Corner(DiscordFooterButton, 4)
+	Custom:Stroke(DiscordFooterButton, Theme.Border, 0.45, 1)
+	Custom:MakeIcon(DiscordFooterButton, "message-circle", {
+		AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 7, 0.5, 0),
+		Size = UDim2.new(0, 13, 0, 13), Color = Theme.Text, Name = "DiscordFooterIcon",
+	})
+	Custom:Label(DiscordFooterButton, {
+		Text = "Discord", TextColor3 = Theme.Text, TextSize = 10,
+		Position = UDim2.new(0, 25, 0, 0), Size = UDim2.new(1, -29, 1, 0),
+		TextYAlignment = Enum.TextYAlignment.Center, Name = "DiscordFooterLabel",
+	})
+	DiscordFooterButton.Activated:Connect(function()
+		local OpenedDiscord = pcall(function()
+			GuiService:OpenBrowserWindow(DiscordInviteURL)
+		end)
+		if not OpenedDiscord then
+			local CopyFn = setclipboard or toclipboard
+			if type(CopyFn) == "function" then
+				local Copied = pcall(CopyFn, DiscordInviteURL)
+				if Copied then
+					pcall(function() Rexxzy_Library:SetNotification({ Type = "info", Content = "Discord invite copied", Delay = 2 }) end)
+				end
+			end
+		end
+	end)
+
+	local FPSChip = Custom:Create("Frame", {
+		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -76, 0.5, 0),
+		Size = UDim2.new(0, 62, 0, 24), BackgroundColor3 = Theme.Field,
+		BorderSizePixel = 0, Name = "FPSChip",
+	}, BottomBar)
+	Custom:Corner(FPSChip, 4)
+	Custom:Label(FPSChip, {
+		Text = "FPS --", TextColor3 = Theme.Sub, TextSize = 9,
+		TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Center,
+		Size = UDim2.new(1, 0, 1, 0), Name = "FPSValue",
+	})
+	local PingChip = Custom:Create("Frame", {
+		AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0),
+		Size = UDim2.new(0, 62, 0, 24), BackgroundColor3 = Theme.Field,
+		BorderSizePixel = 0, Name = "PingChip",
+	}, BottomBar)
+	Custom:Corner(PingChip, 4)
+	local PingValueLabel = Custom:Label(PingChip, {
+		Text = "PING --", TextColor3 = Theme.Sub, TextSize = 9,
+		TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Center,
+		Size = UDim2.new(1, 0, 1, 0), Name = "PingValue",
+	})
+	local FPSValueLabel = FPSChip:FindFirstChild("FPSValue")
+	local FrameCount, SampleTime = 0, 0
+	Track(RunService.RenderStepped:Connect(function(DeltaTime)
+		if Destroyed or not RexxzyGui.Parent then return end
+		FrameCount = FrameCount + 1
+		SampleTime = SampleTime + DeltaTime
+		if SampleTime >= 0.5 then
+			local FPS = math.floor((FrameCount / math.max(SampleTime, 0.001)) + 0.5)
+			FPSValueLabel.Text = "FPS " .. tostring(FPS)
+			FrameCount, SampleTime = 0, 0
+			local Ping = nil
+			local Ok, Value = pcall(function() return Player:GetNetworkPing() * 1000 end)
+			if Ok and type(Value) == "number" then Ping = math.floor(Value + 0.5) end
+			PingValueLabel.Text = Ping and ("PING " .. tostring(Ping) .. "ms") or "PING --"
+		end
+	end))
 
 	task.spawn(function()
 		local ok, url = pcall(function()
@@ -3566,16 +3642,16 @@ function Rexxzy_Library:CreateWindow(Config)
 	-- Re-apply the fixed topbar/sidebar/footer geometry after a resize.
 	local function RefreshSidebarLayout()
 		if Destroyed or not DropShadowHolder.Parent then return end
-		Side.Size = UDim2.new(0, TabWidth, 1, -114)
-		SearchBoxContainer.Position = UDim2.new(0, 8, 1, -8)
-		SearchBoxContainer.Size = UDim2.new(1, -16, 0, 38)
+		Side.Size = UDim2.new(0, TabWidth, 1, -102)
+		SearchBoxContainer.Position = UDim2.new(0, 8, 1, -7)
+		SearchBoxContainer.Size = UDim2.new(1, -16, 0, 32)
 		ScrollTab.Position = UDim2.new(0, 7, 0, 7)
-		ScrollTab.Size = UDim2.new(1, -14, 1, -59)
-		SearchPopup.Position = UDim2.new(0, 8, 1, -58)
-		Layers.Position = UDim2.new(0, TabWidth + 1, 0, 58)
-		Layers.Size = UDim2.new(1, -(TabWidth + 1), 1, -114)
-		LayersReal.Position = UDim2.new(0, 14, 0, 0)
-		LayersReal.Size = UDim2.new(1, -28, 1, 0)
+		ScrollTab.Size = UDim2.new(1, -10, 1, -43)
+		SearchPopup.Position = UDim2.new(0, 8, 1, -48)
+		Layers.Position = UDim2.new(0, TabWidth + 1, 0, 50)
+		Layers.Size = UDim2.new(1, -(TabWidth + 1), 1, -96)
+		LayersReal.Position = UDim2.new(0, 9, 0, 0)
+		LayersReal.Size = UDim2.new(1, -18, 1, 0)
 		AvatarFooter.Size = UDim2.new(0, TabWidth, 1, 0)
 	end
 	Track(DropShadowHolder:GetPropertyChangedSignal("Size"):Connect(function()
@@ -3798,52 +3874,45 @@ function Rexxzy_Library:CreateWindow(Config)
 	}, Main)
 	local ExitConfirm = Custom:Create("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Black,
-		BorderSizePixel = 0, Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 230, 0, 104),
+		BorderSizePixel = 0, Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 208, 0, 88),
 		Visible = false, ZIndex = 50, Name = "ExitConfirm",
 	}, Main)
-	Custom:Corner(ExitConfirm, 10)
-	Custom:Stroke(ExitConfirm, Theme.White, 0, 1)
-	local ExitScale = Custom:Create("UIScale", { Scale = 1 }, ExitConfirm)
+	Custom:Corner(ExitConfirm, 5)
+	Custom:Stroke(ExitConfirm, Theme.Border, 0.35, 1)
 	Custom:Label(ExitConfirm, {
-		Text = "Close Window", TextColor3 = Theme.White, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Center,
-		Size = UDim2.new(1, 0, 0, 32), Name = "ExitTitle",
+		Text = "Close window?", TextColor3 = Theme.White, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left,
+		Position = UDim2.new(0, 12, 0, 0), Size = UDim2.new(1, -24, 0, 26), Name = "ExitTitle",
 	})
 	Custom:Label(ExitConfirm, {
-		Font = Enum.Font.Gotham, Text = "WANT TO CLOSE THIS SCRIPT?", TextColor3 = Theme.Sub, TextSize = 10, TextWrapped = true,
-		TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Center,
-		Position = UDim2.new(0, 10, 0, 32), Size = UDim2.new(1, -20, 0, 20), Name = "ExitDesc",
+		Font = Enum.Font.Gotham, Text = "This will close the library window.", TextColor3 = Theme.Sub, TextSize = 9, TextWrapped = true,
+		TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Center,
+		Position = UDim2.new(0, 12, 0, 26), Size = UDim2.new(1, -24, 0, 18), Name = "ExitDesc",
 	})
 	local CancelButton = Custom:Create("TextButton", {
 		Font = Enum.Font.GothamBold, Text = "Cancel", TextColor3 = Theme.Text, TextSize = 11, AutoButtonColor = false,
 		BackgroundColor3 = Theme.White, BackgroundTransparency = 0.9, BorderSizePixel = 0, ClipsDescendants = true,
-		Position = UDim2.new(0, 12, 1, -38), Size = UDim2.new(0.5, -18, 0, 28), Name = "CancelButton",
+		Position = UDim2.new(0, 12, 1, -31), Size = UDim2.new(0.5, -18, 0, 22), Name = "CancelButton",
 	}, ExitConfirm)
-	Custom:Corner(CancelButton, 7)
-	Custom:Stroke(CancelButton, Theme.White, 0.8, 1)
+	Custom:Corner(CancelButton, 4)
+	Custom:Stroke(CancelButton, Theme.Border, 0.4, 1)
 	local ExitButton = Custom:Create("TextButton", {
 		Font = Enum.Font.GothamBold, Text = "Close", TextColor3 = Theme.White, TextSize = 11, AutoButtonColor = false,
 		BackgroundColor3 = Theme.Red, BorderSizePixel = 0, ClipsDescendants = true,
-		Position = UDim2.new(0.5, 6, 1, -38), Size = UDim2.new(0.5, -18, 0, 28), Name = "ExitButton",
+		Position = UDim2.new(0.5, 6, 1, -31), Size = UDim2.new(0.5, -18, 0, 22), Name = "ExitButton",
 	}, ExitConfirm)
-	Custom:Corner(ExitButton, 7)
-	ExitButton.MouseEnter:Connect(function() Custom:Tween(ExitButton, 0.15, { BackgroundColor3 = Theme.RedHover }) end)
-	ExitButton.MouseLeave:Connect(function() Custom:Tween(ExitButton, 0.2, { BackgroundColor3 = Theme.Red }) end)
+	Custom:Corner(ExitButton, 4)
+	ExitButton.MouseEnter:Connect(function() ExitButton.BackgroundColor3 = Theme.Selected end)
+	ExitButton.MouseLeave:Connect(function() ExitButton.BackgroundColor3 = Theme.Off end)
 
 	local ExitBusy = false
 	local function ShowExitConfirm()
 		if ExitBusy then return end
 		ExitBusy = true
-		ExitBackdrop.BackgroundTransparency = 1
-		ExitScale.Scale = 0.8
+		ExitBackdrop.BackgroundTransparency = 0.55
 		ExitBackdrop.Visible = true
 		ExitConfirm.Visible = true
-		Custom:Tween(ExitBackdrop, 0.2, { BackgroundTransparency = 0.45 })
-		Custom:Tween(ExitScale, 0.25, { Scale = 1 }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 	end
 	local function HideExitConfirm()
-		Custom:Tween(ExitBackdrop, 0.15, { BackgroundTransparency = 1 })
-		local Shrink = Custom:Tween(ExitScale, 0.15, { Scale = 0.85 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-		Shrink.Completed:Wait()
 		ExitConfirm.Visible = false
 		ExitBackdrop.Visible = false
 		ExitBusy = false
@@ -3860,18 +3929,15 @@ function Rexxzy_Library:CreateWindow(Config)
 	end
 
 	CancelButton.Activated:Connect(function()
-		CircleClick(CancelButton)
 		task.spawn(HideExitConfirm)
 	end)
 	ExitButton.Activated:Connect(function()
-		CircleClick(ExitButton)
 		task.spawn(function()
 			HideExitConfirm()
 			Cleanup()
 		end)
 	end)
 	Close.Activated:Connect(function()
-		CircleClick(Close)
 		ShowExitConfirm()
 	end)
 
@@ -3899,19 +3965,19 @@ function Rexxzy_Library:CreateWindow(Config)
 	local ActiveTab = nil
 	local TabOrder = 0
 
-	-- Compact clean layout revision: smaller default scale, tighter spacing, flat colors, and static interactions.
+	-- Compact layout revision: reduced control heights, footer Discord link, live FPS/PING, and plain dialogs.
 -- Generic visual category header. Call it where needed; names such as CORE/TOOLS
 	-- are supplied by the library user and are not built-in navigation entries.
 	function Funcs:AddTabDivider(DividerText)
 		TabOrder = TabOrder + 1
 		local DF = Custom:Create("Frame", {
-			BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 24),
+			BackgroundTransparency = 1, BorderSizePixel = 0, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 18),
 			Name = "TabCategoryHeader",
 		}, ScrollTab)
 		Custom:Label(DF, {
 			Font = Enum.Font.GothamBold, Text = string.upper(tostring(DividerText or "")),
 			TextColor3 = Theme.Sub, TextSize = 9,
-			Position = UDim2.new(0, 10, 0, 6), Size = UDim2.new(1, -18, 0, 12), Name = "CategoryLabel",
+			Position = UDim2.new(0, 8, 0, 3), Size = UDim2.new(1, -16, 0, 12), Name = "CategoryLabel",
 		})
 		return DF
 	end
@@ -3934,61 +4000,56 @@ function Rexxzy_Library:CreateWindow(Config)
 		local TSz = TextService:GetTextSize(DText, 11, Enum.Font.Gotham, Vector2.new(206, 1000))
 		local DH = 34 + TSz.Y + 12 + 28 + 12
 
-		local DBackdrop = Custom:Create("Frame", {
-			Active = true, BackgroundColor3 = Theme.Black, BackgroundTransparency = 1, BorderSizePixel = 0,
-			Size = UDim2.new(1, 0, 1, 0), ZIndex = 59, Name = "DialogBackdrop",
+		local DBackdrop = Custom:Create("TextButton", {
+			Text = "", AutoButtonColor = false, Active = true, BackgroundColor3 = Theme.Black,
+			BackgroundTransparency = 0.55, BorderSizePixel = 0, Size = UDim2.new(1, 0, 1, 0),
+			ZIndex = 59, Name = "DialogBackdrop",
 		}, Main)
 		local DFrame = Custom:Create("Frame", {
-			AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Black, BorderSizePixel = 0,
-			Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 230, 0, DH), ZIndex = 60, Name = "DialogFrame",
+			AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = Theme.Panel, BorderSizePixel = 0,
+			Position = UDim2.new(0.5, 0, 0.5, 0), Size = UDim2.new(0, 220, 0, DH), ZIndex = 60, Name = "DialogFrame",
 		}, Main)
-		Custom:Corner(DFrame, 10)
-		Custom:Stroke(DFrame, Theme.White, 0.6, 1)
-		local DScale = Custom:Create("UIScale", { Scale = 0.85 }, DFrame)
-		Custom:Tween(DBackdrop, 0.2, { BackgroundTransparency = 0.45 })
-		Custom:Tween(DScale, 0.25, { Scale = 1 }, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+		Custom:Corner(DFrame, 5)
+		Custom:Stroke(DFrame, Theme.Border, 0.35, 1)
 		Custom:Label(DFrame, {
-			Text = DTitle, TextColor3 = Theme.White, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Center,
-			Size = UDim2.new(1, 0, 0, 30), Name = "DialogTitle",
+			Text = DTitle, TextColor3 = Theme.White, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left,
+			Position = UDim2.new(0, 12, 0, 0), Size = UDim2.new(1, -24, 0, 28), Name = "DialogTitle",
 		})
 		Custom:Label(DFrame, {
-			Font = Enum.Font.Gotham, Text = DText, TextColor3 = Theme.Sub, TextSize = 11, TextWrapped = true,
-			TextXAlignment = Enum.TextXAlignment.Center, TextYAlignment = Enum.TextYAlignment.Top,
-			Position = UDim2.new(0, 12, 0, 32), Size = UDim2.new(1, -24, 0, TSz.Y + 2), Name = "DialogText",
+			Font = Enum.Font.Gotham, Text = DText, TextColor3 = Theme.Sub, TextSize = 10, TextWrapped = true,
+			TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top,
+			Position = UDim2.new(0, 12, 0, 29), Size = UDim2.new(1, -24, 0, TSz.Y + 2), Name = "DialogText",
 		})
 		local Closing = false
 		local function CloseDialog()
 			if Closing then return end
 			Closing = true
-			Custom:Tween(DBackdrop, 0.15, { BackgroundTransparency = 1 })
-			local Shrink = Custom:Tween(DScale, 0.15, { Scale = 0.85 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-			Shrink.Completed:Wait()
 			DBackdrop:Destroy()
 			DFrame:Destroy()
 		end
+		DBackdrop.Activated:Connect(CloseDialog)
 		local Count = #Btns
 		local Row = Custom:Create("Frame", {
-			BackgroundTransparency = 1, BorderSizePixel = 0, Position = UDim2.new(0, 12, 1, -40),
-			Size = UDim2.new(1, -24, 0, 28), Name = "DialogButtons",
+			BackgroundTransparency = 1, BorderSizePixel = 0, Position = UDim2.new(0, 12, 1, -36),
+			Size = UDim2.new(1, -24, 0, 24), Name = "DialogButtons",
 		}, DFrame)
 		Custom:Create("UIListLayout", {
-			FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6),
+			FillDirection = Enum.FillDirection.Horizontal, SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 5),
 		}, Row)
 		for i, B in ipairs(Btns) do
 			local BName = tostring(B[1] or B.Name or "OK")
 			local BCallback = B[2] or B.Callback
 			local Danger = B.Danger == true or B[3] == true
 			local Button = Custom:Create("TextButton", {
-				Font = Enum.Font.GothamBold, Text = BName, TextColor3 = Danger and Theme.White or Theme.Text, TextSize = 11,
-				AutoButtonColor = false, BackgroundColor3 = Danger and Theme.Red or Theme.White,
-				BackgroundTransparency = Danger and 0 or 0.9, BorderSizePixel = 0, ClipsDescendants = true, LayoutOrder = i,
-				Size = UDim2.new(1 / Count, -math.ceil(6 * (Count - 1) / Count), 0, 28),
+				Font = Enum.Font.GothamBold, Text = BName, TextColor3 = Theme.Text, TextSize = 10,
+				AutoButtonColor = false, BackgroundColor3 = Danger and Theme.Off or Theme.Field,
+				BackgroundTransparency = 0, BorderSizePixel = 0, ClipsDescendants = true, LayoutOrder = i,
+				Size = UDim2.new(1 / Count, -math.ceil(5 * (Count - 1) / Count), 0, 24),
 				Name = "DialogButton_" .. BName,
 			}, Row)
-			Custom:Corner(Button, 7)
-			if not Danger then Custom:Stroke(Button, Theme.White, 0.8, 1) end
+			Custom:Corner(Button, 4)
+			Custom:Stroke(Button, Theme.Border, 0.45, 1)
 			Button.Activated:Connect(function()
-				CircleClick(Button)
 				if BCallback then task.spawn(BCallback) end
 				task.spawn(CloseDialog)
 			end)
@@ -4470,7 +4531,7 @@ function Rexxzy_Library:CreateWindow(Config)
 		TabOrder = TabOrder + 1
 		local TabBtn = Custom:Create("TextButton", {
 			Text = "", AutoButtonColor = false, BackgroundTransparency = 1, BorderSizePixel = 0,
-			ClipsDescendants = true, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 41), Name = TabName .. "TabBtn",
+			ClipsDescendants = true, LayoutOrder = TabOrder, Size = UDim2.new(1, 0, 0, 34), Name = TabName .. "TabBtn",
 		}, ScrollTab)
 		Custom:Corner(TabBtn, 7)
 		local TabStroke = Custom:Stroke(TabBtn, Theme.Border, 0.72, 1)
@@ -4486,15 +4547,15 @@ function Rexxzy_Library:CreateWindow(Config)
 		}, TabBtn)
 		Custom:Round(TabIndicator)
 		local TabIconImg = Custom:MakeIcon(TabBtn, TabIcon, {
-			AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 10, 0.5, 0), Size = UDim2.new(0, 19, 0, 19),
+			AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 10, 0.5, 0), Size = UDim2.new(0, 16, 0, 16),
 			Color = Theme.Sub, Name = "TabIcon",
 		})
 		local HasIcon = TabIconImg ~= nil
 		local TabLabel = Custom:Label(TabBtn, {
-			Text = TabName, TextColor3 = Theme.Sub, TextSize = 12, Font = Enum.Font.GothamSemibold,
+			Text = TabName, TextColor3 = Theme.Sub, TextSize = 11, Font = Enum.Font.GothamSemibold,
 			TextTruncate = Enum.TextTruncate.AtEnd,
-			Position = UDim2.new(0, HasIcon and 39 or 14, 0, 0),
-			Size = UDim2.new(1, HasIcon and -54 or -22, 1, 0), Name = "TabLabel",
+			Position = UDim2.new(0, HasIcon and 34 or 12, 0, 0),
+			Size = UDim2.new(1, HasIcon and -46 or -20, 1, 0), Name = "TabLabel",
 		})
 		local TabActiveDot = Custom:Create("Frame", {
 			AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -12, 0.5, 0),
@@ -4510,8 +4571,8 @@ function Rexxzy_Library:CreateWindow(Config)
 			ScrollBarImageColor3 = Theme.White, ScrollBarImageTransparency = 0.6,
 			Name = TabName .. "Frame", Visible = false,
 		}, LayersReal)
-		Custom:Create("UIListLayout", { Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder }, TabFrame)
-		Custom:Create("UIPadding", { PaddingTop = UDim.new(0, 9), PaddingBottom = UDim.new(0, 14), PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 10) }, TabFrame)
+		Custom:Create("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder }, TabFrame)
+		Custom:Create("UIPadding", { PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 8), PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 6) }, TabFrame)
 
 		local TabFuncs = { Frame = TabFrame, Button = TabBtn, Name = TabName }
 
@@ -4582,19 +4643,19 @@ function Rexxzy_Library:CreateWindow(Config)
 				LayoutOrder = #TabFrame:GetChildren(), Name = SectionName .. "Section",
 			}, TabFrame)
 			Custom:Create("UIListLayout", {
-				Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder,
+				Padding = UDim.new(0, 3), SortOrder = Enum.SortOrder.LayoutOrder,
 			}, SectionFrame)
 
 			local Header = Custom:Create("TextButton", {
 				Text = "", AutoButtonColor = false, BackgroundTransparency = 1, BorderSizePixel = 0,
-				LayoutOrder = 1, Size = UDim2.new(1, 0, 0, 25), Name = "Header",
+				LayoutOrder = 1, Size = UDim2.new(1, 0, 0, 21), Name = "Header",
 			}, SectionFrame)
 			local SectionIcon = Custom:MakeIcon(Header, SectionConfig.Icon or "sliders-horizontal", {
 				AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 2, 0.5, 0),
-				Size = UDim2.new(0, 17, 0, 17), Color = Theme.White, Name = "SectionIcon",
+				Size = UDim2.new(0, 15, 0, 15), Color = Theme.White, Name = "SectionIcon",
 			})
 			local HeaderLabel = Custom:Label(Header, {
-				Text = SectionName, TextColor3 = Theme.White, TextSize = 12,
+				Text = SectionName, TextColor3 = Theme.White, TextSize = 11,
 				Font = Enum.Font.GothamBold, TextTruncate = Enum.TextTruncate.AtEnd,
 				Position = UDim2.new(0, 26, 0, 0), Size = UDim2.new(1, -52, 1, 0), Name = "SectionTitle",
 			})
@@ -4623,8 +4684,8 @@ function Rexxzy_Library:CreateWindow(Config)
 				Padding = UDim.new(0, 0), SortOrder = Enum.SortOrder.LayoutOrder,
 			}, SectionContent)
 			Custom:Create("UIPadding", {
-				PaddingLeft = UDim.new(0, 7), PaddingRight = UDim.new(0, 7),
-				PaddingBottom = UDim.new(0, 5), PaddingTop = UDim.new(0, 5),
+				PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 5),
+				PaddingBottom = UDim.new(0, 3), PaddingTop = UDim.new(0, 3),
 			}, SectionContent)
 
 			local SectionOpen = true
@@ -4660,11 +4721,11 @@ function Rexxzy_Library:CreateWindow(Config)
 			local SecFuncs = {}
 
 			local function AddLeadingIcon(Parent, Source, PixelSize, IconName)
-				PixelSize = tonumber(PixelSize) or 36
+				PixelSize = tonumber(PixelSize) or 32
 				local Tile = Custom:Create("Frame", {
 					BackgroundColor3 = Theme.Field, BackgroundTransparency = 0.08, BorderSizePixel = 0,
 					AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 8, 0.5, 0),
-					Size = UDim2.new(0, math.max(28, PixelSize - 3), 0, math.max(28, PixelSize - 3)), Name = "LeadingIconTile",
+					Size = UDim2.new(0, math.max(24, PixelSize - 3), 0, math.max(24, PixelSize - 3)), Name = "LeadingIconTile",
 				}, Parent)
 				Custom:Corner(Tile, 8)
 				Custom:Stroke(Tile, Theme.Border, 0.4, 1)
@@ -4673,7 +4734,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				if IconName ~= "BtnTileIcon" then
 					IconObj = Custom:MakeIcon(Tile, Source or "circle", {
 						AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.5, 0),
-						Size = UDim2.new(0, math.floor(PixelSize * 0.52), 0, math.floor(PixelSize * 0.52)),
+						Size = UDim2.new(0, math.floor(PixelSize * 0.48), 0, math.floor(PixelSize * 0.48)),
 						Color = Theme.White, Name = IconName or "LeadingIcon",
 					})
 				end
@@ -4690,17 +4751,17 @@ function Rexxzy_Library:CreateWindow(Config)
 				end
 				ButtonDesc = tostring(ButtonDesc)
 				local HasDesc = ButtonDesc ~= ""
-				local Btn, BtnStroke = Custom:Card(SectionContent, HasDesc and 60 or 48, ButtonName .. "Btn", true)
+				local Btn, BtnStroke = Custom:Card(SectionContent, HasDesc and 48 or 40, ButtonName .. "Btn", true)
 				Place(Btn)
 				local BtnIconSrc = ButtonConfig.Icon
 				if BtnIconSrc == nil then BtnIconSrc = "mouse-pointer" end
 				local HasLeading = BtnIconSrc ~= false and BtnIconSrc ~= ""
 				local BtnTile
 				if HasLeading then
-					BtnTile = AddLeadingIcon(Btn, BtnIconSrc, 38, "BtnTileIcon")
+					BtnTile = AddLeadingIcon(Btn, BtnIconSrc, 32, "BtnTileIcon")
 				end
 				local BtnLabel = Custom:Label(Btn, {
-					Text = ButtonName, TextTruncate = Enum.TextTruncate.AtEnd, TextSize = 13,
+					Text = ButtonName, TextTruncate = Enum.TextTruncate.AtEnd, TextSize = 12,
 					Position = UDim2.new(0, HasLeading and 58 or 12, 0, HasDesc and 8 or 0),
 					Size = UDim2.new(1, HasLeading and -78 or -40, 0, 16), Name = "BtnLabel",
 				})
@@ -4735,7 +4796,7 @@ function Rexxzy_Library:CreateWindow(Config)
 					if BtnIconObj then BtnIconObj.Destroy() BtnIconObj = nil end
 					if BtnTile then BtnTile.Visible = Src ~= nil and Src ~= false and Src ~= "" end
 					if Src and Src ~= "" then
-						if not BtnTile then BtnTile = AddLeadingIcon(Btn, Src, 38, "BtnTileIcon") end
+						if not BtnTile then BtnTile = AddLeadingIcon(Btn, Src, 32, "BtnTileIcon") end
 						BtnIconObj = Custom:MakeIcon(Btn, Src, { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0, 28, 0.5, 0), Size = UDim2.new(0, 20, 0, 20), Color = Theme.White, Name = "BtnIcon" })
 					end
 				end }
@@ -4748,9 +4809,9 @@ function Rexxzy_Library:CreateWindow(Config)
 				local ToggleDesc = ToggleConfig.Content or ToggleConfig.Description or ToggleConfig[4]
 				local HasDesc = type(ToggleDesc) == "string" and ToggleDesc ~= ""
 				Default = Default and true or false
-				local ToggleFrame, ToggleStroke = Custom:Card(SectionContent, HasDesc and 60 or 48, ToggleName .. "Toggle", true)
+				local ToggleFrame, ToggleStroke = Custom:Card(SectionContent, HasDesc and 48 or 40, ToggleName .. "Toggle", true)
 				Place(ToggleFrame)
-				AddLeadingIcon(ToggleFrame, ToggleConfig.Icon or "toggle-right", 38, "ToggleIcon")
+				AddLeadingIcon(ToggleFrame, ToggleConfig.Icon or "toggle-right", 32, "ToggleIcon")
 				local ToggleLabel = Custom:Label(ToggleFrame, {
 					Text = ToggleName, TextTruncate = Enum.TextTruncate.AtEnd,
 					Position = UDim2.new(0, 58, 0, HasDesc and 8 or 0), Size = UDim2.new(1, -130, 0, 16), Name = "ToggleLabel",
@@ -4839,9 +4900,9 @@ function Rexxzy_Library:CreateWindow(Config)
 					return math.clamp((v - MinVal) / Range, 0, 1)
 				end
 
-				local SliderFrame, SliderStroke = Custom:Card(SectionContent, 66, SliderName .. "Slider", false)
+				local SliderFrame, SliderStroke = Custom:Card(SectionContent, 54, SliderName .. "Slider", false)
 				Place(SliderFrame)
-				AddLeadingIcon(SliderFrame, SliderConfig.Icon or "sliders-horizontal", 38, "SliderIcon")
+				AddLeadingIcon(SliderFrame, SliderConfig.Icon or "sliders-horizontal", 32, "SliderIcon")
 				Custom:Label(SliderFrame, {
 					Text = SliderName, TextTruncate = Enum.TextTruncate.AtEnd,
 					Position = UDim2.new(0, 58, 0, 7), Size = UDim2.new(1, -126, 0, 15), Name = "SliderLabel",
@@ -4932,9 +4993,9 @@ function Rexxzy_Library:CreateWindow(Config)
 				local Placeholder = InputConfig[2] or InputConfig.Placeholder or "Enter text..."
 				local Default = InputConfig[3] or InputConfig.Default or ""
 				local Callback = InputConfig[4] or InputConfig.Callback or function() end
-				local InputFrame, InputStroke = Custom:Card(SectionContent, 66, InputName .. "Input", false)
+				local InputFrame, InputStroke = Custom:Card(SectionContent, 54, InputName .. "Input", false)
 				Place(InputFrame)
-				AddLeadingIcon(InputFrame, InputConfig.Icon or "keyboard", 38, "InputIcon")
+				AddLeadingIcon(InputFrame, InputConfig.Icon or "keyboard", 32, "InputIcon")
 				Custom:Label(InputFrame, {
 					Text = InputName, TextTruncate = Enum.TextTruncate.AtEnd,
 					Position = UDim2.new(0, 58, 0, 5), Size = UDim2.new(1, -70, 0, 14), Name = "InputLabel",
@@ -4984,7 +5045,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local DeleteIcon = DropdownConfig.DeleteIcon or "trash"
 				local EmptyText = DropdownConfig.Empty
 
-				local HEAD, ROW, MAXLIST, FILTERH = 40, 30, 148, 30
+				local HEAD, ROW, MAXLIST, FILTERH = 36, 27, 132, 26
 				local DropdownFrame, DropdownStroke = Custom:Card(SectionContent, HEAD, DropdownName .. "Dropdown", false)
 				Place(DropdownFrame)
 				DropdownFrame.ClipsDescendants = true
@@ -5348,7 +5409,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local InputFrame, InputStroke = Custom:Card(SectionContent, CardHeight, MultiInputName .. "MultiInput", false)
 				Place(InputFrame)
 				InputFrame.ClipsDescendants = true
-				AddLeadingIcon(InputFrame, MultiInputConfig.Icon or "list-plus", 38, "MultiInputIcon")
+				AddLeadingIcon(InputFrame, MultiInputConfig.Icon or "list-plus", 32, "MultiInputIcon")
 				Custom:Label(InputFrame, {
 					Text = MultiInputName, TextTruncate = Enum.TextTruncate.AtEnd,
 					Position = UDim2.new(0, 58, 0, 6), Size = UDim2.new(1, -70, 0, 16), Name = "MultiInputTitle",
@@ -5444,7 +5505,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local DefaultKey = KeybindConfig[2] or KeybindConfig.Default or Enum.KeyCode.E
 				local Callback = KeybindConfig[3] or KeybindConfig.Callback or function() end
 				if type(DefaultKey) == "string" then DefaultKey = Enum.KeyCode[DefaultKey] or Enum.KeyCode.E end
-				local KeybindFrame, KeybindStroke = Custom:Card(SectionContent, 48, KeybindName .. "Keybind", false)
+				local KeybindFrame, KeybindStroke = Custom:Card(SectionContent, 40, KeybindName .. "Keybind", false)
 				Place(KeybindFrame)
 				AddLeadingIcon(KeybindFrame, KeybindConfig.Icon or "keyboard", 34, "KeybindIcon")
 				Custom:Label(KeybindFrame, {
@@ -5514,10 +5575,10 @@ function Rexxzy_Library:CreateWindow(Config)
 				end
 				local BlockName = Config[1] or Config.Title or DefaultTitle
 				local BlockText = Config[2] or Config.Text or ""
-				local Frame = Custom:Card(SectionContent, 48, BlockName .. Tag, false)
+				local Frame = Custom:Card(SectionContent, 40, BlockName .. Tag, false)
 				Place(Frame)
 				Frame.AutomaticSize = Enum.AutomaticSize.Y
-				AddLeadingIcon(Frame, (type(Config) == "table" and Config.Icon) or (Tag == "ReadMe" and "book-open" or "info"), 38, Tag .. "Icon")
+				AddLeadingIcon(Frame, (type(Config) == "table" and Config.Icon) or (Tag == "ReadMe" and "book-open" or "info"), 32, Tag .. "Icon")
 				Custom:Create("UIListLayout", { Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder }, Frame)
 				Custom:Create("UIPadding", {
 					PaddingTop = UDim.new(0, 6), PaddingBottom = UDim.new(0, 7), PaddingLeft = UDim.new(0, 56), PaddingRight = UDim.new(0, 10),
@@ -5594,7 +5655,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local SocialName = SocialConfig[1] or SocialConfig.Name or "Social"
 				local SocialUrl = SocialConfig[2] or SocialConfig.Url or ""
 				local SocialIcon = SocialConfig[3] or SocialConfig.Icon or ""
-				local SF, SStroke = Custom:Card(SectionContent, 48, SocialName .. "Social", true)
+				local SF, SStroke = Custom:Card(SectionContent, 40, SocialName .. "Social", true)
 				Place(SF)
 				AddLeadingIcon(SF, SocialIcon ~= "" and SocialIcon or "external-link", 34, "SocialIcon")
 				Custom:Label(SF, {
@@ -5618,7 +5679,7 @@ function Rexxzy_Library:CreateWindow(Config)
 			function SecFuncs:AddCopyGroup(CopyConfig)
 				local CopyName = CopyConfig[1] or CopyConfig.Name or "Copy Group"
 				local CopyText = CopyConfig[2] or CopyConfig.Text or ""
-				local CF, CStroke = Custom:Card(SectionContent, 48, CopyName .. "Copy", false)
+				local CF, CStroke = Custom:Card(SectionContent, 40, CopyName .. "Copy", false)
 				Place(CF)
 				AddLeadingIcon(CF, CopyConfig.Icon or "copy", 34, "CopyIcon")
 				Custom:Label(CF, {
@@ -5652,7 +5713,7 @@ function Rexxzy_Library:CreateWindow(Config)
 				local CPName = CPConfig[1] or CPConfig.Name or "Color"
 				local Default = AsColor(CPConfig[2] or CPConfig.Default) or Color3.fromRGB(255, 255, 255)
 				local Callback = CPConfig[3] or CPConfig.Callback or function() end
-				local CPFrame, CPStroke = Custom:Card(SectionContent, 48, CPName .. "ColorPicker", true)
+				local CPFrame, CPStroke = Custom:Card(SectionContent, 40, CPName .. "ColorPicker", true)
 				Place(CPFrame)
 				AddLeadingIcon(CPFrame, CPConfig.Icon or "pipette", 34, "ColorPickerIcon")
 				Custom:Label(CPFrame, {
@@ -5885,9 +5946,9 @@ function Rexxzy_Library:CreateWindow(Config)
 				local PDefault = PConfig[2] or PConfig.Default or 0
 				local PMax = PConfig[3] or PConfig.Max or 100
 				if PMax <= 0 then PMax = 100 end
-				local PF, PStroke = Custom:Card(SectionContent, 54, PName .. "Progress", false)
+				local PF, PStroke = Custom:Card(SectionContent, 44, PName .. "Progress", false)
 				Place(PF)
-				AddLeadingIcon(PF, PConfig.Icon or "chart-no-axes-column-increasing", 36, "ProgressIcon")
+				AddLeadingIcon(PF, PConfig.Icon or "chart-no-axes-column-increasing", 30, "ProgressIcon")
 				Custom:Label(PF, {
 					Text = PName, TextTruncate = Enum.TextTruncate.AtEnd,
 					Position = UDim2.new(0, 56, 0, 4), Size = UDim2.new(1, -116, 0, 14), Name = "ProgressLabel",
